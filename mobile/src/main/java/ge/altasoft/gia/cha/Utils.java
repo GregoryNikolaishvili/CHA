@@ -16,10 +16,10 @@ import java.util.Locale;
 
 public class Utils {
 
-    public final static boolean DEBUG_LIGHT = false;
+    public final static boolean DEBUG_LIGHT = true;
     public final static boolean DEBUG_THEROSTAT = true;
 
-    public static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
+    static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
 
     public static final long TemperatureSensorAnalyzeSeconds = 10;
 
@@ -33,9 +33,7 @@ public class Utils {
         StringBuilder sb = new StringBuilder();
         boolean prevCharIsEscape = false;
         char[] carr = encodedName.toCharArray();
-        for (int i = 0; i < carr.length; i++) {
-            char c = carr[i];
-
+        for (char c : carr) {
             if (c == '~') {
                 prevCharIsEscape = true;
                 continue;
@@ -54,8 +52,7 @@ public class Utils {
         StringBuilder sb = new StringBuilder();
 
         char[] carr = name.toCharArray();
-        for (int i = 0; i < carr.length; i++) {
-            char c = carr[i];
+        for (char c : carr) {
             if (c == ';')
                 sb.append(':');
             else if (c == '~')
@@ -70,7 +67,7 @@ public class Utils {
         return sb.toString();
     }
 
-    public static String GetNetworkInfo(Context context) {
+    static String GetNetworkInfo(Context context) {
         if (Debug.isDebuggerConnected())
             return "Inside Debugger";
 
@@ -105,7 +102,7 @@ public class Utils {
         return wifiInfo.getSSID().trim().equals("\"GIA\"") || wifiInfo.getSSID().trim().equals("\"GIA2\"");
     }
 
-    public static void ConfirmDialog(Context context, String title, String message, final Runnable positiveAction, final Runnable negativeAction) {
+    static void ConfirmDialog(Context context, String title, String message, final Runnable positiveAction, final Runnable negativeAction) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
