@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings">
+
+    <PreferenceCategory android:title="Light">
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="192.168.2.9"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="light_controller_ip"
+            android:summary="%s"
+            android:title="IP address" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="10"
+            android:inputType="number"
+            android:key="light_controller_polling"
+            android:summary="%s sec"
+            android:title="Polling interval" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Thermostat">
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="192.168.2.8"
+            android:digits="0123456789."
+            android:inputType="numberDecimal"
+            android:key="thermostat_controller_ip"
+            android:summary="%s"
+            android:title="IP address" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="10"
+            android:inputType="number"
+            android:key="thermostat_controller_polling"
+            android:summary="%s sec"
+            android:title="Polling interval" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
+

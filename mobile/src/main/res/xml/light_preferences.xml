@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings">
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="automatic_mode"
+        android:summary="Select automatic or manual mode of operation"
+        android:title="Automatic mode" />
+
+    <PreferenceCategory
+        android:key="Relays"
+        android:title="Relays" />
+
+</PreferenceScreen>
+

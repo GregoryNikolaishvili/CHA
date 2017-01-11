@@ -1,0 +1,73 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ge.altasoft.gia.cha.MainActivity">
+
+
+    <item
+        android:id="@+id/action_ok"
+        android:orderInCategory="0"
+        android:title="@string/action_ok"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_cancel"
+        android:orderInCategory="0"
+        android:title="@string/action_cancel"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="3"
+        android:title="@string/action_refresh"
+        app:showAsAction="ifRoom" />
+
+    <group android:id="@+id/grp1">
+        <item
+            android:id="@+id/action_show_info"
+            android:orderInCategory="10"
+            android:title="@string/action_show_info"
+            app:showAsAction="never" />
+
+    </group>
+
+    <group android:id="@+id/grp2">
+        <item
+            android:id="@+id/action_light_reorder"
+            android:orderInCategory="200"
+            android:title="@string/action_reorder"
+            app:showAsAction="never" />
+    </group>
+
+    <group android:id="@+id/grp3">
+
+        <item
+            android:orderInCategory="150"
+            android:title="@string/action_settings"
+            app:showAsAction="never">
+
+            <menu>
+                <item
+                    android:id="@+id/action_settings"
+                    android:orderInCategory="20"
+                    android:title="@string/action_settings"
+                    app:showAsAction="never" />
+
+                <item
+                    android:id="@+id/action_light_settings"
+                    android:orderInCategory="100"
+                    android:title="@string/action_light_settings"
+                    app:showAsAction="never" />
+
+                <item
+                    android:id="@+id/action_thermostat_settings"
+                    android:orderInCategory="110"
+                    android:title="@string/action_thermostat_settings"
+                    app:showAsAction="never" />
+
+            </menu>
+        </item>
+    </group>
+</menu>

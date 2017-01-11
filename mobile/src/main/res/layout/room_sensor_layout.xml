@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/sensor_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Sensor"
+        android:textColor="@android:color/tab_indicator_text" />
+
+    <TextView
+        android:id="@+id/temperature_value"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/sensor_name"
+        android:gravity="right"
+        android:text="25.5"
+        android:textColor="@android:color/tab_indicator_text" />
+
+    <TextView
+        android:id="@+id/temperature_trend"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/sensor_name"
+        android:layout_marginLeft="2dp"
+        android:gravity="left"
+        android:textColor="@android:color/tab_indicator_text" />
+
+    <TextView
+        android:id="@+id/humidity_value"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_toRightOf="@+id/temperature_trend"
+        android:gravity="right"
+        android:text="80 %"
+        android:textColor="@android:color/tab_indicator_text" />
+</merge>

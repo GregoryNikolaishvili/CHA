@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/boilerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/boiler_background">
+
+    <ge.altasoft.gia.cha.views.BoilerSensorView
+        android:id="@+id/boilerSensorSolarPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center" />
+
+    <ge.altasoft.gia.cha.views.BoilerSensorView
+        android:id="@+id/boilerSensorTankTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="140dp"
+        android:gravity="center_horizontal" />
+
+    <ge.altasoft.gia.cha.views.BoilerSensorView
+        android:id="@+id/boilerSensorTankBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="220dp"
+        android:gravity="center_horizontal" />
+
+    <ge.altasoft.gia.cha.views.BoilerSensorView
+        android:id="@+id/boilerSensorRoom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="right" />
+
+    <ge.altasoft.gia.cha.views.BoilerPumpView
+        android:id="@+id/boilerPumpSolarPanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp" />
+
+    <ge.altasoft.gia.cha.views.BoilerPumpView
+        android:id="@+id/boilerPumpHeating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp" />
+
+</RelativeLayout>
