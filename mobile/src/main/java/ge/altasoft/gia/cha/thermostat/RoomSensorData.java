@@ -1,6 +1,6 @@
 package ge.altasoft.gia.cha.thermostat;
 
-import android.graphics.Color;
+import android.support.annotation.NonNull;
 
 import java.util.Locale;
 
@@ -14,7 +14,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     private double H;
     private String name;
 
-    public RoomSensorData(int id) {
+    RoomSensorData(int id) {
         super(id);
 
         H = 99;
@@ -29,11 +29,11 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return this.H;
     }
 
-    public void setRoomSensorView(RoomSensorView roomSensorView) {
+    void setRoomSensorView(RoomSensorView roomSensorView) {
         this.roomSensorView = roomSensorView;
     }
 
-    public void encodeOrderAndName(StringBuilder sb2) {
+    void encodeOrderAndName(StringBuilder sb2) {
         sb2.append(String.format(Locale.US, "%02X", this.id));
         sb2.append(String.format(Locale.US, "%01X", this.order));
         sb2.append(Utils.EncodeArduinoString(name));
@@ -41,16 +41,16 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
 
     }
 
-    public void decodeOrderAndName(String s) {
+    void decodeOrderAndName(String s) {
         order = Character.digit(s.charAt(2), 16);
         name = Utils.DecodeArduinoString(s.substring(3));
     }
 
-    public void encodeState(StringBuilder sb) {
+    void encodeState(StringBuilder sb) {
         sb.append(String.format(Locale.US, "%02X%04X%c%04X", id, ((Double) (getTemperature() * 10)).intValue(), temperatureTrend, ((Double) (H * 10)).intValue()));
     }
 
-    public int decodeState(String value, int idx) {
+    int decodeState(String value, int idx) {
         setTemperature(Integer.parseInt(value.substring(idx + 2, idx + 6), 16) / 10.0);
         temperatureTrend = value.charAt(idx + 6);
         H = Integer.parseInt(value.substring(idx + 7, idx + 11), 16) / 10.0;
@@ -65,7 +65,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
 
 
     @Override
-    public int compareTo(RoomSensorData o) {
+    public int compareTo(@NonNull RoomSensorData o) {
         if (Integer.valueOf(this.order).equals(o.order)) {
             return Integer.valueOf(this.id).compareTo(o.id);
         } else {

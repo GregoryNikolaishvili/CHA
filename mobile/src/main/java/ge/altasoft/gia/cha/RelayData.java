@@ -1,5 +1,7 @@
 package ge.altasoft.gia.cha;
 
+import android.support.annotation.NonNull;
+
 import java.util.Locale;
 
 public abstract class RelayData implements Comparable<RelayData> {
@@ -48,7 +50,7 @@ public abstract class RelayData implements Comparable<RelayData> {
     public void decodeOrderAndName(String s) {
         order = Character.digit(s.charAt(0), 16);
         name = Utils.DecodeArduinoString(s.substring(1));
-        if (name == "")
+        if (name.equals(""))
             name = "Relay #" + order;
     }
 
@@ -80,11 +82,11 @@ public abstract class RelayData implements Comparable<RelayData> {
     }
 
     @Override
-    public int compareTo(RelayData o) {
-        if (Integer.valueOf(this.order).equals(Integer.valueOf(o.order))) {
-            return Integer.valueOf(this.id).compareTo(Integer.valueOf(o.id));
+    public int compareTo(@NonNull RelayData o) {
+        if (Integer.valueOf(this.order).equals(o.order)) {
+            return Integer.valueOf(this.id).compareTo(o.id);
         } else {
-            return Integer.valueOf(this.order).compareTo(Integer.valueOf(o.order));
+            return Integer.valueOf(this.order).compareTo(o.order);
         }
     }
 }

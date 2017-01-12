@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 
     <TextView
         android:id="@+id/relay_name"
@@ -31,4 +34,4 @@
         android:layout_weight="0"
         android:background="@drawable/on_off_toggle_button"
         android:enabled="false" />
-</merge>
+</LinearLayout>

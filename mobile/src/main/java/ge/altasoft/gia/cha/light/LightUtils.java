@@ -14,7 +14,6 @@ import ge.altasoft.gia.cha.Utils;
 public final class LightUtils {
 
     public static String LocalIP = "192.168.2.9";
-    public static String ExternalIP = "178.134.95.18";
     public final static int ServerPort = 80;
     public static int REFRESH_TIMEOUT = 5; //sec
 
@@ -38,7 +37,7 @@ public final class LightUtils {
         if ((activeNetwork == null) || (!activeNetwork.isConnected()))
             return null;
 
-        String externalUrl = ExternalIP;
+        String externalUrl = "178.134.95.18";
 
         if (activeNetwork.getType() != ConnectivityManager.TYPE_WIFI)
             return externalUrl;

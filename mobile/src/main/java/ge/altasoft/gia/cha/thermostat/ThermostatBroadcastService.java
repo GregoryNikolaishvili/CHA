@@ -75,7 +75,7 @@ public class ThermostatBroadcastService extends Service {
         protected String doInBackground(String... args) {
             String response = null;
 
-            if (Utils.DEBUG_THEROSTAT) {
+            if (Utils.DEBUG_THERMOSTAT) {
                 if (args[0].startsWith("#")) {
                     ThermostatControllerData.Instance.relays(Integer.parseInt(String.valueOf(args[0].charAt(1)), 16) - 1)._setIsOn(args[0].charAt(2) == '1');
                     response = ThermostatControllerData.Instance.encodeState();

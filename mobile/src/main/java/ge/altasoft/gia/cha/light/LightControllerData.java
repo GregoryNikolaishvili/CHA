@@ -2,13 +2,11 @@ package ge.altasoft.gia.cha.light;
 
 import android.content.SharedPreferences;
 import android.util.Log;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-
 import ge.altasoft.gia.cha.RelayControllerData;
-import ge.altasoft.gia.cha.Utils;
+
 
 public final class LightControllerData extends RelayControllerData {
 
@@ -35,16 +33,16 @@ public final class LightControllerData extends RelayControllerData {
         return (LightRelayData) super.relays(index);
     }
 
-    public short getSunriseMin() {
+    short getSunriseMin() {
         return this.sunriseMin;
     }
 
-    public short getSunsetMin() {
+    short getSunsetMin() {
         return this.sunsetMin;
     }
 
 
-    public String encodeState() {
+    String encodeState() {
         StringBuilder sb = new StringBuilder();
 
         sb.append('$');
@@ -93,7 +91,7 @@ public final class LightControllerData extends RelayControllerData {
 
         if (response == null) return false;
 
-        Log.d("decode light", response == null ? "(null)" : response);
+        Log.d("decode light", response);
 
         if ((response.charAt(0) != '$') && (response.charAt(0) != '*')) {
             Log.e("LightControllerData", "Not '$' or '*'");
@@ -134,7 +132,7 @@ public final class LightControllerData extends RelayControllerData {
             Log.e("LightControllerData", "Not '*'");
             return false;
         }
-        int length = Integer.parseInt(response.substring(idx + 1, idx + 5), 16);
+        //int length = Integer.parseInt(response.substring(idx + 1, idx + 5), 16);
 
         response = response.substring(idx + 5);
 
@@ -181,7 +179,7 @@ public final class LightControllerData extends RelayControllerData {
         editor.apply();
     }
 
-    public String GetStatusText() {
+    String GetStatusText() {
         String now = DateFormat.getDateTimeInstance().format(this.getNow());
         //SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
         //sdf.format(getNow)

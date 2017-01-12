@@ -1,28 +1,23 @@
 package ge.altasoft.gia.cha.thermostat;
-
 import android.graphics.Color;
-
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.views.RoomSensorView;
-
 public class TempSensorData {
 
-    protected boolean enabled;
+    //private boolean enabled;
 
     protected int id;
     protected int order;
 
     private double T;
-    protected char temperatureTrend;
+    char temperatureTrend;
 
-    protected double desiredT;
+    private double desiredT;
     private double deltaDesiredT;
 
-    protected long lastActivitySec;
+    long lastActivitySec;
 
     private StringBuilder log;
 
@@ -30,9 +25,9 @@ public class TempSensorData {
     public final static char GOING_UP = 'U';
     public final static char GOING_DOWN = 'D';
 
-    public TempSensorData(int id) {
+    TempSensorData(int id) {
         this.id = id;
-        this.enabled = false;
+        //this.enabled = false;
         this.T = 99;
         this.desiredT = 25;
 
@@ -53,13 +48,14 @@ public class TempSensorData {
 
     public String getInfo()
     {
-      return String.format("Last sync: %d seconds ago", System.currentTimeMillis() / 1000 -  lastActivitySec) + "\n\n" + log.toString();
-    }
-    public double getDesiredTemperature() {
-        return this.desiredT;
+      return String.format(Locale.US, "Last sync: %d seconds ago", System.currentTimeMillis() / 1000 -  lastActivitySec) + "\n\n" + log.toString();
     }
 
-    protected void setTemperature(double value) {
+//    public double getDesiredTemperature() {
+//        return this.desiredT;
+//    }
+
+    void setTemperature(double value) {
         T = value;
 
         String now = DateFormat.getDateTimeInstance().format(new Date());
@@ -69,7 +65,7 @@ public class TempSensorData {
         log.append("°\n");
     }
 
-    protected void setDeltaDesiredT(double value) {
+    void setDeltaDesiredT(double value) {
         deltaDesiredT = value;
     }
 

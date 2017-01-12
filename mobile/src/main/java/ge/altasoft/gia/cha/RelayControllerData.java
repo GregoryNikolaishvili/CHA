@@ -42,16 +42,24 @@ public abstract class RelayControllerData {
         return isActive;
     }
 
-    public boolean relayOrderChanged() {
+    protected boolean relayOrderChanged() {
         return relaysReordered;
     }
 
-    public Date getNow() {
+    protected Date getNow() {
         return this.now;
     }
 
+    protected void setNow(String dateAndTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+        try {
+            now = sdf.parse(dateAndTime);
+        } catch (ParseException ex) {
+        }
+    }
 
-    public void setRelay(int index, RelayData relay) {
+
+    protected void setRelay(int index, RelayData relay) {
         relays[index] = relay;
     }
 
@@ -60,36 +68,27 @@ public abstract class RelayControllerData {
         this.isActive = value;
     }
 
-    public void setNow(String dateAndTime) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-        try {
-            now = sdf.parse(dateAndTime);
-        } catch (ParseException ex) {
-        }
-    }
-
-    public void setHaveSettings(boolean value) {
+    protected void setHaveSettings(boolean value) {
         this.haveSettings = value;
     }
 
 
-    public void rebuildUI(IDrawRelaysUI drawUI) {
+    protected void rebuildUI(IDrawRelaysUI drawUI) {
         drawUI.clearAllRelays();
 
         RelayData[] r = Arrays.copyOf(relays, relays.length);
         Arrays.sort(r);
 
-        for (int i = 0; i < r.length; i++)
-            drawUI.createNewRelay(r[i]);
+        for (RelayData aR : r) drawUI.createNewRelay(aR);
     }
 
-    public void saveRelayOrders() {
+    protected void saveRelayOrders() {
         relaysReordered = false;
         for (int i = 0; i < relays.length; i++)
             savedRelayOrders[i] = relays[i].getOrder();
     }
 
-    public void restoreRelayOrders() {
+    protected void restoreRelayOrders() {
         for (int i = 0; i < relays.length; i++)
             relays[i].setOrder(savedRelayOrders[i]);
         relaysReordered = false;
@@ -115,7 +114,7 @@ public abstract class RelayControllerData {
         relaysReordered = true;
     }
 
-    public static <K, V extends Comparable<V>> Map<K, V> sortByOrder(final Map<K, V> map) {
+    protected static <K, V extends Comparable<V>> Map<K, V> sortByOrder(final Map<K, V> map) {
         Comparator<K> valueComparator = new Comparator<K>() {
             public int compare(K k1, K k2) {
                 int compare = -map.get(k2).compareTo(map.get(k1));
@@ -123,11 +122,10 @@ public abstract class RelayControllerData {
                 else return compare;
             }
         };
-        Map<K, V> sortedByValues = new TreeMap<K, V>(valueComparator);
+        Map<K, V> sortedByValues = new TreeMap<>(valueComparator);
         sortedByValues.putAll(map);
         return sortedByValues;
     }
-
 
     public interface IDrawRelaysUI {
         void createNewRelay(final RelayData relayData);

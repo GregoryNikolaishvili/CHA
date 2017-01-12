@@ -4,6 +4,7 @@ package ge.altasoft.gia.cha;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -17,15 +18,20 @@ import java.util.Locale;
 public class Utils {
 
     public final static boolean DEBUG_LIGHT = true;
-    public final static boolean DEBUG_THEROSTAT = true;
+    public final static boolean DEBUG_THERMOSTAT = true;
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
 
-    public static final long TemperatureSensorAnalyzeSeconds = 10;
-
+    public static boolean disableOnCheckedListener = false;
 
     public static String ShortToHex4(short value) {
         return String.format(Locale.US, "%04X", value);
+    }
+
+    static boolean isTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
     @NonNull

@@ -107,10 +107,12 @@ public class LightBroadcastService extends Service {
                 socket.connect(new InetSocketAddress(LightUtils.GetControllerIp(getApplicationContext()), LightUtils.ServerPort), 5000);
             } catch (UnknownHostException e1) {
                 ShowMessage(e1.getMessage());
-                return null; //TODO
+                //TO DO
+                return null;
             } catch (IOException e1) {
                 ShowMessage(e1.getMessage());
-                return null; //TODO
+                //TO DO
+                return null;
             }
             try {
                 PrintWriter out = new PrintWriter(socket.getOutputStream());

@@ -7,7 +7,7 @@ public final class ThermostatRelayData extends RelayData {
 
     private ThermostatRelayView relayView;
 
-    public ThermostatRelayData(int id) {
+    ThermostatRelayData(int id) {
         super(id);
     }
 
@@ -15,7 +15,7 @@ public final class ThermostatRelayData extends RelayData {
         return "";
     }
 
-    public void setIsOn(boolean value) {
+    void setIsOn(boolean value) {
         super._setIsOn(value);
         if (relayView != null)
             relayView.setIsOn(value);

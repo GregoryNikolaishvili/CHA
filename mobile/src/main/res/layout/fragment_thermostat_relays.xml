@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/thermostatRelaysContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <ge.altasoft.gia.cha.views.DragLinearLayout
+        android:id="@+id/thermostatRelayDragLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_margin="8pt"
+        android:layout_weight="1"
+        android:orientation="vertical" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorButtonNormal"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp"
+        android:paddingEnd="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:weightSum="1">
+
+        <ToggleButton
+            android:id="@+id/thermostatAutoMode"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/x_toggle_button"
+            android:textOff="@string/off"
+            android:textOn="@string/active" />
+
+        <TextView
+            android:id="@+id/thermostatRelaysTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"
+            android:padding="4dp"
+            android:text="@string/sample_date"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+</LinearLayout>

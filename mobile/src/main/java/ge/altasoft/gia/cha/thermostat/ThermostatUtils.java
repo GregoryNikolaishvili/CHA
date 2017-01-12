@@ -7,15 +7,12 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Debug;
-
 import ge.altasoft.gia.cha.ChaApplication;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
 
 public final class ThermostatUtils {
 
     public static String LocalIP = "192.168.2.201";
-    public static String ExternalIP = "178.134.95.18";
     public final static int ServerPort = 80;
     public static int REFRESH_TIMEOUT = 5; //sec
 
@@ -39,7 +36,7 @@ public final class ThermostatUtils {
         if ((activeNetwork == null) || (!activeNetwork.isConnected()))
             return null;
 
-        String externalUrl = ExternalIP;
+        String externalUrl = "178.134.95.18";
 
         if (activeNetwork.getType() != ConnectivityManager.TYPE_WIFI)
             return externalUrl;

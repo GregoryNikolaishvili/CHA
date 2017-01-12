@@ -10,9 +10,9 @@ import ge.altasoft.gia.cha.views.LightRelayView;
 
 public final class LightRelayData extends RelayData {
 
-    public static final char OFF_SUNRISE = 'S';
-    public static final char OFF_TIME = 'T';
-    public static final char OFF_DURATION = 'D';
+    private static final char OFF_SUNRISE = 'S';
+    private static final char OFF_TIME = 'T';
+    private static final char OFF_DURATION = 'D';
 
     private LightRelayView relayView;
 
@@ -21,7 +21,7 @@ public final class LightRelayData extends RelayData {
     private String offMode;
     private short offValue;
 
-    public LightRelayData(int id) {
+    LightRelayData(int id) {
         super(id);
 
         this.isActive = false;
@@ -30,18 +30,10 @@ public final class LightRelayData extends RelayData {
         this.offValue = 0;
     }
 
-    public void setIsOn(boolean value) {
+    void setIsOn(boolean value) {
         super._setIsOn(value);
         if (relayView != null)
             relayView.setIsOn(value);
-    }
-
-    public boolean isActive() {
-        return this.isActive;
-    }
-
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
     }
 
     private String getOnTime() {
@@ -60,7 +52,7 @@ public final class LightRelayData extends RelayData {
             return "";
     }
 
-    public String getOffTime() {
+    private String getOffTime() {
         int minutes = 0;
         switch (offMode.charAt(0)) {
             case OFF_SUNRISE:
@@ -95,7 +87,7 @@ public final class LightRelayData extends RelayData {
         return idx;
     }
 
-    public void decodeSettings(SharedPreferences prefs) {
+    void decodeSettings(SharedPreferences prefs) {
         String suffix = Integer.toString(getId());
 
         isActive = prefs.getBoolean("l_is_active_" + suffix, false);
@@ -111,7 +103,7 @@ public final class LightRelayData extends RelayData {
     }
 
     public void encodeSettings(StringBuilder sb) {
-        sb.append(isActive() ? 'T' : 'F');
+        sb.append(isActive ? 'T' : 'F');
         sb.append(Utils.ShortToHex4(onOffset));
         sb.append(offMode);
         sb.append(Utils.ShortToHex4(offValue));
@@ -124,7 +116,7 @@ public final class LightRelayData extends RelayData {
         sb.append(Utils.ShortToHex4((short) 0));
     }
 
-    public void encodeSettings(SharedPreferences.Editor editor) {
+    void encodeSettings(SharedPreferences.Editor editor) {
         String suffix = Integer.toString(getId());
 
         editor.putBoolean("l_is_active_" + suffix, isActive);
