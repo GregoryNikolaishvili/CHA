@@ -35,7 +35,7 @@ public abstract class RelayData implements Comparable<RelayData> {
         return this.name;
     }
 
-    public void _setIsOn(boolean value) {
+    public void setIsOn(boolean value) {
         this.isOn = value;
     }
 
@@ -62,7 +62,7 @@ public abstract class RelayData implements Comparable<RelayData> {
     }
 
 
-    public static void encodeSettingsDebug(StringBuilder sb) {
+    public static void encodeSettingsDebug(StringBuilder ignored) {
     }
 
     public int decodeSettings(String response, int idx) {

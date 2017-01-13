@@ -6,15 +6,12 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.RelayData;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.views.LightRelayView;
 
 public final class LightRelayData extends RelayData {
 
     private static final char OFF_SUNRISE = 'S';
     private static final char OFF_TIME = 'T';
     private static final char OFF_DURATION = 'D';
-
-    private LightRelayView relayView;
 
     private boolean isActive;
     private short onOffset;
@@ -28,12 +25,6 @@ public final class LightRelayData extends RelayData {
         this.onOffset = 0;
         this.offMode = String.valueOf(OFF_SUNRISE);
         this.offValue = 0;
-    }
-
-    void setIsOn(boolean value) {
-        super._setIsOn(value);
-        if (relayView != null)
-            relayView.setIsOn(value);
     }
 
     private String getOnTime() {
@@ -72,12 +63,7 @@ public final class LightRelayData extends RelayData {
         return String.format(Locale.US, "%d:%02d", hours, minutes);
     }
 
-    public void setRelayView(LightRelayView relayView) {
-        this.relayView = relayView;
-    }
-
     public int decodeSettings(String response, int idx) {
-
         isActive = response.charAt(idx) != 'F';
         onOffset = Short.parseShort(response.substring(idx + 1, idx + 5), 16);
         offMode = response.substring(idx + 5, idx + 6);

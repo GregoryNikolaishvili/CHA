@@ -20,6 +20,10 @@ public class Utils {
     public final static boolean DEBUG_LIGHT = true;
     public final static boolean DEBUG_THERMOSTAT = true;
 
+    public static final int FLAG_HAVE_NOTHING = 0;
+    public static final int FLAG_HAVE_STATE = 1;
+    public static final int FLAG_HAVE_SETTINGS = 2;
+
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
 
     public static boolean disableOnCheckedListener = false;
@@ -108,7 +112,12 @@ public class Utils {
         return wifiInfo.getSSID().trim().equals("\"GIA\"") || wifiInfo.getSSID().trim().equals("\"GIA2\"");
     }
 
-    static void ConfirmDialog(Context context, String title, String message, final Runnable positiveAction, final Runnable negativeAction) {
+    public static int random(int min, int max)
+    {
+        return min + (int)Math.round(Math.random() * (max - min));
+    }
+
+    public static void ConfirmDialog(Context context, String title, String message, final Runnable positiveAction, final Runnable negativeAction) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);

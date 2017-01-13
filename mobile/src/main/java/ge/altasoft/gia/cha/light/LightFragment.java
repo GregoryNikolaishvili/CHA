@@ -10,18 +10,15 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
-import ge.altasoft.gia.cha.ChaApplication;
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.RelayControllerData;
 import ge.altasoft.gia.cha.RelayData;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.DragLinearLayout;
 import ge.altasoft.gia.cha.views.LightRelayView;
 
-public class LightFragment extends Fragment implements RelayControllerData.IDrawRelaysUI {
+public class LightFragment extends Fragment {
 
-    public DragLinearLayout lightDragLinearLayout = null;
+    public DragLinearLayout dragLinearLayout = null;
     private View rootView = null;
 
     public LightFragment() {
@@ -35,8 +32,8 @@ public class LightFragment extends Fragment implements RelayControllerData.IDraw
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_light, container, false);
 
-        lightDragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.lightDragLinearLayout);
-        lightDragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
+        dragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.lightDragLinearLayout);
+        dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
             @Override
             public void onSwap(View firstView, int firstPosition,
                                View secondView, int secondPosition) {
@@ -57,37 +54,51 @@ public class LightFragment extends Fragment implements RelayControllerData.IDraw
             }
         });
 
+        if (LightControllerData.Instance.haveSettings())
+            rebuildUI();
+
         return rootView;
     }
 
     public void setDraggableViews(boolean on) {
-        for (int I = 0; I < lightDragLinearLayout.getChildCount(); I++) {
-            LinearLayout lt = (LinearLayout) lightDragLinearLayout.getChildAt(I);
+        for (int I = 0; I < dragLinearLayout.getChildCount(); I++) {
+            LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
 
             if (on)
-                lightDragLinearLayout.setViewDraggable(lt, lt);
+                dragLinearLayout.setViewDraggable(lt, lt);
             else
-                lightDragLinearLayout.setViewNonDraggable(lt);
+                dragLinearLayout.setViewNonDraggable(lt);
         }
     }
 
+    public void rebuildUI() {
+        dragLinearLayout.removeAllViews();
 
-    public void createNewRelay(final RelayData relayData) {
-        Context context = ChaApplication.getAppContext();
+        Context context = getContext();
         LinearLayout.LayoutParams lpRelay = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
 
-        LightRelayView relayView = new LightRelayView(context);
-        relayView.setLightRelayData((LightRelayData) relayData);
-        relayView.setLayoutParams(lpRelay);
+        RelayData[] relays = LightControllerData.Instance.sortedRelays();
+        for (RelayData data : relays)
+        {
+            LightRelayView relayView = new LightRelayView(context);
+            relayView.setRelayData((LightRelayData) data);
+            relayView.setLayoutParams(lpRelay);
 
-        lightDragLinearLayout.addView(relayView);
+            dragLinearLayout.addView(relayView);
+        }
     }
 
-    public void clearAllRelays() {
-        lightDragLinearLayout.removeAllViews();
-    }
+    public void drawState() {
 
-    public void drawFooterRelays() {
+        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
+            if (dragLinearLayout.getChildAt(i) instanceof LightRelayView)
+            {
+                LightRelayView rv = (LightRelayView) dragLinearLayout.getChildAt(i);
+                LightRelayData data = rv.getRelayData();
+                rv.setIsOn(data.isOn());
+            }
+        }
+
         ToggleButton tvAuto = ((ToggleButton) rootView.findViewById(R.id.lightsAutoMode));
         Utils.disableOnCheckedListener = true;
         try {

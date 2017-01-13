@@ -1,5 +1,7 @@
 package ge.altasoft.gia.cha.thermostat;
+
 import android.graphics.Color;
+
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -46,9 +48,8 @@ public class TempSensorData {
         return this.temperatureTrend;
     }
 
-    public String getInfo()
-    {
-      return String.format(Locale.US, "Last sync: %d seconds ago", System.currentTimeMillis() / 1000 -  lastActivitySec) + "\n\n" + log.toString();
+    public String getInfo() {
+        return String.format(Locale.US, "Last sync: %d seconds ago", System.currentTimeMillis() / 1000 - lastActivitySec) + "\n\n" + log.toString();
     }
 
 //    public double getDesiredTemperature() {

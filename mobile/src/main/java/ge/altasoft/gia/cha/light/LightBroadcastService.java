@@ -31,7 +31,7 @@ public class LightBroadcastService extends Service {
     public static final String BROADCAST_ACTION_SET = "home.gia.light.set_data";
     private final Handler handler = new Handler();
 
-    private Intent intentGet;
+    private Intent intentBroadcastSender;
 
     @Override
     public void onCreate() {
@@ -42,7 +42,7 @@ public class LightBroadcastService extends Service {
         LightUtils.LocalIP = prefs.getString("light_controller_ip", LightUtils.LocalIP);
         LightUtils.REFRESH_TIMEOUT = Integer.parseInt(prefs.getString("light_controller_polling", Integer.toString(LightUtils.REFRESH_TIMEOUT)));
 
-        intentGet = new Intent(BROADCAST_ACTION_GET);
+        intentBroadcastSender = new Intent(BROADCAST_ACTION_GET);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class LightBroadcastService extends Service {
 
             if (Utils.DEBUG_LIGHT) {
                 if (args[0].startsWith("#")) {
-                    LightControllerData.Instance.relays(Integer.parseInt(String.valueOf(args[0].charAt(1)), 16) - 1)._setIsOn(args[0].charAt(2) == '1');
+                    LightControllerData.Instance.relays(Integer.parseInt(String.valueOf(args[0].charAt(1)), 16) - 1).setIsOn(args[0].charAt(2) == '1');
                     response = LightControllerData.Instance.encodeState();
                 } else if (args[0].equals("M")) {
                     LightControllerData.Instance.setIsActive(false);
@@ -133,8 +133,8 @@ public class LightBroadcastService extends Service {
 
         protected void onPostExecute(String result) {
             //result is the data returned from doInbackground
-            intentGet.putExtra("response", result);
-            sendBroadcast(intentGet);
+            intentBroadcastSender.putExtra("response", result);
+            sendBroadcast(intentBroadcastSender);
         }
     }
 

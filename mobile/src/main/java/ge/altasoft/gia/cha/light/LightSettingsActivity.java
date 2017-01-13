@@ -1,4 +1,4 @@
-package ge.altasoft.gia.cha;
+package ge.altasoft.gia.cha.light;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +15,8 @@ import android.preference.PreferenceScreen;
 import android.view.KeyEvent;
 import android.widget.BaseAdapter;
 
-import ge.altasoft.gia.cha.light.LightControllerData;
+import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.FriendlyEditTextPreference;
 import ge.altasoft.gia.cha.views.TimePreference;
 

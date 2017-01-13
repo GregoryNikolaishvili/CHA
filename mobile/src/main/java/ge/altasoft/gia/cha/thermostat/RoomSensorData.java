@@ -5,11 +5,8 @@ import android.support.annotation.NonNull;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.views.RoomSensorView;
 
 public final class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
-
-    private RoomSensorView roomSensorView;
 
     private double H;
     private String name;
@@ -27,10 +24,6 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
 
     public double getHumidity() {
         return this.H;
-    }
-
-    void setRoomSensorView(RoomSensorView roomSensorView) {
-        this.roomSensorView = roomSensorView;
     }
 
     void encodeOrderAndName(StringBuilder sb2) {
@@ -56,9 +49,6 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         H = Integer.parseInt(value.substring(idx + 7, idx + 11), 16) / 10.0;
 
         this.lastActivitySec = System.currentTimeMillis() / 1000;
-
-        if (roomSensorView != null)
-            roomSensorView.setSensorData(this);
 
         return idx + 11;
     }

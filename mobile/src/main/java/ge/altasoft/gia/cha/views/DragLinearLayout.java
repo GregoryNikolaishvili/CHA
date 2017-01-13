@@ -79,11 +79,11 @@ public final class DragLinearLayout extends LinearLayout {
          */
         private ValueAnimator swapAnimation;
 
-        public void endExistingAnimation() {
+        void endExistingAnimation() {
             if (null != swapAnimation) swapAnimation.end();
         }
 
-        public void cancelExistingAnimation() {
+        void cancelExistingAnimation() {
             if (null != swapAnimation) swapAnimation.cancel();
         }
     }
@@ -111,11 +111,11 @@ public final class DragLinearLayout extends LinearLayout {
         private boolean detecting;
         private boolean dragging;
 
-        public DragItem() {
+        DragItem() {
             stopDetecting();
         }
 
-        public void startDetectingOnPossibleDrag(final View view, final int position) {
+        void startDetectingOnPossibleDrag(final View view, final int position) {
             this.view = view;
             this.startVisibility = view.getVisibility();
             this.viewDrawable = getDragDrawable(view);

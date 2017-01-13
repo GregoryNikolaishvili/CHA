@@ -8,14 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import ge.altasoft.gia.cha.ChaApplication;
+import java.util.Map;
+
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.views.DragLinearLayout;
 import ge.altasoft.gia.cha.views.RoomSensorView;
 
 public class ThermostatSensorsFragment extends Fragment {
 
-    public DragLinearLayout thermostatSensorsDragLinearLayout = null;
+    public DragLinearLayout dragLinearLayout = null;
 
     public ThermostatSensorsFragment() {
     }
@@ -28,8 +29,8 @@ public class ThermostatSensorsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_thermostat_sensors, container, false);
 
-        thermostatSensorsDragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.thermostatSensorDragLinearLayout);
-        thermostatSensorsDragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
+        dragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.thermostatSensorDragLinearLayout);
+        dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
             @Override
             public void onSwap(View firstView, int firstPosition,
                                View secondView, int secondPosition) {
@@ -38,33 +39,49 @@ public class ThermostatSensorsFragment extends Fragment {
             }
         });
 
+        if (ThermostatControllerData.Instance.haveSettings())
+            rebuildUI();
+
         return rootView;
     }
 
     public void setDraggableViews(boolean on) {
-        for (int I = 0; I < thermostatSensorsDragLinearLayout.getChildCount(); I++) {
-            LinearLayout lt = (LinearLayout) thermostatSensorsDragLinearLayout.getChildAt(I);
+        for (int I = 0; I < dragLinearLayout.getChildCount(); I++) {
+            LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
 
             if (on)
-                thermostatSensorsDragLinearLayout.setViewDraggable(lt, lt);
+                dragLinearLayout.setViewDraggable(lt, lt);
             else
-                thermostatSensorsDragLinearLayout.setViewNonDraggable(lt);
+                dragLinearLayout.setViewNonDraggable(lt);
         }
     }
 
-    public void createNewSensor(RoomSensorData roomSensorData) {
-        Context context = ChaApplication.getAppContext();
+    public void rebuildUI() {
+        dragLinearLayout.removeAllViews();
+
+        Context context = getContext();
         LinearLayout.LayoutParams lpSensor = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
 
-        RoomSensorView sensor = new RoomSensorView(context);
-        sensor.setSensorData(roomSensorData);
-        roomSensorData.setRoomSensorView(sensor);
-        sensor.setLayoutParams(lpSensor);
+        Map<Integer, RoomSensorData> sensors = ThermostatControllerData.Instance.sortedRoomSensors();
+        for (int id : sensors.keySet()) {
+            RoomSensorData data = ThermostatControllerData.Instance.roomSensor(id);
 
-        thermostatSensorsDragLinearLayout.addView(sensor);
+            RoomSensorView sensor = new RoomSensorView(context);
+            sensor.setSensorData(data);
+            sensor.setLayoutParams(lpSensor);
+
+            dragLinearLayout.addView(sensor);
+        }
     }
 
-    public void clearAllSensors() {
-        thermostatSensorsDragLinearLayout.removeAllViews();
+    public void drawState() {
+        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
+            if (dragLinearLayout.getChildAt(i) instanceof RoomSensorView) {
+                RoomSensorView rv = (RoomSensorView) dragLinearLayout.getChildAt(i);
+                RoomSensorData data = rv.getSensorData();
+                rv.setSensorData(data);
+            }
+        }
+
     }
 }

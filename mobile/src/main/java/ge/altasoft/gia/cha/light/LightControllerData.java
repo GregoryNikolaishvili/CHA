@@ -6,11 +6,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import ge.altasoft.gia.cha.RelayControllerData;
+import ge.altasoft.gia.cha.Utils;
 
 
 public final class LightControllerData extends RelayControllerData {
 
-    public final static int RELAY_COUNT = 12;
+    final static int RELAY_COUNT = 12;
 
     public final static LightControllerData Instance = new LightControllerData();
 
@@ -87,20 +88,20 @@ public final class LightControllerData extends RelayControllerData {
         return sb.toString();
     }
 
-    public boolean decode(String response, IDrawRelaysUI drawUI) {
+    public int decode(String response) {
 
-        if (response == null) return false;
+        if (response == null) return Utils.FLAG_HAVE_NOTHING;
 
         Log.d("decode light", response);
 
         if ((response.charAt(0) != '$') && (response.charAt(0) != '*')) {
             Log.e("LightControllerData", "Not '$' or '*'");
-            return false;
+            return Utils.FLAG_HAVE_NOTHING;
         }
 
-        if (response.charAt(0) == '$') {
+        if (response.charAt(0) == '$') { // received state
             if (!haveSettings())
-                return false;
+                return Utils.FLAG_HAVE_NOTHING;
 
             setIsActive(response.charAt(1) != 'F');
 
@@ -112,9 +113,7 @@ public final class LightControllerData extends RelayControllerData {
             sunriseMin = Short.parseShort(response.substring(idx + 12, idx + 16), 16);
             sunsetMin = Short.parseShort(response.substring(idx + 16, idx + 20), 16);
 
-            drawUI.drawFooterRelays();
-
-            return false;
+            return Utils.FLAG_HAVE_STATE;
         }
 
         setIsActive(response.charAt(1) != 'F');
@@ -130,7 +129,7 @@ public final class LightControllerData extends RelayControllerData {
 
         if (response.charAt(idx) != '*') {
             Log.e("LightControllerData", "Not '*'");
-            return false;
+            return Utils.FLAG_HAVE_NOTHING;
         }
         //int length = Integer.parseInt(response.substring(idx + 1, idx + 5), 16);
 
@@ -145,21 +144,19 @@ public final class LightControllerData extends RelayControllerData {
         arr = response.split(";");
         if (arr.length != RELAY_COUNT) {
             Log.e("LightControllerData", "Invalid number of relays returned");
-            return false;
+            return Utils.FLAG_HAVE_NOTHING;
         }
 
         for (int i = 0; i < RELAY_COUNT; i++)
             relays(i).decodeOrderAndName(arr[i]);
 
-        rebuildUI(drawUI);
-
         if (stateResponse != null)
-            decode(stateResponse, drawUI);
+            return Utils.FLAG_HAVE_SETTINGS | decode(stateResponse);
 
-        return true;
+        return Utils.FLAG_HAVE_SETTINGS;
     }
 
-    public void decode(SharedPreferences prefs) {
+    void decode(SharedPreferences prefs) {
 
         setIsActive(prefs.getBoolean("l_automatic_mode", false));
 
@@ -167,7 +164,7 @@ public final class LightControllerData extends RelayControllerData {
             relays(i).decodeSettings(prefs);
     }
 
-    public void saveToPreferences(SharedPreferences prefs) {
+    void saveToPreferences(SharedPreferences prefs) {
         LightControllerData ss = LightControllerData.Instance;
 
         SharedPreferences.Editor editor = prefs.edit();

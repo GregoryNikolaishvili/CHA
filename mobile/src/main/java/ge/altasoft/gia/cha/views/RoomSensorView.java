@@ -14,7 +14,6 @@ import java.util.Locale;
 import ge.altasoft.gia.cha.ChaApplication;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
-import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class RoomSensorView extends LinearLayout {
 
@@ -86,6 +85,10 @@ public class RoomSensorView extends LinearLayout {
 //    public void setHumidity(double value) {
 //        getHumidityTextView().setText(String.format(Locale.US, "%.0f%%", value));
 //    }
+
+    public RoomSensorData getSensorData() {
+        return this.sensorData;
+    }
 
     public void setSensorData(RoomSensorData value) {
         this.sensorData = value;

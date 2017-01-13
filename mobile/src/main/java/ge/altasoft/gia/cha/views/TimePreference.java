@@ -8,8 +8,6 @@ import android.view.View;
 
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.views.TimePicker;
-
 // Based on http://stackoverflow.com/a/7484289/922168
 
 public final class TimePreference extends DialogPreference {
@@ -27,7 +25,7 @@ public final class TimePreference extends DialogPreference {
         setNegativeButtonText("Cancel");
     }
 
-    public void setTime(short value) {
+    private void setTime(short value) {
         mTimeValueInMin = value;
 
         persistInt(value);
@@ -54,7 +52,7 @@ public final class TimePreference extends DialogPreference {
         return String.format(Locale.US, "%s %02d:%02d", sign, value / 60, value % 60);
     }
 
-    public void updateSummary() {
+    private void updateSummary() {
         setSummary(getDisplayTime());
     }
 

@@ -10,7 +10,6 @@ import android.widget.ToggleButton;
 
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightRelayData;
 import ge.altasoft.gia.cha.light.LightUtils;
 import ge.altasoft.gia.cha.R;
@@ -23,7 +22,7 @@ public class LightRelayView extends LinearLayout {
 
     private Boolean disableOnCheckedListener = false;
 
-    LightRelayData lightRelayData;
+    LightRelayData relayData;
 
     public LightRelayView(Context context) {
         super(context);
@@ -53,7 +52,7 @@ public class LightRelayView extends LinearLayout {
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
 
-                    LightUtils.sendCommandToController(String.format(Locale.US, "#%01X%s", lightRelayData.getId(), isChecked ? "1" : "0"));
+                    LightUtils.sendCommandToController(String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
                 }
             }
         });
@@ -100,9 +99,13 @@ public class LightRelayView extends LinearLayout {
         }
     }
 
-    public void setLightRelayData(LightRelayData value) {
-        this.lightRelayData = value;
-        value.setRelayView(this);
+    public LightRelayData getRelayData() {
+        return this.relayData;
+    }
+
+    public void setRelayData(LightRelayData value) {
+        this.relayData = value;
+
         setRelayName(value.getName()); // + ", order=" + String.valueOf(value.getOrder()));
         setComment(value.getComment());
         setIsOn(value.isOn());

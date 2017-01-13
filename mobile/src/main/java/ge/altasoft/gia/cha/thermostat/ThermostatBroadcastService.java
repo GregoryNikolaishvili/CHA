@@ -31,7 +31,7 @@ public class ThermostatBroadcastService extends Service {
     public static final String BROADCAST_ACTION_SET = "home.gia.thermostat.set_data";
     private final Handler handler = new Handler();
 
-    private Intent intentGet;
+    private Intent intentBroadcastSender;
 
     @Override
     public void onCreate() {
@@ -42,7 +42,7 @@ public class ThermostatBroadcastService extends Service {
         ThermostatUtils.LocalIP = prefs.getString("thermostat_controller_ip", ThermostatUtils.LocalIP);
         ThermostatUtils.REFRESH_TIMEOUT = Integer.parseInt(prefs.getString("thermostat_controller_polling", Integer.toString(ThermostatUtils.REFRESH_TIMEOUT)));
 
-        intentGet = new Intent(BROADCAST_ACTION_GET);
+        intentBroadcastSender = new Intent(BROADCAST_ACTION_GET);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ThermostatBroadcastService extends Service {
 
             if (Utils.DEBUG_THERMOSTAT) {
                 if (args[0].startsWith("#")) {
-                    ThermostatControllerData.Instance.relays(Integer.parseInt(String.valueOf(args[0].charAt(1)), 16) - 1)._setIsOn(args[0].charAt(2) == '1');
+                    ThermostatControllerData.Instance.relays(Integer.parseInt(String.valueOf(args[0].charAt(1)), 16) - 1).setIsOn(args[0].charAt(2) == '1');
                     response = ThermostatControllerData.Instance.encodeState();
                 } else if (args[0].equals("M")) {
                     ThermostatControllerData.Instance.setIsActive(false);
@@ -130,8 +130,8 @@ public class ThermostatBroadcastService extends Service {
 
         protected void onPostExecute(String result) {
             //result is the data returned from doInbackground
-            intentGet.putExtra("response", result);
-            sendBroadcast(intentGet);
+            intentBroadcastSender.putExtra("response", result);
+            sendBroadcast(intentBroadcastSender);
         }
     }
 

@@ -38,6 +38,12 @@ public abstract class RelayControllerData {
         return relays[index];
     }
 
+    public RelayData[] sortedRelays() {
+        RelayData[] r = Arrays.copyOf(relays, relays.length);
+        Arrays.sort(r);
+        return r;
+    }
+
     public boolean isActive() {
         return isActive;
     }
@@ -54,7 +60,7 @@ public abstract class RelayControllerData {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
         try {
             now = sdf.parse(dateAndTime);
-        } catch (ParseException ex) {
+        } catch (ParseException ignored) {
         }
     }
 
@@ -70,16 +76,6 @@ public abstract class RelayControllerData {
 
     protected void setHaveSettings(boolean value) {
         this.haveSettings = value;
-    }
-
-
-    protected void rebuildUI(IDrawRelaysUI drawUI) {
-        drawUI.clearAllRelays();
-
-        RelayData[] r = Arrays.copyOf(relays, relays.length);
-        Arrays.sort(r);
-
-        for (RelayData aR : r) drawUI.createNewRelay(aR);
     }
 
     protected void saveRelayOrders() {
@@ -125,13 +121,5 @@ public abstract class RelayControllerData {
         Map<K, V> sortedByValues = new TreeMap<>(valueComparator);
         sortedByValues.putAll(map);
         return sortedByValues;
-    }
-
-    public interface IDrawRelaysUI {
-        void createNewRelay(final RelayData relayData);
-
-        void clearAllRelays();
-
-        void drawFooterRelays();
     }
 }

@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import ge.altasoft.gia.cha.ChaApplication;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.RelayData;
 import ge.altasoft.gia.cha.Utils;
@@ -20,7 +19,7 @@ import ge.altasoft.gia.cha.views.ThermostatRelayView;
 
 public class ThermostatRelaysFragment extends Fragment {
 
-    public DragLinearLayout thermostatRelaysDragLinearLayout = null;
+    public DragLinearLayout dragLinearLayout = null;
     private View rootView = null;
 
     public ThermostatRelaysFragment() {
@@ -34,8 +33,8 @@ public class ThermostatRelaysFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_thermostat_relays, container, false);
 
-        thermostatRelaysDragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.thermostatRelayDragLinearLayout);
-        thermostatRelaysDragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
+        dragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.thermostatRelayDragLinearLayout);
+        dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
             @Override
             public void onSwap(View firstView, int firstPosition,
                                View secondView, int secondPosition) {
@@ -56,36 +55,51 @@ public class ThermostatRelaysFragment extends Fragment {
             }
         });
 
+        if (ThermostatControllerData.Instance.haveSettings())
+            rebuildUI();
+
         return rootView;
     }
 
     public void setDraggableViews(boolean on) {
-        for (int I = 0; I < thermostatRelaysDragLinearLayout.getChildCount(); I++) {
-            LinearLayout lt = (LinearLayout) thermostatRelaysDragLinearLayout.getChildAt(I);
+        for (int I = 0; I < dragLinearLayout.getChildCount(); I++) {
+            LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
 
             if (on)
-                thermostatRelaysDragLinearLayout.setViewDraggable(lt, lt);
+                dragLinearLayout.setViewDraggable(lt, lt);
             else
-                thermostatRelaysDragLinearLayout.setViewNonDraggable(lt);
+                dragLinearLayout.setViewNonDraggable(lt);
         }
     }
 
-    public void createNewRelay(RelayData relayData) {
-        Context context = ChaApplication.getAppContext();
+    public void rebuildUI() {
+        dragLinearLayout.removeAllViews();
+
+        Context context = getContext();
         LinearLayout.LayoutParams lpRelay = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
 
-        ThermostatRelayView relay = new ThermostatRelayView(context);
-        relay.setThermostatRelayData((ThermostatRelayData) relayData);
-        relay.setLayoutParams(lpRelay);
+        RelayData[] relays = ThermostatControllerData.Instance.sortedRelays();
+        for (RelayData data : relays)
+        {
+            ThermostatRelayView relayView = new ThermostatRelayView(context);
+            relayView.setRelayData((ThermostatRelayData) data);
+            relayView.setLayoutParams(lpRelay);
 
-        thermostatRelaysDragLinearLayout.addView(relay);
+            dragLinearLayout.addView(relayView);
+        }
     }
 
-    public void clearAllRelays() {
-        thermostatRelaysDragLinearLayout.removeAllViews();
-    }
+    public void drawState() {
 
-    public void drawFooterRelays() {
+        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
+            if (dragLinearLayout.getChildAt(i) instanceof ThermostatRelayView)
+            {
+                ThermostatRelayView rv = (ThermostatRelayView)dragLinearLayout.getChildAt(i);
+                ThermostatRelayData data = rv.getRelayData();
+                rv.setIsOn(data.isOn());
+            }
+        }
+
         ToggleButton tvAuto = ((ToggleButton) rootView.findViewById(R.id.thermostatAutoMode));
         Utils.disableOnCheckedListener = true;
         try {

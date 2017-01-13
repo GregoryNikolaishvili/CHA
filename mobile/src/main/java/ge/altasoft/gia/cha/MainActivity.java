@@ -1,59 +1,38 @@
 package ge.altasoft.gia.cha;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
 import ge.altasoft.gia.cha.light.LightBroadcastService;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightFragment;
+import ge.altasoft.gia.cha.light.LightSettingsActivity;
 import ge.altasoft.gia.cha.light.LightUtils;
 import ge.altasoft.gia.cha.thermostat.BoilerFragment;
-import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
-import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatSensorsFragment;
 import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatRelaysFragment;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ChaActivity {
 
-    private Intent lightIntentGet;
-    private Intent thermostatIntentGet;
-
-    private boolean lightShowSettingsDialog = false;
-    private boolean thermostatShowSettingsDialog = false;
+    private Intent lightIntent;
+    private Intent thermostatIntent;
 
     private SectionsPagerAdapter pagerAdapter;
 
     private Menu mainMenu;
-
-    private BroadcastReceiver lightBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            processLightControllerData(intent);
-        }
-    };
-
-    private BroadcastReceiver thermostatBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            processThermostatControllerData(intent);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,14 +55,8 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setOffscreenPageLimit(8);
         viewPager.setAdapter(pagerAdapter);
 
-        if (LightControllerData.Instance.haveSettings())
-            LightControllerData.Instance.rebuildUI(pagerAdapter.lightFragment);
-
-        if (ThermostatControllerData.Instance.haveSettings())
-            ThermostatControllerData.Instance.rebuildUI(getThermostatDrawUI());
-
-        lightIntentGet = new Intent(this, LightBroadcastService.class);
-        thermostatIntentGet = new Intent(this, ThermostatBroadcastService.class);
+        lightIntent = new Intent(this, LightBroadcastService.class);
+        thermostatIntent = new Intent(this, ThermostatBroadcastService.class);
     }
 
     @Override
@@ -120,11 +93,12 @@ public class MainActivity extends AppCompatActivity {
                         ThermostatUtils.sendCommandToController(ThermostatControllerData.Instance.encodeSettings());
                 } else {
                     LightControllerData.Instance.restoreRelayOrders();
-                    LightControllerData.Instance.rebuildUI(pagerAdapter.lightFragment);
+                    pagerAdapter.lightFragment.rebuildUI();
 
                     ThermostatControllerData.Instance.restoreRelayOrders();
                     ThermostatControllerData.Instance.restoreRoomSensorRelayOrders();
-                    ThermostatControllerData.Instance.rebuildUI(getThermostatDrawUI());
+                    pagerAdapter.thermostatSensorsFragment.rebuildUI();
+                    pagerAdapter.thermostatRelaysFragment.rebuildUI();
                 }
                 return true;
 
@@ -142,8 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
             //region Light
             case R.id.action_light_settings:
-                lightShowSettingsDialog = true;
-                LightUtils.sendCommandToController("@");
+                startActivityForResult(new Intent(this, LightSettingsActivity.class), LightUtils.ACTIVITY_REQUEST_SETTINGS_CODE);
                 return true;
 
             case R.id.action_light_reorder:
@@ -165,8 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
             //region Thermostat
             case R.id.action_thermostat_settings:
-                thermostatShowSettingsDialog = true;
-                ThermostatUtils.sendCommandToController("@");
+                startActivityForResult(new Intent(this, LightSettingsActivity.class), ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE);
                 return true;
 
             //endregion
@@ -176,23 +148,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        startService(lightIntentGet);
-        startService(thermostatIntentGet);
+    public void onStart() {
+        super.onStart();
 
-        registerReceiver(lightBroadcastReceiver, new IntentFilter(LightBroadcastService.BROADCAST_ACTION_GET));
-        registerReceiver(thermostatBroadcastReceiver, new IntentFilter(ThermostatBroadcastService.BROADCAST_ACTION_GET));
+        startService(lightIntent);
+        startService(thermostatIntent);
+
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        unregisterReceiver(thermostatBroadcastReceiver);
-        unregisterReceiver(lightBroadcastReceiver);
+    public void onDestroy() {
+        super.onDestroy();
 
-        stopService(thermostatIntentGet);
-        stopService(lightIntentGet);
+        stopService(thermostatIntent);
+        stopService(lightIntent);
     }
 
     @Override
@@ -208,72 +177,51 @@ public class MainActivity extends AppCompatActivity {
             case LightUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
                 if (resultCode == Activity.RESULT_OK)
                     LightBroadcastService.SetAllSettings = true;
-                LightControllerData.Instance.rebuildUI(pagerAdapter.lightFragment);
+                pagerAdapter.lightFragment.rebuildUI();
                 break;
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
                 if (resultCode == Activity.RESULT_OK)
                     ThermostatBroadcastService.SetAllSettings = true;
-                ThermostatControllerData.Instance.rebuildUI(getThermostatDrawUI());
+                pagerAdapter.boilerFragment.rebuildUI();
+                pagerAdapter.thermostatSensorsFragment.rebuildUI();
+                pagerAdapter.thermostatRelaysFragment.rebuildUI();
                 break;
         }
     }
 
-    private void processLightControllerData(Intent intent) {
-        String response = intent.getStringExtra("response");
-        if (LightControllerData.Instance.decode(response, pagerAdapter.lightFragment)) {
-            if (lightShowSettingsDialog) {
-                lightShowSettingsDialog = false;
-                startActivityForResult(new Intent(this, LightSettingsActivity.class), LightUtils.ACTIVITY_REQUEST_SETTINGS_CODE);
-            }
+    @Override
+    protected int processLightControllerData(String response) {
+        int flags = super.processLightControllerData(response);
+
+        if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0)
+            pagerAdapter.lightFragment.rebuildUI();
+
+        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
+            pagerAdapter.lightFragment.drawState();
         }
+
+        return flags;
     }
 
-    private void processThermostatControllerData(Intent intent) {
+    @Override
+    protected int processThermostatControllerData(String response) {
+        int flags = super.processThermostatControllerData(response);
 
-        String response = intent.getStringExtra("response");
-
-        if (ThermostatControllerData.Instance.decode(response, getThermostatDrawUI())) {
-            if (thermostatShowSettingsDialog) {
-                thermostatShowSettingsDialog = false;
-                startActivityForResult(new Intent(this, LightSettingsActivity.class), ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE);
-            }
+        if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0) {
+            pagerAdapter.boilerFragment.rebuildUI();
+            pagerAdapter.thermostatSensorsFragment.rebuildUI();
+            pagerAdapter.thermostatRelaysFragment.rebuildUI();
         }
+
+        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
+            pagerAdapter.boilerFragment.drawState();
+            pagerAdapter.thermostatSensorsFragment.drawState();
+            pagerAdapter.thermostatRelaysFragment.drawState();
+
+        }
+
+        return flags;
     }
-
-    private ThermostatControllerData.IDrawThermostatUI getThermostatDrawUI() {
-        return new ThermostatControllerData.IDrawThermostatUI() {
-
-            public void createNewRelay(RelayData relayData) {
-                pagerAdapter.thermostatRelaysFragment.createNewRelay(relayData);
-            }
-
-            public void clearAllRelays() {
-                pagerAdapter.thermostatRelaysFragment.clearAllRelays();
-            }
-
-            public void drawFooterRelays() {
-                pagerAdapter.thermostatRelaysFragment.drawFooterRelays();
-            }
-
-            public void createNewSensor(RoomSensorData roomSensorData) {
-                pagerAdapter.thermostatSensorsFragment.createNewSensor(roomSensorData);
-            }
-
-            public void clearAllSensors() {
-                pagerAdapter.thermostatSensorsFragment.clearAllSensors();
-            }
-
-            public void resetBoiler() {
-                pagerAdapter.boilerFragment.resetBoiler();
-            }
-
-            public void drawChart(int id, BoilerSensorData boilerSensorData)
-            {
-                pagerAdapter.boilerFragment.drawGraph(id, boilerSensorData);
-            }
-        };
-    }
-
 
     private void showNetworkInfo() {
         StringBuilder sb = new StringBuilder();

@@ -9,10 +9,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.hardware.wifi" />
 
-
     <application
-        android:name="ge.altasoft.gia.cha.ChaApplication"
-
+        android:name=".ChaApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -34,12 +32,11 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
-
         <activity
-            android:name=".LightSettingsActivity"
+            android:name=".light.LightSettingsActivity"
             android:label="@string/title_activity_settings" />
-
-
+        <activity android:name=".GraphActivity" />
+        <activity android:name=".TemperatureLogActivity"></activity>
     </application>
 
 </manifest>

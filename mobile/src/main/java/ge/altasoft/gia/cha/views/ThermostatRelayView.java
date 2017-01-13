@@ -22,7 +22,7 @@ public class ThermostatRelayView extends LinearLayout {
 
     private Boolean disableOnCheckedListener = false;
 
-    ThermostatRelayData thermostatRelayData;
+    ThermostatRelayData relayData;
 
     public ThermostatRelayView(Context context) {
         super(context);
@@ -52,7 +52,7 @@ public class ThermostatRelayView extends LinearLayout {
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
 
-                    ThermostatUtils.sendCommandToController(String.format(Locale.US, "#%01X%s", thermostatRelayData.getId(), isChecked ? "1" : "0"));
+                    ThermostatUtils.sendCommandToController(String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
                 }
             }
         });
@@ -99,10 +99,13 @@ public class ThermostatRelayView extends LinearLayout {
         }
     }
 
+    public ThermostatRelayData getRelayData() {
+        return this.relayData;
+    }
 
-    public void setThermostatRelayData(ThermostatRelayData value) {
-        this.thermostatRelayData = value;
-        value.setRelayView(this);
+    public void setRelayData(ThermostatRelayData value) {
+        this.relayData = value;
+
         setRelayName(value.getName() + ", order=" + String.valueOf(value.getOrder()));
         setComment(value.getComment());
         setIsOn(value.isOn());
