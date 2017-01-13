@@ -39,8 +39,7 @@ public class ThermostatSensorsFragment extends Fragment {
             }
         });
 
-        if (ThermostatControllerData.Instance.haveSettings())
-            rebuildUI();
+        rebuildUI();
 
         return rootView;
     }
@@ -57,6 +56,9 @@ public class ThermostatSensorsFragment extends Fragment {
     }
 
     public void rebuildUI() {
+        if (!ThermostatControllerData.Instance.haveSettings())
+            return;
+
         dragLinearLayout.removeAllViews();
 
         Context context = getContext();

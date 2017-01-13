@@ -71,7 +71,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         return boilerPumpsData[index];
     }
 
-    BoilerSensorData boilerSensors(int index) {
+    public BoilerSensorData boilerSensors(int index) {
         return boilerSensorsData[index];
     }
 

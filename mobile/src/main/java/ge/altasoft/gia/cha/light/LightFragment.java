@@ -10,6 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.RelayData;
 import ge.altasoft.gia.cha.Utils;
@@ -54,8 +55,7 @@ public class LightFragment extends Fragment {
             }
         });
 
-        if (LightControllerData.Instance.haveSettings())
-            rebuildUI();
+        rebuildUI();
 
         return rootView;
     }
@@ -72,14 +72,16 @@ public class LightFragment extends Fragment {
     }
 
     public void rebuildUI() {
+        if (!LightControllerData.Instance.haveSettings())
+            return;
+
         dragLinearLayout.removeAllViews();
 
         Context context = getContext();
         LinearLayout.LayoutParams lpRelay = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
 
         RelayData[] relays = LightControllerData.Instance.sortedRelays();
-        for (RelayData data : relays)
-        {
+        for (RelayData data : relays) {
             LightRelayView relayView = new LightRelayView(context);
             relayView.setRelayData((LightRelayData) data);
             relayView.setLayoutParams(lpRelay);
@@ -91,8 +93,7 @@ public class LightFragment extends Fragment {
     public void drawState() {
 
         for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
-            if (dragLinearLayout.getChildAt(i) instanceof LightRelayView)
-            {
+            if (dragLinearLayout.getChildAt(i) instanceof LightRelayView) {
                 LightRelayView rv = (LightRelayView) dragLinearLayout.getChildAt(i);
                 LightRelayData data = rv.getRelayData();
                 rv.setIsOn(data.isOn());

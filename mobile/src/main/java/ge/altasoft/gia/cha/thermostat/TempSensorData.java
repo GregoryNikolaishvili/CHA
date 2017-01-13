@@ -1,10 +1,13 @@
 package ge.altasoft.gia.cha.thermostat;
 
 import android.graphics.Color;
+import android.util.Pair;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import ge.altasoft.gia.cha.CircularArrayList;
 
 public class TempSensorData {
 
@@ -21,7 +24,8 @@ public class TempSensorData {
 
     long lastActivitySec;
 
-    private StringBuilder log;
+    private CircularArrayList<Pair<Date, Double>> logBuffer = new CircularArrayList<>(100);
+    //private StringBuilder log;
 
     public final static char NO_CHANGE = 'N';
     public final static char GOING_UP = 'U';
@@ -32,8 +36,6 @@ public class TempSensorData {
         //this.enabled = false;
         this.T = 99;
         this.desiredT = 25;
-
-        log = new StringBuilder();
     }
 
     public int getId() {
@@ -48,9 +50,13 @@ public class TempSensorData {
         return this.temperatureTrend;
     }
 
-    public String getInfo() {
-        return String.format(Locale.US, "Last sync: %d seconds ago", System.currentTimeMillis() / 1000 - lastActivitySec) + "\n\n" + log.toString();
+    public CircularArrayList<Pair<Date, Double>> getLogBuffer()
+    {
+        return logBuffer;
     }
+//    public String getInfo() {
+//        return String.format(Locale.US, "Last sync: %d seconds ago", System.currentTimeMillis() / 1000 - lastActivitySec) + "\n\n" + log.toString();
+//    }
 
 //    public double getDesiredTemperature() {
 //        return this.desiredT;
@@ -59,11 +65,7 @@ public class TempSensorData {
     void setTemperature(double value) {
         T = value;
 
-        String now = DateFormat.getDateTimeInstance().format(new Date());
-        log.append(now);
-        log.append(": ");
-        log.append(value);
-        log.append("°\n");
+        logBuffer.add(new Pair<>(new Date(), value));
     }
 
     void setDeltaDesiredT(double value) {

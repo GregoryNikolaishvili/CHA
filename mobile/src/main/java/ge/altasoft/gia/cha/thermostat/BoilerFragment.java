@@ -166,13 +166,14 @@ public class BoilerFragment extends Fragment {
 
                 );
 
-        if (ThermostatControllerData.Instance.haveSettings())
             rebuildUI();
 
         return rootView;
     }
 
     public void rebuildUI() {
+        if (!ThermostatControllerData.Instance.haveSettings())
+            return;
 
     }
 

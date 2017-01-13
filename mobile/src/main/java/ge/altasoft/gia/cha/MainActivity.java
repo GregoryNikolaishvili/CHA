@@ -157,6 +157,21 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        if (pagerAdapter.lightFragment != null)
+            pagerAdapter.lightFragment.rebuildUI();
+
+        if (pagerAdapter.boilerFragment != null)
+            pagerAdapter.boilerFragment.rebuildUI();
+        if (pagerAdapter.thermostatSensorsFragment != null)
+            pagerAdapter.thermostatSensorsFragment.rebuildUI();
+        if (pagerAdapter.thermostatRelaysFragment != null)
+            pagerAdapter.thermostatRelaysFragment.rebuildUI();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
 

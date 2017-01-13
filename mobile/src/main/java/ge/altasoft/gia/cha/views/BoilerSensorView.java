@@ -1,6 +1,7 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.ChaApplication;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.TemperatureLogActivity;
 import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
 
 public class BoilerSensorView extends LinearLayout {
@@ -44,8 +46,14 @@ public class BoilerSensorView extends LinearLayout {
         this.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (sensorData != null)
-                    Toast.makeText(ChaApplication.getAppContext(), sensorData.getInfo(), Toast.LENGTH_LONG).show();
+                if (sensorData != null) {
+                    Intent intent = new Intent(ChaApplication.getAppContext(), TemperatureLogActivity.class);
+                    intent.putExtra("id", sensorData.getId());
+                    intent.putExtra("scope", "BoilerSensor");
+                    ChaApplication.getAppContext().startActivity(intent);
+
+                    //Toast.makeText(ChaApplication.getAppContext(), sensorData.getInfo(), Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

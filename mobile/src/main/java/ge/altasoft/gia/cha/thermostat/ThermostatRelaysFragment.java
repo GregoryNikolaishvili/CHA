@@ -55,8 +55,7 @@ public class ThermostatRelaysFragment extends Fragment {
             }
         });
 
-        if (ThermostatControllerData.Instance.haveSettings())
-            rebuildUI();
+        rebuildUI();
 
         return rootView;
     }
@@ -73,14 +72,16 @@ public class ThermostatRelaysFragment extends Fragment {
     }
 
     public void rebuildUI() {
+        if (!ThermostatControllerData.Instance.haveSettings())
+            return;
+
         dragLinearLayout.removeAllViews();
 
         Context context = getContext();
         LinearLayout.LayoutParams lpRelay = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
 
         RelayData[] relays = ThermostatControllerData.Instance.sortedRelays();
-        for (RelayData data : relays)
-        {
+        for (RelayData data : relays) {
             ThermostatRelayView relayView = new ThermostatRelayView(context);
             relayView.setRelayData((ThermostatRelayData) data);
             relayView.setLayoutParams(lpRelay);
@@ -92,9 +93,8 @@ public class ThermostatRelaysFragment extends Fragment {
     public void drawState() {
 
         for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
-            if (dragLinearLayout.getChildAt(i) instanceof ThermostatRelayView)
-            {
-                ThermostatRelayView rv = (ThermostatRelayView)dragLinearLayout.getChildAt(i);
+            if (dragLinearLayout.getChildAt(i) instanceof ThermostatRelayView) {
+                ThermostatRelayView rv = (ThermostatRelayView) dragLinearLayout.getChildAt(i);
                 ThermostatRelayData data = rv.getRelayData();
                 rv.setIsOn(data.isOn());
             }
