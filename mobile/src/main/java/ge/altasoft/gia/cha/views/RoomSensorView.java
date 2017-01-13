@@ -46,8 +46,8 @@ public class RoomSensorView extends LinearLayout {
         this.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (sensorData != null)
-                    Toast.makeText(ChaApplication.getAppContext(), sensorData.getInfo(), Toast.LENGTH_LONG).show();
+                //if (sensorData != null)
+                //    Toast.makeText(ChaApplication.getAppContext(), sensorData.getInfo(), Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -24,7 +24,7 @@ public class TempSensorData {
 
     long lastActivitySec;
 
-    private CircularArrayList<Pair<Date, Double>> logBuffer = new CircularArrayList<>(100);
+    private TemperaturePointArray logBuffer = new TemperaturePointArray(100);
     //private StringBuilder log;
 
     public final static char NO_CHANGE = 'N';
@@ -50,8 +50,7 @@ public class TempSensorData {
         return this.temperatureTrend;
     }
 
-    public CircularArrayList<Pair<Date, Double>> getLogBuffer()
-    {
+    public TemperaturePointArray getLogBuffer() {
         return logBuffer;
     }
 //    public String getInfo() {
@@ -65,7 +64,7 @@ public class TempSensorData {
     void setTemperature(double value) {
         T = value;
 
-        logBuffer.add(new Pair<>(new Date(), value));
+        logBuffer.add(new TemperaturePoint(new Date(), value));
     }
 
     void setDeltaDesiredT(double value) {
