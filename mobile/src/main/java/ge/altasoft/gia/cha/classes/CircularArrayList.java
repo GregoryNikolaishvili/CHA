@@ -1,4 +1,4 @@
-package ge.altasoft.gia.cha;
+package ge.altasoft.gia.cha.classes;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

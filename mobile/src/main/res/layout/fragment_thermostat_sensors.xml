@@ -11,7 +11,16 @@
         android:layout_height="0dip"
         android:layout_margin="8pt"
         android:layout_weight="1"
-        android:orientation="vertical" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/thermostatsLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/loading" />
+
+    </ge.altasoft.gia.cha.views.DragLinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,12 +37,12 @@
 
         <TextView
             android:id="@+id/thermostatSensorsTimeTextView"
+            style="@android:style/TextAppearance.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="bottom"
             android:padding="4dp"
-            android:text="@string/sample_date"
-            android:textSize="16sp" />
+            android:text="@string/sample_date" />
     </LinearLayout>
 </LinearLayout>

@@ -133,8 +133,11 @@ public class LightBroadcastService extends Service {
 
         protected void onPostExecute(String result) {
             //result is the data returned from doInbackground
-            intentBroadcastSender.putExtra("response", result);
-            sendBroadcast(intentBroadcastSender);
+            int decodeResult = LightControllerData.Instance.decode(result);
+            if (decodeResult != Utils.FLAG_HAVE_NOTHING) {
+                intentBroadcastSender.putExtra("result", decodeResult);
+                sendBroadcast(intentBroadcastSender);
+            }
         }
     }
 

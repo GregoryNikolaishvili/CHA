@@ -12,15 +12,15 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.RelayData;
+import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.DragLinearLayout;
 import ge.altasoft.gia.cha.views.ThermostatRelayView;
 
 public class ThermostatRelaysFragment extends Fragment {
 
-    public DragLinearLayout dragLinearLayout = null;
     private View rootView = null;
+    private DragLinearLayout dragLinearLayout = null;
 
     public ThermostatRelaysFragment() {
     }
@@ -71,9 +71,14 @@ public class ThermostatRelaysFragment extends Fragment {
         }
     }
 
+    // rebuild everything and draws new state
     public void rebuildUI() {
-        if (!ThermostatControllerData.Instance.haveSettings())
+        if (!ThermostatControllerData.Instance.haveSettings() || (rootView == null))
             return;
+
+        View vLoading = dragLinearLayout.findViewById(R.id.roomRelaysLoading);
+        if (vLoading != null)
+            dragLinearLayout.removeView(vLoading);
 
         dragLinearLayout.removeAllViews();
 
@@ -88,9 +93,14 @@ public class ThermostatRelaysFragment extends Fragment {
 
             dragLinearLayout.addView(relayView);
         }
+
+        drawFooter();
     }
 
     public void drawState() {
+
+        if (rootView == null)
+            return;
 
         for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
             if (dragLinearLayout.getChildAt(i) instanceof ThermostatRelayView) {
@@ -100,6 +110,10 @@ public class ThermostatRelaysFragment extends Fragment {
             }
         }
 
+        drawFooter();
+    }
+
+    private void drawFooter() {
         ToggleButton tvAuto = ((ToggleButton) rootView.findViewById(R.id.thermostatAutoMode));
         Utils.disableOnCheckedListener = true;
         try {

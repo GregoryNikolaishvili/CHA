@@ -48,9 +48,10 @@ public class BoilerSensorView extends LinearLayout {
             public void onClick(View v) {
                 if (sensorData != null) {
                     Intent intent = new Intent(ChaApplication.getAppContext(), TemperatureLogActivity.class);
+                    //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("id", sensorData.getId());
                     intent.putExtra("scope", "BoilerSensor");
-                    ChaApplication.getAppContext().startActivity(intent);
+                    getContext().startActivity(intent);
 
                     //Toast.makeText(ChaApplication.getAppContext(), sensorData.getInfo(), Toast.LENGTH_LONG).show();
                 }

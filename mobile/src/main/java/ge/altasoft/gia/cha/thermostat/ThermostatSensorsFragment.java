@@ -16,7 +16,8 @@ import ge.altasoft.gia.cha.views.RoomSensorView;
 
 public class ThermostatSensorsFragment extends Fragment {
 
-    public DragLinearLayout dragLinearLayout = null;
+    private View rootView = null;
+    private DragLinearLayout dragLinearLayout = null;
 
     public ThermostatSensorsFragment() {
     }
@@ -27,7 +28,7 @@ public class ThermostatSensorsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_thermostat_sensors, container, false);
+        rootView = inflater.inflate(R.layout.fragment_thermostat_sensors, container, false);
 
         dragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.thermostatSensorDragLinearLayout);
         dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
@@ -55,9 +56,14 @@ public class ThermostatSensorsFragment extends Fragment {
         }
     }
 
+    // rebuild everything and draws new state
     public void rebuildUI() {
-        if (!ThermostatControllerData.Instance.haveSettings())
+        if (!ThermostatControllerData.Instance.haveSettings() || (rootView == null))
             return;
+
+        View vLoading = dragLinearLayout.findViewById(R.id.thermostatsLoading);
+        if (vLoading != null)
+            dragLinearLayout.removeView(vLoading);
 
         dragLinearLayout.removeAllViews();
 
@@ -77,6 +83,9 @@ public class ThermostatSensorsFragment extends Fragment {
     }
 
     public void drawState() {
+        if (rootView == null)
+            return;
+
         for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
             if (dragLinearLayout.getChildAt(i) instanceof RoomSensorView) {
                 RoomSensorView rv = (RoomSensorView) dragLinearLayout.getChildAt(i);
@@ -84,6 +93,5 @@ public class ThermostatSensorsFragment extends Fragment {
                 rv.setSensorData(data);
             }
         }
-
     }
 }

@@ -31,7 +31,6 @@ public class MainActivity extends ChaActivity {
     private Intent thermostatIntent;
 
     private SectionsPagerAdapter pagerAdapter;
-
     private Menu mainMenu;
 
     @Override
@@ -205,37 +204,29 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
-    protected int processLightControllerData(String response) {
-        int flags = super.processLightControllerData(response);
+    protected void processLightControllerData(int flags) {
+        super.processLightControllerData(flags);
 
         if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0)
             pagerAdapter.lightFragment.rebuildUI();
-
-        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
+        else if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
             pagerAdapter.lightFragment.drawState();
         }
-
-        return flags;
     }
 
     @Override
-    protected int processThermostatControllerData(String response) {
-        int flags = super.processThermostatControllerData(response);
+    protected void processThermostatControllerData(int flags) {
+        super.processThermostatControllerData(flags);
 
         if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0) {
             pagerAdapter.boilerFragment.rebuildUI();
             pagerAdapter.thermostatSensorsFragment.rebuildUI();
             pagerAdapter.thermostatRelaysFragment.rebuildUI();
-        }
-
-        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
+        } else if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
             pagerAdapter.boilerFragment.drawState();
             pagerAdapter.thermostatSensorsFragment.drawState();
             pagerAdapter.thermostatRelaysFragment.drawState();
-
         }
-
-        return flags;
     }
 
     private void showNetworkInfo() {
@@ -272,7 +263,6 @@ public class MainActivity extends ChaActivity {
         BoilerFragment boilerFragment = null;
         ThermostatSensorsFragment thermostatSensorsFragment = null;
         ThermostatRelaysFragment thermostatRelaysFragment = null;
-
 
         SectionsPagerAdapter(FragmentManager fm, boolean isLandscape) {
             super(fm);

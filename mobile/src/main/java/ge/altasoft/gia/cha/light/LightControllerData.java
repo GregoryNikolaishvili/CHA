@@ -5,7 +5,7 @@ import android.util.Log;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import ge.altasoft.gia.cha.RelayControllerData;
+import ge.altasoft.gia.cha.classes.RelayControllerData;
 import ge.altasoft.gia.cha.Utils;
 
 

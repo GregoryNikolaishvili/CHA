@@ -1,4 +1,4 @@
-package ge.altasoft.gia.cha;
+package ge.altasoft.gia.cha.classes;
 
 public abstract class RunnableWithParams implements Runnable {
 
@@ -7,7 +7,7 @@ public abstract class RunnableWithParams implements Runnable {
     public RunnableWithParams() {
     }
 
-    void run(final String parameter) {
+    public void run(final String parameter) {
         this.m_parameter = parameter;
         run();
     }

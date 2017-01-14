@@ -15,7 +15,7 @@ public final class LightUtils {
 
     public static String LocalIP = "192.168.2.9";
     public final static int ServerPort = 80;
-    public static int REFRESH_TIMEOUT = 5; //sec
+    public static int REFRESH_TIMEOUT = 10; //sec
 
     public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 2; // $ + 12 switches + autoatic_mode + datetime  + sunrise/sunset 123456789012TYYMMDDHHmmssxxxxxxxx. 34 chars
 

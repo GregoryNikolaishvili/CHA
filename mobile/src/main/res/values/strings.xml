@@ -29,13 +29,19 @@
     <string name="action_reset_names">Reset relay names and order to default</string>
 
     <string name="light">Light</string>
-    <string name="sample_date">Feb 02 2016, 22:10</string>
     <string name="auto">Auto</string>
     <string name="manual">Man</string>
     <string name="active">Active</string>
     <string name="on">On</string>
     <string name="off">Off</string>
     <string name="thermostat">Thermostat</string>
+
+
+    <string name="sample_date">Feb 02 2016, 22:10</string>
+    <string name="sample_temperature">25.5</string>
+    <string name="centigrade">°</string>
+    <string name="sample_humidity">80 %</string>
+    <string name="loading">Loading...</string>
 
     <string-array name="listArray">
         <item>Sunrise</item>

@@ -3,25 +3,23 @@
 
     <TextView
         android:id="@+id/relay_name"
+        style="@android:style/TextAppearance.Medium"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:paddingBottom="2dp"
-        android:paddingTop="2dp"
-        android:textColor="@android:color/tab_indicator_text"
-        android:textSize="24sp" />
+        android:paddingTop="2dp" />
 
     <TextView
         android:id="@+id/comment"
+        style="@android:style/TextAppearance.Medium"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_toRightOf="@+id/relay_name"
         android:layout_weight="0"
         android:gravity="center_vertical"
-        android:paddingRight="8dp"
-        android:textColor="@android:color/tab_indicator_text"
-        android:textSize="24sp" />
+        android:paddingRight="8dp" />
 
     <ToggleButton
         android:id="@+id/onOffButton"

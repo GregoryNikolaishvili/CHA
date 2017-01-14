@@ -2,34 +2,19 @@
     android:id="@+id/solarContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false"
     android:orientation="vertical">
 
-    <LinearLayout
+    <include
+        layout="@layout/boiler_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_marginBottom="20dp"
-        android:layout_weight="10"
-        android:clipChildren="false"
-        android:orientation="horizontal">
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_weight="1" />
-
-        <include
-            layout="@layout/boiler_layout"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="15" />
-    </LinearLayout>
+        android:layout_height="0dp"
+        android:layout_weight="100" />
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3" />
+        android:layout_weight="40" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,13 +31,13 @@
 
         <TextView
             android:id="@+id/SolarTimeTextView"
+            style="@android:style/TextAppearance.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="bottom"
             android:padding="4dp"
-            android:text="@string/sample_date"
-            android:textSize="16sp" />
+            android:text="@string/sample_date" />
     </LinearLayout>
 
 </LinearLayout>

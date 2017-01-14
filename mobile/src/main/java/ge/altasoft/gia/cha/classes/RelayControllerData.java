@@ -1,4 +1,4 @@
-package ge.altasoft.gia.cha;
+package ge.altasoft.gia.cha.classes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+
+import ge.altasoft.gia.cha.classes.RelayData;
 
 public abstract class RelayControllerData {
 
@@ -48,7 +50,7 @@ public abstract class RelayControllerData {
         return isActive;
     }
 
-    protected boolean relayOrderChanged() {
+    public boolean relayOrderChanged() {
         return relaysReordered;
     }
 
@@ -78,13 +80,13 @@ public abstract class RelayControllerData {
         this.haveSettings = value;
     }
 
-    protected void saveRelayOrders() {
+    public void saveRelayOrders() {
         relaysReordered = false;
         for (int i = 0; i < relays.length; i++)
             savedRelayOrders[i] = relays[i].getOrder();
     }
 
-    protected void restoreRelayOrders() {
+    public void restoreRelayOrders() {
         for (int i = 0; i < relays.length; i++)
             relays[i].setOrder(savedRelayOrders[i]);
         relaysReordered = false;

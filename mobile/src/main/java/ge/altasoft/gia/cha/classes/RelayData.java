@@ -1,8 +1,10 @@
-package ge.altasoft.gia.cha;
+package ge.altasoft.gia.cha.classes;
 
 import android.support.annotation.NonNull;
 
 import java.util.Locale;
+
+import ge.altasoft.gia.cha.Utils;
 
 public abstract class RelayData implements Comparable<RelayData> {
 

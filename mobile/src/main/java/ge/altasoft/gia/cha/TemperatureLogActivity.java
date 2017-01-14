@@ -4,26 +4,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Locale;
 
 import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
 import ge.altasoft.gia.cha.thermostat.TemperaturePoint;
 import ge.altasoft.gia.cha.thermostat.TemperaturePointArray;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
-public class TemperatureLogActivity extends AppCompatActivity {
+public class TemperatureLogActivity extends ChaActivity {
+
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
+    private TemperatureLogAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,40 +36,52 @@ public class TemperatureLogActivity extends AppCompatActivity {
         String scope = intent.getStringExtra("scope");
 
         if (scope.equals("BoilerSensor")) {
-            int id = intent.getIntExtra("id", 1);
+            int id = intent.getIntExtra("id", 0);
 
-            BoilerSensorData sensorData = ThermostatControllerData.Instance.boilerSensors(id);
-            logBuffer = sensorData.getLogBuffer();
+            if (id > 0) {
+                BoilerSensorData sensorData = ThermostatControllerData.Instance.boilerSensors(id - 1);
+                logBuffer = sensorData.getLogBuffer();
+            }
         }
 
-        UsersAdapter adapter = new UsersAdapter(this, logBuffer);
+        if (logBuffer != null) {
+            adapter = new TemperatureLogAdapter(this, logBuffer);
 
-        ListView listView = (ListView) findViewById(R.id.lvLog);
-        listView.setAdapter(adapter);
+            ListView listView = (ListView) findViewById(R.id.lvLog);
+            listView.setAdapter(adapter);
+        }
     }
 
-    public class UsersAdapter extends ArrayAdapter<TemperaturePoint> {
-        public UsersAdapter(Context context, ArrayList<TemperaturePoint> users) {
-            super(context, 0, users);
+    public class TemperatureLogAdapter extends ArrayAdapter<TemperaturePoint> {
+        public TemperatureLogAdapter(Context context, ArrayList<TemperaturePoint> points) {
+            super(context, 0, points);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            // Get the data item for this position
-            TemperaturePoint user = getItem(position);
+            TemperaturePoint point = getItem(position);
+
             // Check if an existing view is being reused, otherwise inflate the view
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.temp_log_view, parent, false);
             }
-            // Lookup view for data population
+
             TextView tvName = (TextView) convertView.findViewById(R.id.tvLogDateTime);
             TextView tvHome = (TextView) convertView.findViewById(R.id.tvLogValue);
-            // Populate the data into the template view using the data object
-            tvName.setText(user.first.toString());
-            tvHome.setText(user.second.toString());
 
-            // Return the completed view to render on screen
+            tvName.setText(sdf.format(point.first).toString());
+            tvHome.setText(String.format(Locale.US, "%.1f°", point.second));
+
             return convertView;
+        }
+    }
+
+    @Override
+    protected void processThermostatControllerData(int flags) {
+        super.processThermostatControllerData(flags);
+
+        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
+            adapter.notifyDataSetChanged();
         }
     }
 }

@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-import ge.altasoft.gia.cha.RelayControllerData;
+import ge.altasoft.gia.cha.classes.RelayControllerData;
 import ge.altasoft.gia.cha.Utils;
 
 public final class ThermostatControllerData extends RelayControllerData {

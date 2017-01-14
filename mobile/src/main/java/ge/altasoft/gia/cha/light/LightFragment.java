@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.RelayData;
+import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.DragLinearLayout;
 import ge.altasoft.gia.cha.views.LightRelayView;
@@ -71,9 +71,14 @@ public class LightFragment extends Fragment {
         }
     }
 
+    // rebuild everything and draw new state
     public void rebuildUI() {
-        if (!LightControllerData.Instance.haveSettings())
+        if (!LightControllerData.Instance.haveSettings() || (rootView == null))
             return;
+
+        View vLoading = dragLinearLayout.findViewById(R.id.lightLoading);
+        if (vLoading != null)
+            dragLinearLayout.removeView(vLoading);
 
         dragLinearLayout.removeAllViews();
 
@@ -88,9 +93,14 @@ public class LightFragment extends Fragment {
 
             dragLinearLayout.addView(relayView);
         }
+
+        drawFooter();
     }
 
     public void drawState() {
+
+        if (rootView == null)
+            return;
 
         for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
             if (dragLinearLayout.getChildAt(i) instanceof LightRelayView) {
@@ -100,6 +110,10 @@ public class LightFragment extends Fragment {
             }
         }
 
+        drawFooter();
+    }
+
+    private void drawFooter() {
         ToggleButton tvAuto = ((ToggleButton) rootView.findViewById(R.id.lightsAutoMode));
         Utils.disableOnCheckedListener = true;
         try {

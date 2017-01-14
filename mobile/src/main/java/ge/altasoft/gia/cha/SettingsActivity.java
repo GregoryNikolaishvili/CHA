@@ -38,10 +38,10 @@ public class SettingsActivity extends PreferenceActivity {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
                             LightUtils.LocalIP = prefs.getString("light_controller_ip", LightUtils.LocalIP);
-                            LightUtils.REFRESH_TIMEOUT = prefs.getInt("light_controller_polling", LightUtils.REFRESH_TIMEOUT);
+                            LightUtils.REFRESH_TIMEOUT = Integer.parseInt(prefs.getString("light_controller_polling", Integer.toString(LightUtils.REFRESH_TIMEOUT)));
 
                             ThermostatUtils.LocalIP = prefs.getString("thermostat_controller_ip", ThermostatUtils.LocalIP);
-                            ThermostatUtils.REFRESH_TIMEOUT = prefs.getInt("thermostat_controller_polling", ThermostatUtils.REFRESH_TIMEOUT);
+                            ThermostatUtils.REFRESH_TIMEOUT = Integer.parseInt(prefs.getString("thermostat_controller_polling", Integer.toString(ThermostatUtils.REFRESH_TIMEOUT)));
 
                             setResult(Activity.RESULT_OK, null); //The data you want to send back
                             context.finish();

@@ -1,4 +1,4 @@
-package ge.altasoft.gia.cha;
+package ge.altasoft.gia.cha.classes;
 
 import com.jjoe64.graphview.DefaultLabelFormatter;
 
@@ -8,10 +8,12 @@ import java.util.Locale;
 
 public class TimeAsXAxisLabelFormatter extends DefaultLabelFormatter {
 
-    private final String mFormat;
+    //private final String mFormat;
+    private SimpleDateFormat sdf;
 
     public TimeAsXAxisLabelFormatter(String format) {
-        mFormat = format;
+        //mFormat = format;
+        sdf = new SimpleDateFormat(format, Locale.US);
     }
 
     @Override
@@ -20,8 +22,7 @@ public class TimeAsXAxisLabelFormatter extends DefaultLabelFormatter {
             // format as date
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis((long) value);
-            SimpleDateFormat dateFormat = new SimpleDateFormat(mFormat, Locale.US);
-            return dateFormat.format(calendar.getTimeInMillis());
+            return sdf.format(calendar.getTimeInMillis());
         } else {
             return super.formatLabel(value, false);
         }

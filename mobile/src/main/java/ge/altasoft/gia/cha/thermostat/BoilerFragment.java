@@ -1,7 +1,6 @@
 package ge.altasoft.gia.cha.thermostat;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,25 +11,18 @@ import android.widget.RelativeLayout;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
-
-import java.util.Calendar;
-import java.util.Date;
 
 import ge.altasoft.gia.cha.GraphActivity;
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.TimeAsXAxisLabelFormatter;
+import ge.altasoft.gia.cha.classes.LineSeriesArray;
 import ge.altasoft.gia.cha.views.BoilerPumpView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
 
 public class BoilerFragment extends Fragment {
 
-    public static LineGraphSeries[] graphSeriesStatic;
-
     private View rootView = null;
 
-    @SuppressWarnings("unchecked")
-    private LineGraphSeries<DataPoint>[] graphSeries = new LineGraphSeries[ThermostatControllerData.BOILER_SENSOR_COUNT];
+    private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
 
     public BoilerFragment() {
     }
@@ -44,39 +36,12 @@ public class BoilerFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_boiler, container, false);
 
         final GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
+        pointSeries.addToGraph(graph);
 
-        graphSeries[ThermostatControllerData.BOILER_SENSOR_SOLAR_PANEL] = new LineGraphSeries<>();
-        graphSeries[ThermostatControllerData.BOILER_SENSOR_BOTTOM] = new LineGraphSeries<>();
-        graphSeries[ThermostatControllerData.BOILER_SENSOR_TOP] = new LineGraphSeries<>();
-        graphSeries[ThermostatControllerData.BOILER_SENSOR_ROOM] = new LineGraphSeries<>();
-
-        graphSeries[ThermostatControllerData.BOILER_SENSOR_SOLAR_PANEL].setColor(Color.RED);
-        graphSeries[ThermostatControllerData.BOILER_SENSOR_BOTTOM].setColor(Color.BLUE);
-        graphSeries[ThermostatControllerData.BOILER_SENSOR_TOP].setColor(Color.CYAN);
-        graphSeries[ThermostatControllerData.BOILER_SENSOR_ROOM].setColor(Color.BLACK);
-
-        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++)
-            graph.addSeries(graphSeries[i]);
-
-        Calendar calendar = Calendar.getInstance();
-        Date d1 = calendar.getTime();
-
-        calendar.add(Calendar.MINUTE, 1);
-        Date d2 = calendar.getTime();
-
-        graph.getGridLabelRenderer().setLabelFormatter(new TimeAsXAxisLabelFormatter("HH:mm"));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(d1.getTime());
-        graph.getViewport().setMaxX(d2.getTime());
-        graph.getGridLabelRenderer().setHumanRounding(false);
-
-        graph.setOnLongClickListener(new View.OnLongClickListener() {
-            public boolean onLongClick(View arg0) {
-                graphSeriesStatic = graphSeries;
+        graph.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
                 Intent intent = new Intent(getActivity(), GraphActivity.class);
                 startActivity(intent);
-                return true;
             }
         });
 
@@ -88,22 +53,22 @@ public class BoilerFragment extends Fragment {
                                               public void onGlobalLayout() {
                                                   //At this point the layout is complete
 
-                                                  final int boilerImageWidth = 480;
-                                                  final int boilerImageHeight = 312;
+                                                  final int boilerImageWidth = 520;
+                                                  final int boilerImageHeight = 320;
 
-                                                  final int solarPipePositionX = 90;
+                                                  final int solarPipePositionX = 110;
                                                   final int solarPipePositionY = 290;
 
-                                                  final int heaterPipePositionX = 400;
+                                                  final int heaterPipePositionX = 420;
                                                   final int heaterPipePositionY = 190;
 
                                                   final int topSensorPositionY = 140;
                                                   final int bottomSensorPositionY = 240;
 
-                                                  final int solarPanelTopRightX = 110;
+                                                  final int solarPanelTopRightX = 130;
                                                   final int solarPanelTopRightY = 28;
 
-                                                  final int solarPanelLeftBottomX = 14;
+                                                  final int solarPanelLeftBottomX = 34;
                                                   final int solarPanelLeftBottomY = 112;
 
                                                   float scaleX = boilerLayout.getWidth() / (float) boilerImageWidth;
@@ -166,18 +131,42 @@ public class BoilerFragment extends Fragment {
 
                 );
 
-            rebuildUI();
+        rebuildUI();
 
         return rootView;
     }
 
+    // rebuild everything and draws new state
     public void rebuildUI() {
-        if (!ThermostatControllerData.Instance.haveSettings())
+        if (!ThermostatControllerData.Instance.haveSettings() || (rootView == null))
             return;
 
+        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
+            TemperaturePointArray points = ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer();
+
+            DataPoint[] dataPoints = new DataPoint[points.size()];
+            int idx = 0;
+            for (TemperaturePoint pt : points)
+                dataPoints[idx++] = new DataPoint(pt.first.getTime(), pt.second);
+
+            pointSeries.getItem(i).resetData(dataPoints);
+        }
+
+        drawSensorAndRelayStates();
     }
 
     public void drawState() {
+        if (rootView == null)
+            return;
+
+        drawSensorAndRelayStates();
+
+        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
+            pointSeries.getItem(i).append(ThermostatControllerData.Instance.boilerSensors(i));
+        }
+    }
+
+    private void drawSensorAndRelayStates() {
         ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorSolarPanel)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_SOLAR_PANEL));
 
         ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorTankBottom)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_BOTTOM));
@@ -186,12 +175,5 @@ public class BoilerFragment extends Fragment {
 
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setIsOn(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_SOLAR_PUMP).isOn());
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setIsOn(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_HEATING_PUMP).isOn());
-
-        Calendar calendar = Calendar.getInstance();
-        Date d1 = calendar.getTime();
-
-        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-            graphSeries[i].appendData(new DataPoint(d1.getTime(), ThermostatControllerData.Instance.boilerSensors(i).getTemperature()), true, 40);
-        }
     }
 }

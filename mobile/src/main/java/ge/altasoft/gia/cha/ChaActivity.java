@@ -16,16 +16,16 @@ public abstract class ChaActivity extends AppCompatActivity {
     private BroadcastReceiver lightBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String response = intent.getStringExtra("response");
-            processLightControllerData(response);
+            int flags = intent.getIntExtra("result", Utils.FLAG_HAVE_NOTHING);
+            processLightControllerData(flags);
         }
     };
 
     private BroadcastReceiver thermostatBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String response = intent.getStringExtra("response");
-            processThermostatControllerData(response);
+            int flags = intent.getIntExtra("result", Utils.FLAG_HAVE_NOTHING);
+            processThermostatControllerData(flags);
         }
     };
 
@@ -45,12 +45,9 @@ public abstract class ChaActivity extends AppCompatActivity {
         unregisterReceiver(lightBroadcastReceiver);
     }
 
-    protected int processLightControllerData(String response) {
-        return LightControllerData.Instance.decode(response);
+    protected void processLightControllerData(int flags) {
     }
 
-    protected int processThermostatControllerData(String response)
-    {
-        return ThermostatControllerData.Instance.decode(response);
+    protected void processThermostatControllerData(int flags) {
     }
 }

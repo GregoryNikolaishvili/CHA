@@ -1,13 +1,8 @@
 package ge.altasoft.gia.cha.thermostat;
 
 import android.graphics.Color;
-import android.util.Pair;
 
-import java.text.DateFormat;
 import java.util.Date;
-import java.util.Locale;
-
-import ge.altasoft.gia.cha.CircularArrayList;
 
 public class TempSensorData {
 
@@ -46,6 +41,10 @@ public class TempSensorData {
         return this.T;
     }
 
+    public long getLastActivitySec() {
+        return this.lastActivitySec;
+    }
+
     public int getTemperatureTrend() {
         return this.temperatureTrend;
     }
@@ -62,7 +61,8 @@ public class TempSensorData {
 //    }
 
     void setTemperature(double value) {
-        T = value;
+        this.T = value;
+        this.lastActivitySec = System.currentTimeMillis() / 1000;
 
         logBuffer.add(new TemperaturePoint(new Date(), value));
     }

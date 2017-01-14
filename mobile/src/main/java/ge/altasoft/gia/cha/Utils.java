@@ -15,9 +15,11 @@ import android.widget.EditText;
 
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.classes.RunnableWithParams;
+
 public class Utils {
 
-    public final static boolean DEBUG_LIGHT = true;
+    public final static boolean DEBUG_LIGHT = false;
     public final static boolean DEBUG_THERMOSTAT = true;
 
     public static final int FLAG_HAVE_NOTHING = 0;
