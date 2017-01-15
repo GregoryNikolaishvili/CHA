@@ -50,7 +50,7 @@ public class LightFragment extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    LightUtils.sendCommandToController(isChecked ? "A" : "M");
+                    LightUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
                 }
             }
         });

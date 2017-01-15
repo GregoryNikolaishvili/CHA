@@ -1,17 +1,17 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.ChaApplication;
+import ge.altasoft.gia.cha.LogTHActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 
@@ -43,11 +43,29 @@ public class RoomSensorView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.room_sensor_layout, this);
 
-        this.setOnClickListener(new View.OnClickListener() {
+        getTemperatureTextView().setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                //if (sensorData != null)
-                //    Toast.makeText(ChaApplication.getAppContext(), sensorData.getInfo(), Toast.LENGTH_LONG).show();
+            public boolean onLongClick(View v) {
+                if (sensorData != null) {
+                    Intent intent = new Intent(getContext(), LogTHActivity.class);
+                    intent.putExtra("id", sensorData.getId());
+                    intent.putExtra("scope", "RoomSensorT");
+                    getContext().startActivity(intent);
+                }
+                return true;
+            }
+        });
+
+        getHumidityTextView().setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (sensorData != null) {
+                    Intent intent = new Intent(getContext(), LogTHActivity.class);
+                    intent.putExtra("id", sensorData.getId());
+                    intent.putExtra("scope", "RoomSensorH");
+                    getContext().startActivity(intent);
+                }
+                return true;
             }
         });
     }

@@ -11,9 +11,8 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.ChaApplication;
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.LogTemperatureActivity;
+import ge.altasoft.gia.cha.LogTHActivity;
 import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
 
 public class BoilerSensorView extends LinearLayout {
@@ -42,15 +41,16 @@ public class BoilerSensorView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.boiler_sensor_layout, this);
 
-        this.setOnClickListener(new View.OnClickListener() {
+        this.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 if (sensorData != null) {
-                    Intent intent = new Intent(ChaApplication.getAppContext(), LogTemperatureActivity.class);
+                    Intent intent = new Intent(getContext(), LogTHActivity.class);
                     intent.putExtra("id", sensorData.getId());
                     intent.putExtra("scope", "BoilerSensor");
                     getContext().startActivity(intent);
                 }
+                return true;
             }
         });
     }

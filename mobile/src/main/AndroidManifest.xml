@@ -40,7 +40,7 @@
             android:label="@string/title_activity_settings" />
 
         <activity android:name=".GraphActivity" />
-        <activity android:name=".LogTemperatureActivity" />
+        <activity android:name=".LogTHActivity" />
         <activity android:name=".LogBooleanActivity"></activity>
     </application>
 

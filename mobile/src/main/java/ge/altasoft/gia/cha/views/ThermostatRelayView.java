@@ -1,8 +1,10 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -10,7 +12,9 @@ import android.widget.ToggleButton;
 
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.LogBooleanActivity;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 import ge.altasoft.gia.cha.thermostat.ThermostatRelayData;
 
@@ -19,8 +23,6 @@ public class ThermostatRelayView extends LinearLayout {
     private TextView tvRelayName;
     private TextView tvComment;
     private ToggleButton tbButton;
-
-    private Boolean disableOnCheckedListener = false;
 
     ThermostatRelayData relayData;
 
@@ -43,17 +45,28 @@ public class ThermostatRelayView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.thermostat_relay_layout, this);
 
-        getOnOffButton();
-
-        tbButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        getOnOffButton().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                if (!disableOnCheckedListener) {
+                if (!Utils.disableOnCheckedListener) {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
 
-                    ThermostatUtils.sendCommandToController(String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
+                    ThermostatUtils.sendCommandToController(getContext(), String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
                 }
+            }
+        });
+
+        this.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (relayData != null) {
+                    Intent intent = new Intent(getContext(), LogBooleanActivity.class);
+                    intent.putExtra("id", relayData.getId());
+                    intent.putExtra("scope", "ThermostatRelay");
+                    getContext().startActivity(intent);
+                }
+                return true;
             }
         });
     }
@@ -88,14 +101,14 @@ public class ThermostatRelayView extends LinearLayout {
     public void setIsOn(boolean value) {
         getOnOffButton();
 
-        disableOnCheckedListener = true;
+        Utils.disableOnCheckedListener = true;
         try {
             tbButton.setTextOn(getResources().getString(R.string.on));
             tbButton.setTextOff(getResources().getString(R.string.off));
             tbButton.setChecked(value);
             tbButton.setEnabled(true);
         } finally {
-            disableOnCheckedListener = false;
+            Utils.disableOnCheckedListener = false;
         }
     }
 

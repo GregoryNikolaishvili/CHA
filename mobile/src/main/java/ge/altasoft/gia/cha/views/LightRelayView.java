@@ -12,8 +12,8 @@ import android.widget.ToggleButton;
 
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.ChaApplication;
 import ge.altasoft.gia.cha.LogBooleanActivity;
+import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.light.LightRelayData;
 import ge.altasoft.gia.cha.light.LightUtils;
 import ge.altasoft.gia.cha.R;
@@ -23,8 +23,6 @@ public class LightRelayView extends LinearLayout {
     private TextView tvRelayName;
     private TextView tvComment;
     private ToggleButton tbButton;
-
-    private Boolean disableOnCheckedListener = false;
 
     LightRelayData relayData;
 
@@ -47,31 +45,29 @@ public class LightRelayView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.light_relay_layout, this);
 
-        getOnOffButton();
-
-        tbButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        getOnOffButton().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                if (!disableOnCheckedListener) {
+                if (!Utils.disableOnCheckedListener) {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
 
-                    LightUtils.sendCommandToController(String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
+                    LightUtils.sendCommandToController(getContext(), String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
                 }
             }
         });
 
 
-        getRelayNameTextView();
-        tvRelayName.setOnClickListener(new View.OnClickListener() {
+        this.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 if (relayData != null) {
-                    Intent intent = new Intent(ChaApplication.getAppContext(), LogBooleanActivity.class);
+                    Intent intent = new Intent(getContext(), LogBooleanActivity.class);
                     intent.putExtra("id", relayData.getId());
                     intent.putExtra("scope", "LightRelay");
                     getContext().startActivity(intent);
                 }
+                return true;
             }
         });
     }
@@ -106,14 +102,14 @@ public class LightRelayView extends LinearLayout {
     public void setIsOn(boolean value) {
         getOnOffButton();
 
-        disableOnCheckedListener = true;
+        Utils.disableOnCheckedListener = true;
         try {
             tbButton.setTextOn(getResources().getString(R.string.on));
             tbButton.setTextOff(getResources().getString(R.string.off));
             tbButton.setChecked(value);
             tbButton.setEnabled(true);
         } finally {
-            disableOnCheckedListener = false;
+            Utils.disableOnCheckedListener = false;
         }
     }
 

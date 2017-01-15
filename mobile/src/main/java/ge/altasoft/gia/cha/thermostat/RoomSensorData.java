@@ -2,16 +2,20 @@ package ge.altasoft.gia.cha.thermostat;
 
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
+import java.util.Date;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.Utils;
+import ge.altasoft.gia.cha.classes.CircularArrayList;
 import ge.altasoft.gia.cha.classes.TempSensorData;
 
 public final class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
 
     private double H;
     private String name;
+    private CircularArrayList<Pair<Date, Double>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
     RoomSensorData(int id) {
         super(id);
@@ -20,12 +24,24 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         setDeltaDesiredT(1);
     }
 
+    public CircularArrayList<Pair<Date, Double>> getLogBufferH() {
+        return logBufferH;
+    }
+
     public String getName() {
         return this.name;
     }
 
     public double getHumidity() {
         return this.H;
+    }
+
+    private void setHumidity(double value)
+    {
+        if (this.H !=value) {
+            this.H = value;
+            logBufferH.add(new Pair<>(new Date(), value));
+        }
     }
 
     void encodeOrderAndName(StringBuilder sb2) {
@@ -49,7 +65,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         setTemperature(Integer.parseInt(value.substring(idx + 2, idx + 6), 16) / 10.0);
         setTemperatureTrend(value.charAt(idx + 6));
 
-        H = Integer.parseInt(value.substring(idx + 7, idx + 11), 16) / 10.0;
+        setHumidity(Integer.parseInt(value.substring(idx + 7, idx + 11), 16) / 10.0);
         return idx + 11;
     }
 
@@ -60,6 +76,12 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         setDesiredTemperature(Double.parseDouble(prefs.getString("t_desired_t_" + suffix, "25")));
     }
 
+    void encodeSettings(SharedPreferences.Editor editor) {
+        String suffix = Integer.toString(getId());
+
+        editor.putString("t_sensor_name_" + suffix, getName());
+        editor.putFloat("t_desired_t_" + suffix, (float)getDesiredTemperature());
+    }
 
     @Override
     public int compareTo(@NonNull RoomSensorData o) {

@@ -2,7 +2,6 @@ package ge.altasoft.gia.cha.thermostat;
 
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.SparseIntArray;
 
 import java.text.DateFormat;
@@ -218,12 +217,12 @@ public final class ThermostatControllerData extends RelayControllerData {
         }
 
         if (haveSettings()) {
-            sb.append(String.format(Locale.US, "%02X", roomSensorsMap.size()));
+            sb2.append(String.format(Locale.US, "%02X;", roomSensorsMap.size()));
             for (int id : roomSensorsMap.keySet())
                 roomSensorsMap.get(id).encodeOrderAndName(sb2);
         } else {
             if (Utils.DEBUG_THERMOSTAT) {
-                sb.append(String.format(Locale.US, "%02X", 10));
+                sb2.append(String.format(Locale.US, "%02X;", 10));
 
                 for (int id = 1; id <= 10; id++) {
                     sb2.append(String.format(Locale.US, "%02X%01X", id, id));
@@ -231,7 +230,7 @@ public final class ThermostatControllerData extends RelayControllerData {
                     sb2.append(';');
                 }
             } else
-                sb.append(String.format(Locale.US, "%02X", 0));
+                sb2.append(String.format(Locale.US, "%02X;", 0));
         }
         sb2.insert(0, String.format(Locale.US, "%04X", sb2.length()));
         sb.append(sb2);
@@ -280,6 +279,8 @@ public final class ThermostatControllerData extends RelayControllerData {
                 RoomSensorData roomSensorData = roomSensorsMap.get(id);
                 if (roomSensorData != null)
                     idx = roomSensorData.decodeState(response, idx);
+                else
+                    idx += 11;
             }
 
             setNow(response.substring(idx, idx + 12));
@@ -327,7 +328,13 @@ public final class ThermostatControllerData extends RelayControllerData {
         for (int i = 0; i < RELAY_COUNT; i++)
             relays(i).decodeOrderAndName(arr[i]);
 
-        for (int i = RELAY_COUNT; i < arr.length; i++) {
+        int count = Integer.parseInt(arr[RELAY_COUNT].substring(0, 2), 16);
+        if (count != (arr.length - RELAY_COUNT - 1)) {
+            Log.e("ThermControllerData", "Invalid number of sensors returned");
+            return Utils.FLAG_HAVE_NOTHING;
+        }
+
+        for (int i = RELAY_COUNT + 1; i < arr.length; i++) {
             int id = Integer.parseInt(arr[i].substring(0, 2), 16);
             RoomSensorData roomSensorData = roomSensorsMap.get(id);
 
@@ -355,19 +362,23 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         for (int id : roomSensorsMap.keySet())
             roomSensors(id).decodeSettings(prefs);
+
+        for (BoilerSensorData bs : boilerSensorsData)
+            bs.decodeSettings(prefs);
     }
 
     void saveToPreferences(SharedPreferences prefs) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("t_automatic_mode", isActive());
 
-        for (int i = 0; i < RELAY_COUNT; i++) {
-            String suffix = Integer.toString(i + 1);
+        for (int i = 0; i < RELAY_COUNT; i++)
+            relays(i).encodeSettings(editor);
 
-            ThermostatRelayData rs = relays(i);
+        for (RoomSensorData ss : roomSensorsMap.values())
+            ss.encodeSettings(editor);
 
-            editor.putString("t_relay_name_" + suffix, rs.getName());
-        }
+        for (BoilerSensorData bs : boilerSensorsData)
+            bs.encodeSettings(editor);
 
         editor.apply();
     }

@@ -50,7 +50,7 @@ public class ThermostatRelaysFragment extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    ThermostatUtils.sendCommandToController(isChecked ? "A" : "M");
+                    ThermostatUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
                 }
             }
         });

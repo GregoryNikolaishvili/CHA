@@ -1,5 +1,7 @@
 package ge.altasoft.gia.cha.thermostat;
 
+import android.content.SharedPreferences;
+
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.Utils;
@@ -33,5 +35,19 @@ public final class BoilerSensorData extends TempSensorData {
         setTemperatureTrend(value.charAt(idx + 4));
 
         return idx + 5;
+    }
+
+    void decodeSettings(SharedPreferences prefs) {
+        //String suffix = Integer.toString(getId());
+
+        //name = prefs.getString("t_sensor_name_" + suffix, "Sensor #" + suffix);
+        //setDesiredTemperature(Double.parseDouble(prefs.getString("t_desired_t_" + suffix, "25")));
+    }
+
+    public void encodeSettings(SharedPreferences.Editor editor) {
+        //String suffix = Integer.toString(getId());
+
+        //editor.putString("t_bsensor_name_" + suffix, getName());
+        //editor.putFloat("t_desired_t_" + suffix, (float)getDesiredTemperature());
     }
 }

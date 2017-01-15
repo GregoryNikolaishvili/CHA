@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 
-import ge.altasoft.gia.cha.ChaApplication;
 import ge.altasoft.gia.cha.LogBooleanActivity;
 import ge.altasoft.gia.cha.R;
 
@@ -35,13 +34,14 @@ public class BoilerPumpView extends ImageView {
         isOn = false;
         setBackgroundResource(R.drawable.pump_off);
 
-        this.setOnClickListener(new View.OnClickListener() {
+        this.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ChaApplication.getAppContext(), LogBooleanActivity.class);
+            public boolean onLongClick (View v){
+                Intent intent = new Intent(getContext(), LogBooleanActivity.class);
                 intent.putExtra("id", relayId);
                 intent.putExtra("scope", "BoilerPump");
                 getContext().startActivity(intent);
+                return true;
             }
         });
     }

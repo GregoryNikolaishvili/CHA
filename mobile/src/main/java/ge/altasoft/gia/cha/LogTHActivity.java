@@ -19,17 +19,19 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.classes.CircularArrayList;
 import ge.altasoft.gia.cha.classes.TempSensorData;
+import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
-public class LogTemperatureActivity extends ChaActivity {
+public class LogTHActivity extends ChaActivity {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
-    private TemperatureLogAdapter adapter = null;
+    private THLogAdapter adapter = null;
+    private boolean isTemperature = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_log_temperature);
+        setContentView(R.layout.activity_log_th);
 
         CircularArrayList<Pair<Date, Double>> logBuffer = null;
 
@@ -43,26 +45,34 @@ public class LogTemperatureActivity extends ChaActivity {
                 TempSensorData sensorData = ThermostatControllerData.Instance.boilerSensors(id - 1);
                 logBuffer = sensorData.getLogBuffer();
             }
-        } else if (scope.equals("RoomSensor")) {
+        } else if (scope.equals("RoomSensorT")) {
             int id = intent.getIntExtra("id", 0);
 
-            if (id > 0) {
-                TempSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id - 1);
-                logBuffer = sensorData.getLogBuffer();
-            }
+            TempSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id);
+            logBuffer = sensorData.getLogBuffer();
+        } else if (scope.equals("RoomSensorH")) {
+            int id = intent.getIntExtra("id", 0);
+
+            isTemperature = false;
+            RoomSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id);
+            logBuffer = sensorData.getLogBufferH();
         }
 
         if (logBuffer != null) {
-            adapter = new TemperatureLogAdapter(this, logBuffer);
+            adapter = new THLogAdapter(this, logBuffer, isTemperature);
 
             ListView listView = (ListView) findViewById(R.id.lvLogTemperature);
             listView.setAdapter(adapter);
         }
     }
 
-    public class TemperatureLogAdapter extends ArrayAdapter<Pair<Date, Double>> {
-        TemperatureLogAdapter(Context context, ArrayList<Pair<Date, Double>> points) {
+    public class THLogAdapter extends ArrayAdapter<Pair<Date, Double>> {
+        private boolean isTemperature;
+
+        THLogAdapter(Context context, ArrayList<Pair<Date, Double>> points, boolean isTemperature) {
             super(context, 0, points);
+
+            this.isTemperature = isTemperature;
         }
 
         @NonNull
@@ -77,7 +87,10 @@ public class LogTemperatureActivity extends ChaActivity {
             Pair<Date, Double> point = getItem(position);
             if (point != null) {
                 ((TextView) convertView.findViewById(R.id.tvLogDateTime)).setText(sdf.format(point.first));
-                ((TextView) convertView.findViewById(R.id.tvLogValue)).setText(String.format(Locale.US, "%.1f°", point.second));
+                if (isTemperature)
+                    ((TextView) convertView.findViewById(R.id.tvLogValue)).setText(String.format(Locale.US, "%.1f°", point.second));
+                else
+                    ((TextView) convertView.findViewById(R.id.tvLogValue)).setText(String.format(Locale.US, "%.0f %%", point.second));
             }
             return convertView;
         }

@@ -88,9 +88,9 @@ public class MainActivity extends ChaActivity {
 
                 if (id == R.id.action_ok) {
                     if (LightControllerData.Instance.relayOrderChanged())
-                        LightUtils.sendCommandToController(LightControllerData.Instance.encodeSettings());
+                        LightUtils.sendCommandToController(this, LightControllerData.Instance.encodeSettings());
                     if (ThermostatControllerData.Instance.relayOrderChanged() || ThermostatControllerData.Instance.roomSensorOrderChanged())
-                        ThermostatUtils.sendCommandToController(ThermostatControllerData.Instance.encodeSettings());
+                        ThermostatUtils.sendCommandToController(this, ThermostatControllerData.Instance.encodeSettings());
                 } else {
                     LightControllerData.Instance.restoreRelayOrders();
                     pagerAdapter.lightFragment.rebuildUI();
@@ -103,7 +103,7 @@ public class MainActivity extends ChaActivity {
                 return true;
 
             case R.id.action_refresh:
-                LightUtils.sendCommandToController("?");
+                LightUtils.sendCommandToController(this, "?");
                 return true;
 
             case R.id.action_show_info:

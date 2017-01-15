@@ -1,26 +1,29 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
-import android.preference.EditTextPreference;
 import android.text.InputType;
 import android.util.AttributeSet;
 
-public class IntegerPreference extends EditTextPreference {
+public class IntegerPreference extends FriendlyEditTextPreference {
 
     private Integer mInteger;
 
     public IntegerPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        init();
     }
 
     public IntegerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        init();
     }
 
     public IntegerPreference(Context context) {
         super(context);
+        init();
+    }
+
+    private void init() {
         getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
     }
 

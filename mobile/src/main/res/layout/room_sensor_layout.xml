@@ -5,33 +5,33 @@
 
     <TextView
         android:id="@+id/sensor_name"
-        style="@android:style/TextAppearance.Medium"
+        style="@android:style/TextAppearance.Small"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
 
     <TextView
         android:id="@+id/temperature_value"
-        style="@android:style/TextAppearance.Medium"
-        android:layout_width="100dp"
+        style="@android:style/TextAppearance.Small"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:gravity="right"
         android:text="@string/sample_temperature" />
 
     <TextView
         android:id="@+id/temperature_trend"
-        style="@android:style/TextAppearance.Medium"
-        android:layout_width="20dp"
+        style="@android:style/TextAppearance.Small"
+        android:layout_width="16dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
+
         android:gravity="left" />
 
     <TextView
         android:id="@+id/humidity_value"
-        style="@android:style/TextAppearance.Medium"
-        android:layout_width="100dp"
+        style="@android:style/TextAppearance.Small"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+
         android:gravity="right"
         android:text="@string/sample_humidity" />
 </LinearLayout>

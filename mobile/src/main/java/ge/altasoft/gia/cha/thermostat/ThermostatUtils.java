@@ -7,7 +7,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Debug;
-import ge.altasoft.gia.cha.ChaApplication;
+
 import ge.altasoft.gia.cha.Utils;
 
 public final class ThermostatUtils {
@@ -18,11 +18,11 @@ public final class ThermostatUtils {
 
     public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 3; // $ + 12 switches + autoatic_mode + datetime  + sunrise/sunset 123456789012TYYMMDDHHmmssxxxxxxxx. 34 chars
 
-    public static void sendCommandToController(String command) {
+    public static void sendCommandToController(Context context, String command) {
         Intent intent;
         intent = new Intent(ThermostatBroadcastService.BROADCAST_ACTION_SET);
         intent.putExtra("command", command);
-        ChaApplication.getAppContext().sendBroadcast(intent);
+        context.sendBroadcast(intent);
     }
 
     public static String GetControllerIp(Context context) {

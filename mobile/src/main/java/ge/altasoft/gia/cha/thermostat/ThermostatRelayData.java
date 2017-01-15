@@ -19,4 +19,10 @@ public final class ThermostatRelayData extends RelayData {
 
         setName(prefs.getString("t_relay_name_" + suffix, "Relay #" + suffix));
     }
+
+    void encodeSettings(SharedPreferences.Editor editor) {
+        String suffix = Integer.toString(getId());
+
+        editor.putString("t_relay_name_" + suffix, getName());
+    }
 }

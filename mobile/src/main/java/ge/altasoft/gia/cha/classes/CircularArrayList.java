@@ -6,7 +6,7 @@ public class CircularArrayList<E> extends ArrayList<E> {
 
     private int capacity = 0;
 
-    CircularArrayList(int capacity) {
+    public CircularArrayList(int capacity) {
         this.capacity = capacity;
     }
 

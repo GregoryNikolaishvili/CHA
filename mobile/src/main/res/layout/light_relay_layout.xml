@@ -16,7 +16,7 @@
 
     <TextView
         android:id="@+id/comment"
-        style="@android:style/TextAppearance.Medium"
+        style="@android:style/TextAppearance.Small"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="0"
@@ -25,7 +25,7 @@
 
     <ToggleButton
         android:id="@+id/onOffButton"
-        style="@android:style/TextAppearance.Medium"
+        style="@android:style/TextAppearance.Small"
         android:layout_width="100dp"
         android:layout_height="match_parent"
         android:layout_weight="0"

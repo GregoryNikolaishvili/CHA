@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
@@ -19,6 +18,7 @@ import java.util.Map;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.FriendlyEditTextPreference;
+import ge.altasoft.gia.cha.views.TemperaturePreference;
 
 public class ThermostatSettingsActivity extends PreferenceActivity {
 
@@ -129,12 +129,12 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
                     p1.setTitle("Name");
                     screen.addPreference(p1);
 
-//                    Numeri p2 = new DecimalPreference(prefContext);
-//                    p2.setKey("t_desired_t_" + Integer.toString(id));
-//                    p2.setSummary("%s°");
-//                    p2.setTitle("Desired temperature");
-//                    screen.addPreference(p2);
-//
+                    TemperaturePreference p2 = new TemperaturePreference(prefContext);
+                    p2.setKey("t_desired_t_" + Integer.toString(id));
+                    p2.setSummary("%s°");
+                    p2.setTitle("Desired temperature");
+                    screen.addPreference(p2);
+
                     sensorsCat.addPreference(screen);
                 }
 

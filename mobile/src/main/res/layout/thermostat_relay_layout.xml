@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/relay_name"
@@ -13,20 +15,19 @@
 
     <TextView
         android:id="@+id/comment"
-        style="@android:style/TextAppearance.Medium"
+        style="@android:style/TextAppearance.Small"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@+id/relay_name"
         android:layout_weight="0"
         android:gravity="center_vertical"
         android:paddingRight="8dp" />
 
     <ToggleButton
         android:id="@+id/onOffButton"
+        style="@android:style/TextAppearance.Small"
         android:layout_width="100dp"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@+id/comment"
         android:layout_weight="0"
         android:background="@drawable/on_off_toggle_button"
         android:enabled="false" />
-</merge>
+</LinearLayout>
