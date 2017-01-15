@@ -35,8 +35,13 @@
         <activity
             android:name=".light.LightSettingsActivity"
             android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".thermostat.ThermostatSettingsActivity"
+            android:label="@string/title_activity_settings" />
+
         <activity android:name=".GraphActivity" />
-        <activity android:name=".TemperatureLogActivity"></activity>
+        <activity android:name=".LogTemperatureActivity" />
+        <activity android:name=".LogBooleanActivity"></activity>
     </application>
 
 </manifest>

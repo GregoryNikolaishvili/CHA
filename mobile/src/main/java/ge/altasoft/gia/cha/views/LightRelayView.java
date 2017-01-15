@@ -1,8 +1,10 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -10,6 +12,8 @@ import android.widget.ToggleButton;
 
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.ChaApplication;
+import ge.altasoft.gia.cha.LogBooleanActivity;
 import ge.altasoft.gia.cha.light.LightRelayData;
 import ge.altasoft.gia.cha.light.LightUtils;
 import ge.altasoft.gia.cha.R;
@@ -53,6 +57,20 @@ public class LightRelayView extends LinearLayout {
                     button.setEnabled(false);
 
                     LightUtils.sendCommandToController(String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
+                }
+            }
+        });
+
+
+        getRelayNameTextView();
+        tvRelayName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (relayData != null) {
+                    Intent intent = new Intent(ChaApplication.getAppContext(), LogBooleanActivity.class);
+                    intent.putExtra("id", relayData.getId());
+                    intent.putExtra("scope", "LightRelay");
+                    getContext().startActivity(intent);
                 }
             }
         });

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings">
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="automatic_mode"
+        android:summary="Select thermostat is active or inactive"
+        android:title="Active" />
+    <PreferenceScreen android:title="Relays">
+        <PreferenceCategory
+            android:key="Relays"
+            android:title="Relays" />
+    </PreferenceScreen>
+
+    <PreferenceScreen android:title="Sensors">
+        <PreferenceCategory
+            android:key="Sensors"
+            android:title="Sensors" />
+    </PreferenceScreen>
+
+    <PreferenceScreen android:title="Solar">
+    </PreferenceScreen>
+</PreferenceScreen>
+

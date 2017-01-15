@@ -165,10 +165,8 @@ public final class LightControllerData extends RelayControllerData {
     }
 
     void saveToPreferences(SharedPreferences prefs) {
-        LightControllerData ss = LightControllerData.Instance;
-
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean("l_automatic_mode", ss.isActive());
+        editor.putBoolean("l_automatic_mode", isActive());
 
         for (int i = 0; i < RELAY_COUNT; i++)
             relays(i).encodeSettings(editor);

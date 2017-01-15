@@ -1,8 +1,11 @@
-package ge.altasoft.gia.cha.thermostat;
+package ge.altasoft.gia.cha.classes;
 
 import android.graphics.Color;
+import android.util.Pair;
 
 import java.util.Date;
+
+import ge.altasoft.gia.cha.Utils;
 
 public class TempSensorData {
 
@@ -12,21 +15,20 @@ public class TempSensorData {
     protected int order;
 
     private double T;
-    char temperatureTrend;
+    private char temperatureTrend;
 
     private double desiredT;
     private double deltaDesiredT;
 
-    long lastActivitySec;
+    private long lastActivitySec;
 
-    private TemperaturePointArray logBuffer = new TemperaturePointArray(100);
-    //private StringBuilder log;
+    private CircularArrayList<Pair<Date, Double>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
     public final static char NO_CHANGE = 'N';
     public final static char GOING_UP = 'U';
     public final static char GOING_DOWN = 'D';
 
-    TempSensorData(int id) {
+    public TempSensorData(int id) {
         this.id = id;
         //this.enabled = false;
         this.T = 99;
@@ -37,37 +39,48 @@ public class TempSensorData {
         return this.id;
     }
 
+    long getLastActivitySec() {
+        return this.lastActivitySec;
+    }
+
     public double getTemperature() {
         return this.T;
     }
 
-    public long getLastActivitySec() {
-        return this.lastActivitySec;
+    protected void setTemperature(double value) {
+        this.lastActivitySec = System.currentTimeMillis() / 1000;
+
+        if (this.T != value) {
+            this.T = value;
+            logBuffer.add(new Pair<Date, Double>(new Date(), value));
+        }
     }
 
-    public int getTemperatureTrend() {
+    public char getTemperatureTrend() {
         return this.temperatureTrend;
     }
 
-    public TemperaturePointArray getLogBuffer() {
+    protected void setTemperatureTrend(char value) {
+        this.temperatureTrend = value;
+    }
+
+    public CircularArrayList<Pair<Date, Double>> getLogBuffer() {
         return logBuffer;
     }
+
 //    public String getInfo() {
 //        return String.format(Locale.US, "Last sync: %d seconds ago", System.currentTimeMillis() / 1000 - lastActivitySec) + "\n\n" + log.toString();
 //    }
 
-//    public double getDesiredTemperature() {
-//        return this.desiredT;
-//    }
-
-    void setTemperature(double value) {
-        this.T = value;
-        this.lastActivitySec = System.currentTimeMillis() / 1000;
-
-        logBuffer.add(new TemperaturePoint(new Date(), value));
+    public double getDesiredTemperature() {
+        return this.desiredT;
     }
 
-    void setDeltaDesiredT(double value) {
+    public void setDesiredTemperature(double value) {
+        this.desiredT = value;
+    }
+
+    protected void setDeltaDesiredT(double value) {
         deltaDesiredT = value;
     }
 

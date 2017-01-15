@@ -1,5 +1,7 @@
 package ge.altasoft.gia.cha.thermostat;
 
+import android.content.SharedPreferences;
+
 import ge.altasoft.gia.cha.classes.RelayData;
 
 public final class ThermostatRelayData extends RelayData {
@@ -10,5 +12,11 @@ public final class ThermostatRelayData extends RelayData {
 
     public String getComment() {
         return "";
+    }
+
+    void decodeSettings(SharedPreferences prefs) {
+        String suffix = Integer.toString(getId());
+
+        setName(prefs.getString("t_relay_name_" + suffix, "Relay #" + suffix));
     }
 }

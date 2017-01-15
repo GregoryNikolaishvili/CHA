@@ -10,18 +10,18 @@ import java.util.Date;
 
 public class LineSeriesArray {
 
-    private LineSeries[] series;
+    private TemperatureLineSeries[] series;
 
     public LineSeriesArray(int count) {
-        series = new LineSeries[count];
+        series = new TemperatureLineSeries[count];
 
         for (int i = 0; i < count; i++) {
-            series[i] = new LineSeries();
+            series[i] = new TemperatureLineSeries();
             series[i].setColor(getDefaultColor(i));
         }
     }
 
-    public LineSeries getItem(int index)
+    public TemperatureLineSeries getItem(int index)
     {
         return series[index];
     }
@@ -47,8 +47,7 @@ public class LineSeriesArray {
         graph.getViewport().setMaxY(100.0);
         graph.getGridLabelRenderer().setHumanRounding(false);
 
-        for (int i = 0; i < series.length; i++)
-            graph.addSeries(series[i]);
+        for (TemperatureLineSeries s : series) graph.addSeries(s);
     }
 
     private int getDefaultColor(int idx) {

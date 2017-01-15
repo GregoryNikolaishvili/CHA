@@ -3,6 +3,7 @@ package ge.altasoft.gia.cha.thermostat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,11 @@ import android.widget.RelativeLayout;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 
+import java.util.Date;
+
 import ge.altasoft.gia.cha.GraphActivity;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.classes.CircularArrayList;
 import ge.altasoft.gia.cha.classes.LineSeriesArray;
 import ge.altasoft.gia.cha.views.BoilerPumpView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
@@ -141,12 +145,15 @@ public class BoilerFragment extends Fragment {
         if (!ThermostatControllerData.Instance.haveSettings() || (rootView == null))
             return;
 
+        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setRelayId(ThermostatControllerData.BOILER_SOLAR_PUMP);
+        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);
+
         for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-            TemperaturePointArray points = ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer();
+            CircularArrayList<Pair<Date, Double>> points = ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer();
 
             DataPoint[] dataPoints = new DataPoint[points.size()];
             int idx = 0;
-            for (TemperaturePoint pt : points)
+            for (Pair<Date, Double> pt : points)
                 dataPoints[idx++] = new DataPoint(pt.first.getTime(), pt.second);
 
             pointSeries.getItem(i).resetData(dataPoints);

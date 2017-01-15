@@ -23,6 +23,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatSensorsFragment;
 import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatRelaysFragment;
+import ge.altasoft.gia.cha.thermostat.ThermostatSettingsActivity;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class MainActivity extends ChaActivity {
@@ -137,7 +138,7 @@ public class MainActivity extends ChaActivity {
 
             //region Thermostat
             case R.id.action_thermostat_settings:
-                startActivityForResult(new Intent(this, LightSettingsActivity.class), ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE);
+                startActivityForResult(new Intent(this, ThermostatSettingsActivity.class), ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE);
                 return true;
 
             //endregion

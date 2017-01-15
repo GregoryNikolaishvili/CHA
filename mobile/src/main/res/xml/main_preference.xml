@@ -4,10 +4,8 @@
 
     <PreferenceCategory android:title="Light">
 
-        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+        <ge.altasoft.gia.cha.views.IPAddressPreference
             android:defaultValue="192.168.2.9"
-            android:digits="0123456789."
-            android:inputType="numberDecimal"
             android:key="light_controller_ip"
             android:summary="%s"
             android:title="IP address" />
@@ -22,10 +20,8 @@
 
     <PreferenceCategory android:title="Thermostat">
 
-        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+        <ge.altasoft.gia.cha.views.IPAddressPreference
             android:defaultValue="192.168.2.8"
-            android:digits="0123456789."
-            android:inputType="numberDecimal"
             android:key="thermostat_controller_ip"
             android:summary="%s"
             android:title="IP address" />

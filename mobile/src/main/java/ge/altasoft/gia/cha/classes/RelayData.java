@@ -1,7 +1,9 @@
 package ge.altasoft.gia.cha.classes;
 
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
+import java.util.Date;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.Utils;
@@ -14,11 +16,17 @@ public abstract class RelayData implements Comparable<RelayData> {
 
     private String name;
 
+    private CircularArrayList<Pair<Date, Boolean>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
+
     public RelayData(int id) {
         this.id = id;
         this.order = id;
         this.isOn = false;
         this.name = "Default Relay #" + String.valueOf(id);
+    }
+
+    public CircularArrayList<Pair<Date, Boolean>> getLogBuffer() {
+        return logBuffer;
     }
 
     public int getId() {
@@ -38,7 +46,10 @@ public abstract class RelayData implements Comparable<RelayData> {
     }
 
     public void setIsOn(boolean value) {
-        this.isOn = value;
+        if (this.isOn != value) {
+            this.isOn = value;
+            logBuffer.add(new Pair<Date, Boolean>(new Date(), value));
+        }
     }
 
     public void setName(String value) {
@@ -62,7 +73,6 @@ public abstract class RelayData implements Comparable<RelayData> {
 
     public void encodeSettings(StringBuilder sb) {
     }
-
 
     public static void encodeSettingsDebug(StringBuilder ignored) {
     }

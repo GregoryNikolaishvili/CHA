@@ -72,7 +72,7 @@ public class ThermostatSensorsFragment extends Fragment {
 
         Map<Integer, RoomSensorData> sensors = ThermostatControllerData.Instance.sortedRoomSensors();
         for (int id : sensors.keySet()) {
-            RoomSensorData data = ThermostatControllerData.Instance.roomSensor(id);
+            RoomSensorData data = ThermostatControllerData.Instance.roomSensors(id);
 
             RoomSensorView sensor = new RoomSensorView(context);
             sensor.setSensorData(data);

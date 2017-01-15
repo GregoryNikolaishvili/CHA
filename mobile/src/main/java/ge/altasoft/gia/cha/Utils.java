@@ -26,6 +26,8 @@ public class Utils {
     public static final int FLAG_HAVE_STATE = 1;
     public static final int FLAG_HAVE_SETTINGS = 2;
 
+    public static final int LOG_BUFFER_SIZE = 100;
+
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
 
     public static boolean disableOnCheckedListener = false;

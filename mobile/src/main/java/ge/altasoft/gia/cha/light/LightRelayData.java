@@ -28,7 +28,7 @@ public final class LightRelayData extends RelayData {
     }
 
     private String getOnTime() {
-        int minutes = LightControllerData.Instance.getSunriseMin() + onOffset;
+        int minutes = LightControllerData.Instance.getSunsetMin() + onOffset;
 
         int hours = minutes / 60;
         minutes = minutes % 60;

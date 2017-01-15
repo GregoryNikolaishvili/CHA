@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 
 import java.util.Locale;
 
-public final class FriendlyEditTextPreference extends EditTextPreference {
+public class FriendlyEditTextPreference extends EditTextPreference {
 
     public FriendlyEditTextPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);

@@ -2,6 +2,8 @@ package ge.altasoft.gia.cha.thermostat;
 
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,18 +25,17 @@ public final class ThermostatControllerData extends RelayControllerData {
     final static int BOILER_SOLAR_PUMP = 0;
     final static int BOILER_HEATING_PUMP = 1;
 
-    final private static int RELAY_COUNT = 15;
+    final static int RELAY_COUNT = 15;
     final public static int BOILER_SENSOR_COUNT = 4;
     final private static int BOILER_PUMP_COUNT = 2;
-    final private static int ROOM_SENSOR_MAX_COUNT = 30;
 
     final public static ThermostatControllerData Instance = new ThermostatControllerData();
 
     private BoilerSensorData[] boilerSensorsData;
     private BoilerPumpData[] boilerPumpsData;
 
-    private HashMap<Integer, RoomSensorData> roomSensors;
-    private int[] savedRoomSensorOrders;
+    private HashMap<Integer, RoomSensorData> roomSensorsMap;
+    private SparseIntArray savedRoomSensorOrders;
     private boolean roomSensorsReordered;
 
     private ThermostatControllerData() {
@@ -45,8 +46,8 @@ public final class ThermostatControllerData extends RelayControllerData {
         boilerSensorsData = new BoilerSensorData[BOILER_SENSOR_COUNT];
         boilerPumpsData = new BoilerPumpData[BOILER_PUMP_COUNT];
 
-        roomSensors = new HashMap<Integer, RoomSensorData>();
-        savedRoomSensorOrders = new int[ROOM_SENSOR_MAX_COUNT];
+        roomSensorsMap = new HashMap<>();
+        savedRoomSensorOrders = new SparseIntArray();
 
         for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
             boilerSensorsData[i] = new BoilerSensorData(i + 1);
@@ -67,7 +68,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         return (ThermostatRelayData) super.relays(index);
     }
 
-    BoilerPumpData boilerPumps(int index) {
+    public BoilerPumpData boilerPumps(int index) {
         return boilerPumpsData[index];
     }
 
@@ -77,28 +78,28 @@ public final class ThermostatControllerData extends RelayControllerData {
 
 
     Map<Integer, RoomSensorData> sortedRoomSensors() {
-        return sortByOrder(roomSensors);
+
+        return sortByOrder(roomSensorsMap);
     }
 
-    RoomSensorData roomSensor(int id) {
-        return Instance.roomSensors.get(id);
+    public RoomSensorData roomSensors(int id) {
+        return roomSensorsMap.get(id);
     }
 
     public void saveRoomSensorOrders() {
         roomSensorsReordered = false;
 
-        //TODO
-//        for (int i = 0; i < ThermostatUtils.ROOM_SENSOR_MAX_COUNT; i++) {
-//            savedRoomSensorOrders[i] = roomSensors.get(i).order;
-//        }
+        savedRoomSensorOrders.clear();
+        for (int id : roomSensorsMap.keySet())
+            savedRoomSensorOrders.append(id, roomSensorsMap.get(id).getOrder());
     }
 
     public void restoreRoomSensorRelayOrders() {
-        //TODO
-//        for (int i = 0; i < ThermostatUtils.ROOM_SENSOR_MAX_COUNT; i++) {
-//            roomSensors.get(i).order = savedRoomSensorOrders[i];
-//        }
+        for (int id : roomSensorsMap.keySet())
+            roomSensorsMap.get(id).setOrder(savedRoomSensorOrders.get(id));
+
         roomSensorsReordered = false;
+        savedRoomSensorOrders.clear();
     }
 
     public boolean roomSensorOrderChanged() {
@@ -107,12 +108,12 @@ public final class ThermostatControllerData extends RelayControllerData {
 
     private RoomSensorData getRoomSensorFromUIIndex(int index) {
 
-        Map<Integer, RoomSensorData> ss = sortByOrder(roomSensors);
+        Map<Integer, RoomSensorData> ss = sortByOrder(roomSensorsMap);
 
         int idx = 0;
         for (int id : ss.keySet()) {
             if (idx == index)
-                return roomSensors.get(id);
+                return roomSensorsMap.get(id);
             idx++;
         }
         return null;
@@ -169,9 +170,9 @@ public final class ThermostatControllerData extends RelayControllerData {
                     sb.append(String.format(Locale.US, "%02X%04X%c%04X", id, Utils.random(10, 100) * 10, c, Utils.random(10, 100) * 10));
                 }
             } else {
-                sb.append(String.format(Locale.US, "%02X", roomSensors.size()));
-                for (int id : roomSensors.keySet()) {
-                    roomSensors.get(id).encodeState(sb);
+                sb.append(String.format(Locale.US, "%02X", roomSensorsMap.size()));
+                for (int id : roomSensorsMap.keySet()) {
+                    roomSensorsMap.get(id).encodeState(sb);
                 }
             }
         } else {
@@ -217,9 +218,9 @@ public final class ThermostatControllerData extends RelayControllerData {
         }
 
         if (haveSettings()) {
-            sb.append(String.format(Locale.US, "%02X", roomSensors.size()));
-            for (int id : roomSensors.keySet())
-                roomSensors.get(id).encodeOrderAndName(sb2);
+            sb.append(String.format(Locale.US, "%02X", roomSensorsMap.size()));
+            for (int id : roomSensorsMap.keySet())
+                roomSensorsMap.get(id).encodeOrderAndName(sb2);
         } else {
             if (Utils.DEBUG_THERMOSTAT) {
                 sb.append(String.format(Locale.US, "%02X", 10));
@@ -238,7 +239,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         return sb.toString();
     }
 
-    public int decode(String response) {
+    int decode(String response) {
         if (response == null) return Utils.FLAG_HAVE_NOTHING;
 
         Log.d("decode thermostat", response);
@@ -276,7 +277,7 @@ public final class ThermostatControllerData extends RelayControllerData {
             for (int i = 0; i < count; i++) {
                 Integer id = Integer.parseInt(response.substring(idx, idx + 2), 16);
 
-                RoomSensorData roomSensorData = roomSensors.get(id);
+                RoomSensorData roomSensorData = roomSensorsMap.get(id);
                 if (roomSensorData != null)
                     idx = roomSensorData.decodeState(response, idx);
             }
@@ -328,12 +329,12 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         for (int i = RELAY_COUNT; i < arr.length; i++) {
             int id = Integer.parseInt(arr[i].substring(0, 2), 16);
-            RoomSensorData roomSensorData = roomSensors.get(id);
+            RoomSensorData roomSensorData = roomSensorsMap.get(id);
 
             if (roomSensorData == null) {
                 roomSensorData = new RoomSensorData(id);
                 //drawUI.createNewSensor(roomSensorData);
-                roomSensors.put(id, roomSensorData);
+                roomSensorsMap.put(id, roomSensorData);
             }
 
             roomSensorData.decodeOrderAndName(arr[i]);
@@ -345,16 +346,25 @@ public final class ThermostatControllerData extends RelayControllerData {
         return Utils.FLAG_HAVE_SETTINGS;
     }
 
-    public static void saveToPreferences(SharedPreferences prefs) {
-        ThermostatControllerData ss = ThermostatControllerData.Instance;
+    void decode(SharedPreferences prefs) {
 
+        setIsActive(prefs.getBoolean("t_automatic_mode", false));
+
+        for (int i = 0; i < RELAY_COUNT; i++)
+            relays(i).decodeSettings(prefs);
+
+        for (int id : roomSensorsMap.keySet())
+            roomSensors(id).decodeSettings(prefs);
+    }
+
+    void saveToPreferences(SharedPreferences prefs) {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean("t_automatic_mode", ss.isActive());
+        editor.putBoolean("t_automatic_mode", isActive());
 
         for (int i = 0; i < RELAY_COUNT; i++) {
             String suffix = Integer.toString(i + 1);
 
-            ThermostatRelayData rs = ss.relays(i);
+            ThermostatRelayData rs = relays(i);
 
             editor.putString("t_relay_name_" + suffix, rs.getName());
         }

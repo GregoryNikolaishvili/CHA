@@ -105,7 +105,7 @@ public class LightSettingsActivity extends PreferenceActivity {
 
                     TimePreference p3 = new TimePreference(prefContext);
                     p3.setKey("l_on_offset_" + Integer.toString(id));
-                    p3.setTitle("On onOffset");
+                    p3.setTitle("On (offset to sunrise)");
                     screen.addPreference(p3);
 
                     ListPreference p4 = new ListPreference(prefContext);
