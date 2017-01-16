@@ -13,6 +13,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -74,27 +77,42 @@ public class ThermostatBroadcastService extends Service {
 
         protected String doInBackground(String... args) {
             String response = null;
+            JSONObject jState = null;
 
             if (Utils.DEBUG_THERMOSTAT) {
                 if (args[0].startsWith("#")) {
                     ThermostatControllerData.Instance.relays(Integer.parseInt(String.valueOf(args[0].charAt(1)), 16) - 1).setIsOn(args[0].charAt(2) == '1');
-                    response = ThermostatControllerData.Instance.encodeState();
+                    jState = ThermostatControllerData.Instance.encodeState();
                 } else if (args[0].equals("M")) {
                     ThermostatControllerData.Instance.setIsActive(false);
-                    response = ThermostatControllerData.Instance.encodeState();
+                    jState = ThermostatControllerData.Instance.encodeState();
                 } else if (args[0].equals("A")) {
                     ThermostatControllerData.Instance.setIsActive(true);
-                    response = ThermostatControllerData.Instance.encodeState();
+                    jState = ThermostatControllerData.Instance.encodeState();
                 } else if (args[0].equals("?") || args[0].equals("@") || args[0].startsWith("*") || args[0].startsWith("#")) {
-                    response = ThermostatControllerData.Instance.encodeState();
+                    jState = ThermostatControllerData.Instance.encodeState();
                 }
 
                 if (args[0].equals("@")) {
-                    response = ThermostatControllerData.Instance.encodeSettings() + response;
+                    try {
+                        JSONObject jSettings = new JSONObject(ThermostatControllerData.Instance.encodeSettings().substring(1));
+                        jSettings.put("state", jState);
+                        response = jSettings.toString();
+                    } catch (JSONException e) {
+                        Log.e("JSON", e.getMessage());
+                    }
+                } else {
+                    JSONObject jStateMain = new JSONObject();
+                    try {
+                        jStateMain.put("state", jState);
+                    } catch (JSONException e) {
+                        Log.e("JSON", e.getMessage());
+                    }
+                    response = jStateMain.toString();
                 }
-                if (response == null) {
+
+                if ((response == null) || (response.length() <= 1))
                     Log.wtf("GetSensorMappingId", "what the fuck");
-                }
 
                 return response;
             }
@@ -160,7 +178,7 @@ public class ThermostatBroadcastService extends Service {
         public void run() {
             if (SetAllSettings) {
                 SetAllSettings = false;
-                sendDataToController("*" + ThermostatControllerData.Instance.encodeSettings());
+                sendDataToController(ThermostatControllerData.Instance.encodeSettings());
             } else {
                 sendDataToController(ThermostatControllerData.Instance.haveSettings() ? "?" : "@");
             }

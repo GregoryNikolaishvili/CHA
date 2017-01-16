@@ -23,6 +23,11 @@ public final class LightControllerData extends RelayControllerData {
 
         sunriseMin = 8 * 60;
         sunsetMin = 22 * 60;
+
+        for (int i = 0; i < RELAY_COUNT; i++) {
+            LightRelayData relay = new LightRelayData(i + 1);
+            setRelay(i, relay);
+        }
     }
 
     @Override
@@ -119,11 +124,8 @@ public final class LightControllerData extends RelayControllerData {
         setIsActive(response.charAt(1) != 'F');
 
         int idx = 2;
-        for (int i = 0; i < RELAY_COUNT; i++) {
-            LightRelayData relay = new LightRelayData(i + 1);
-            idx = relay.decodeSettings(response, idx);
-            setRelay(i, relay);
-        }
+        for (int i = 0; i < RELAY_COUNT; i++)
+            idx = relays(i).decodeSettings(response, idx);
 
         setHaveSettings(true);
 

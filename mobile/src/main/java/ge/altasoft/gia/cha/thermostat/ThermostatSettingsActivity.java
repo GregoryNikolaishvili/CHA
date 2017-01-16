@@ -13,6 +13,7 @@ import android.preference.PreferenceScreen;
 import android.view.KeyEvent;
 import android.widget.BaseAdapter;
 
+import java.util.Locale;
 import java.util.Map;
 
 import ge.altasoft.gia.cha.R;
@@ -188,11 +189,10 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
                     if (sensors.getPreference(i) instanceof PreferenceScreen) {
                         PreferenceScreen screen = (PreferenceScreen) sensors.getPreference(i);
                         FriendlyEditTextPreference namePref = (FriendlyEditTextPreference) screen.getPreference(1);
+                        TemperaturePreference desiredTPref = (TemperaturePreference) screen.getPreference(2);
 
-                        String name = namePref.getText();
-                        if (name == null)
-                            name = "Sensor #" + Integer.toString(ThermostatControllerData.Instance.relays(i).getId());
-                        screen.setTitle(name);
+                        screen.setTitle(namePref.getText() == null ? "Sensor #" + Integer.toString(ThermostatControllerData.Instance.relays(i).getId()) : namePref.getText());
+                        screen.setSummary(String.format(Locale.US, "Set T: %s°", desiredTPref.getText() == null ? String.valueOf(Utils.DEFAULT_DESIRED_TEMPERATURE) : desiredTPref.getText()));
                     }
                 }
             }

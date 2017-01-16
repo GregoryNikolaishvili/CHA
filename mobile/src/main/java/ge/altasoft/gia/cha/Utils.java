@@ -30,6 +30,8 @@ public class Utils {
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
 
+    public static final double DEFAULT_DESIRED_TEMPERATURE = 25.0;
+
     public static boolean disableOnCheckedListener = false;
 
     public static String ShortToHex4(short value) {

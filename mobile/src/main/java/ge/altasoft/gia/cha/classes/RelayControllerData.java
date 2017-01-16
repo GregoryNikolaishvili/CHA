@@ -9,15 +9,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ge.altasoft.gia.cha.classes.RelayData;
-
 public abstract class RelayControllerData {
 
     private boolean isActive;
     private boolean haveSettings;
     private Date now;
 
-    private RelayData[] relays;
+    private RelayData[] relayDatas;
     private int[] savedRelayOrders;
     private boolean relaysReordered;
 
@@ -28,7 +26,7 @@ public abstract class RelayControllerData {
         relaysReordered = false;
         haveSettings = false;
         now = new Date();
-        relays = new RelayData[relayCount()];
+        relayDatas = new RelayData[relayCount()];
         savedRelayOrders = new int[relayCount()];
     }
 
@@ -37,11 +35,11 @@ public abstract class RelayControllerData {
     }
 
     public RelayData relays(int index) {
-        return relays[index];
+        return relayDatas[index];
     }
 
     public RelayData[] sortedRelays() {
-        RelayData[] r = Arrays.copyOf(relays, relays.length);
+        RelayData[] r = Arrays.copyOf(relayDatas, relayDatas.length);
         Arrays.sort(r);
         return r;
     }
@@ -68,7 +66,7 @@ public abstract class RelayControllerData {
 
 
     protected void setRelay(int index, RelayData relay) {
-        relays[index] = relay;
+        relayDatas[index] = relay;
     }
 
 
@@ -82,18 +80,18 @@ public abstract class RelayControllerData {
 
     public void saveRelayOrders() {
         relaysReordered = false;
-        for (int i = 0; i < relays.length; i++)
-            savedRelayOrders[i] = relays[i].getOrder();
+        for (int i = 0; i < relayDatas.length; i++)
+            savedRelayOrders[i] = relayDatas[i].getOrder();
     }
 
     public void restoreRelayOrders() {
-        for (int i = 0; i < relays.length; i++)
-            relays[i].setOrder(savedRelayOrders[i]);
+        for (int i = 0; i < relayDatas.length; i++)
+            relayDatas[i].setOrder(savedRelayOrders[i]);
         relaysReordered = false;
     }
 
     private RelayData getRelayFromUIIndex(int index) {
-        RelayData[] r = Arrays.copyOf(relays, relays.length);
+        RelayData[] r = Arrays.copyOf(relayDatas, relayDatas.length);
         Arrays.sort(r);
 
         return r[index];

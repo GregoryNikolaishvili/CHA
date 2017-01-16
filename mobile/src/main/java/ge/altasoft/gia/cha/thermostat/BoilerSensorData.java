@@ -37,6 +37,11 @@ public final class BoilerSensorData extends TempSensorData {
         return idx + 5;
     }
 
+
+    public void encodeSettings(StringBuilder sb) {
+    }
+
+
     void decodeSettings(SharedPreferences prefs) {
         //String suffix = Integer.toString(getId());
 

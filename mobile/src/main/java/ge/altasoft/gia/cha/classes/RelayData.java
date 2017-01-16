@@ -74,9 +74,6 @@ public abstract class RelayData implements Comparable<RelayData> {
     public void encodeSettings(StringBuilder sb) {
     }
 
-    public static void encodeSettingsDebug(StringBuilder ignored) {
-    }
-
     public int decodeSettings(String response, int idx) {
         return idx;
     }

@@ -32,7 +32,7 @@ public class TempSensorData {
         this.id = id;
         //this.enabled = false;
         this.T = 99;
-        this.desiredT = 25;
+        this.desiredT = Utils.DEFAULT_DESIRED_TEMPERATURE;
     }
 
     public int getId() {

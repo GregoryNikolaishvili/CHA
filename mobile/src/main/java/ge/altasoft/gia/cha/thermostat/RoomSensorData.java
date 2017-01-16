@@ -15,13 +15,15 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
 
     private double H;
     private String name;
+    private boolean canBeControlled;
     private CircularArrayList<Pair<Date, Double>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
     RoomSensorData(int id) {
         super(id);
 
         H = 99;
-        setDeltaDesiredT(1);
+        canBeControlled = false;
+        setDeltaDesiredT(1.0);
     }
 
     public CircularArrayList<Pair<Date, Double>> getLogBufferH() {
@@ -36,12 +38,19 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return this.H;
     }
 
-    private void setHumidity(double value)
-    {
-        if (this.H !=value) {
+    private void setHumidity(double value) {
+        if (this.H != value) {
             this.H = value;
             logBufferH.add(new Pair<>(new Date(), value));
         }
+    }
+
+    public boolean canBeControlled() {
+        return this.canBeControlled;
+    }
+
+    public void setCanBeControlled(boolean canBeControlled) {
+        this.canBeControlled = canBeControlled;
     }
 
     void encodeOrderAndName(StringBuilder sb2) {
@@ -49,7 +58,6 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         sb2.append(String.format(Locale.US, "%01X", this.order));
         sb2.append(Utils.EncodeArduinoString(name));
         sb2.append(';');
-
     }
 
     void decodeOrderAndName(String s) {
@@ -69,6 +77,16 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return idx + 11;
     }
 
+    public void encodeSettings(StringBuilder sb) {
+        sb.append(String.format(Locale.US, "%02X", this.id));
+        sb.append(canBeControlled ? 'C' : 'N');
+    }
+
+    public int decodeSettings(String response, int idx) {
+        canBeControlled = response.charAt(idx) != 'N';
+        return idx + 1;
+    }
+
     void decodeSettings(SharedPreferences prefs) {
         String suffix = Integer.toString(getId());
 
@@ -80,7 +98,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         String suffix = Integer.toString(getId());
 
         editor.putString("t_sensor_name_" + suffix, getName());
-        editor.putFloat("t_desired_t_" + suffix, (float)getDesiredTemperature());
+        editor.putString("t_desired_t_" + suffix, String.format(Locale.US, "%.1f°", (float) getDesiredTemperature()));
     }
 
     @Override
