@@ -19,6 +19,8 @@ public class BoilerSensorView extends LinearLayout {
 
     private TextView tvTemperature;
     private TextView tvTemperatureTrend;
+    private TextView tvTargetTemperature;
+    private LinearLayout llTargetTemperature;
 
     BoilerSensorData sensorData;
 
@@ -67,11 +69,24 @@ public class BoilerSensorView extends LinearLayout {
         return tvTemperatureTrend;
     }
 
+    private TextView getTargetTemperatureTextView() {
+        if (tvTargetTemperature == null)
+            tvTargetTemperature = (TextView) this.findViewById(R.id.target_temperature_value);
+        return tvTargetTemperature;
+    }
+
+    private LinearLayout getTargetTemperatureLayout() {
+        if (llTargetTemperature == null)
+            llTargetTemperature = (LinearLayout) this.findViewById(R.id.target_temperature);
+        return llTargetTemperature;
+    }
+
     public void setSensorData(BoilerSensorData value) {
         this.sensorData = value;
 
         getTemperatureTextView();
         getTemperatureTrendTextView();
+        getTargetTemperatureLayout();
 
         tvTemperature.setText(String.format(Locale.US, "%.1f°", value.getTemperature()));
         tvTemperature.setTextColor(value.getTemperatureColor());
@@ -89,5 +104,12 @@ public class BoilerSensorView extends LinearLayout {
                 tvTemperatureTrend.setTextColor(Color.BLUE);
                 break;
         }
+
+        if (value.getTargetTemperature() != 0f) {
+            getTargetTemperatureTextView();
+            tvTargetTemperature.setText(String.format(Locale.US, "%.1f°", value.getTargetTemperature()));
+            llTargetTemperature.setVisibility(View.VISIBLE);
+        } else
+            llTargetTemperature.setVisibility(View.GONE);
     }
 }

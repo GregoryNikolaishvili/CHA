@@ -11,11 +11,11 @@ import ge.altasoft.gia.cha.Utils;
 
 public class TemperatureLineSeries extends LineGraphSeries<DataPoint> {
 
-    public void fill(CircularArrayList<Pair<Date, Double>> points) {
+    public void fill(CircularArrayList<Pair<Date, Float>> points) {
         DataPoint[] dataPoints = new DataPoint[points.size()];
 
         int idx = 0;
-        for (Pair<Date, Double> pt : points)
+        for (Pair<Date, Float> pt : points)
             dataPoints[idx++] = new DataPoint(pt.first.getTime(), pt.second);
 
         resetData(dataPoints);

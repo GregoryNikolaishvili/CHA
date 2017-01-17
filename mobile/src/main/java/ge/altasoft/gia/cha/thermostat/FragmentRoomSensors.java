@@ -14,16 +14,16 @@ import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.views.DragLinearLayout;
 import ge.altasoft.gia.cha.views.RoomSensorView;
 
-public class ThermostatSensorsFragment extends Fragment {
+public class FragmentRoomSensors extends Fragment {
 
     private View rootView = null;
     private DragLinearLayout dragLinearLayout = null;
 
-    public ThermostatSensorsFragment() {
+    public FragmentRoomSensors() {
     }
 
-    public static ThermostatSensorsFragment newInstance() {
-        return new ThermostatSensorsFragment();
+    public static FragmentRoomSensors newInstance() {
+        return new FragmentRoomSensors();
     }
 
     @Override

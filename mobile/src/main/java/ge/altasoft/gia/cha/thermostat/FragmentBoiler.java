@@ -8,7 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -17,22 +20,23 @@ import java.util.Date;
 
 import ge.altasoft.gia.cha.GraphActivity;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.CircularArrayList;
 import ge.altasoft.gia.cha.classes.LineSeriesArray;
 import ge.altasoft.gia.cha.views.BoilerPumpView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
 
-public class BoilerFragment extends Fragment {
+public class FragmentBoiler extends Fragment {
 
     private View rootView = null;
 
     private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
 
-    public BoilerFragment() {
+    public FragmentBoiler() {
     }
 
-    public static BoilerFragment newInstance() {
-        return new BoilerFragment();
+    public static FragmentBoiler newInstance() {
+        return new FragmentBoiler();
     }
 
     @Override
@@ -50,7 +54,20 @@ public class BoilerFragment extends Fragment {
         });
 
 
+        ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.boilerMode));
+        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+                if (!Utils.disableOnCheckedListener) {
+                    ((ToggleButton) button).setTextOn("");
+                    ((ToggleButton) button).setTextOff("");
+                    button.setEnabled(false);
+                    ThermostatUtils.sendCommandToController(getContext(), "X");
+                }
+            }
+        });
         final View boilerLayout = rootView.findViewById(R.id.boilerLayout);
+
+        //region relayout
         boilerLayout.getViewTreeObserver().
                 addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                                               @Override
@@ -134,6 +151,7 @@ public class BoilerFragment extends Fragment {
                                           }
 
                 );
+        //endregion
 
         rebuildUI();
 
@@ -149,11 +167,11 @@ public class BoilerFragment extends Fragment {
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);
 
         for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-            CircularArrayList<Pair<Date, Double>> points = ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer();
+            CircularArrayList<Pair<Date, Float>> points = ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer();
 
             DataPoint[] dataPoints = new DataPoint[points.size()];
             int idx = 0;
-            for (Pair<Date, Double> pt : points)
+            for (Pair<Date, Float> pt : points)
                 dataPoints[idx++] = new DataPoint(pt.first.getTime(), pt.second);
 
             pointSeries.getItem(i).resetData(dataPoints);
@@ -182,5 +200,22 @@ public class BoilerFragment extends Fragment {
 
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setIsOn(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_SOLAR_PUMP).isOn());
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setIsOn(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_HEATING_PUMP).isOn());
+
+        drawFooter();
+    }
+
+    private void drawFooter() {
+        ToggleButton tvAuto = ((ToggleButton) rootView.findViewById(R.id.boilerMode));
+        Utils.disableOnCheckedListener = true;
+        try {
+            tvAuto.setTextOn(ThermostatControllerData.Instance.getBoilerModeText());
+            tvAuto.setTextOff(getResources().getString(R.string.off));
+            tvAuto.setChecked(ThermostatControllerData.Instance.getBoilerMode() != ThermostatControllerData.BOILER_MODE_OFF);
+            tvAuto.setEnabled(true);
+        } finally {
+            Utils.disableOnCheckedListener = false;
+        }
+
+        ((TextView) rootView.findViewById(R.id.boilerTimeTextView)).setText(ThermostatControllerData.Instance.GetStatusText());
     }
 }

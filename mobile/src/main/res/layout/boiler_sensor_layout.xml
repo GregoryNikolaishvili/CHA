@@ -3,27 +3,58 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_border"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <TextView
-        style="@android:style/TextAppearance.Medium"
-        android:layout_width="4dp"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="2dp"
-        android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/temperature_value"
-        style="@android:style/TextAppearance.Medium"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/sample_temperature"
-        android:textColor="@android:color/black" />
-
-    <TextView
-        android:id="@+id/temperature_trend"
-        style="@android:style/TextAppearance.Medium"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/centigrade" />
+        android:orientation="horizontal">
+
+        <TextView
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="4dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/temperature_value"
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_temperature"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/temperature_trend"
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/centigrade" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/target_temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:background="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/target_temperature_value"
+            style="@android:style/TextAppearance.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/sample_temperature"
+            android:textStyle="bold"
+            android:visibility="visible" />
+    </LinearLayout>
 </LinearLayout>

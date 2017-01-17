@@ -62,7 +62,7 @@ public final class LightControllerData extends RelayControllerData {
                 sb.append('0');
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-        sb.append(sdf.format(getNow()));
+        sb.append(sdf.format(getControllerCurrentTime()));
         sb.append(String.format(Locale.US, "%04X%04X", sunriseMin, sunsetMin));
         return sb.toString();
     }
@@ -114,7 +114,7 @@ public final class LightControllerData extends RelayControllerData {
                 relays(i).setIsOn(response.charAt(i + 2) == '1');
 
             int idx = RELAY_COUNT + 2;
-            setNow(response.substring(idx, idx + 12));
+            setControllerCurrentTime(response.substring(idx, idx + 12));
             sunriseMin = Short.parseShort(response.substring(idx + 12, idx + 16), 16);
             sunsetMin = Short.parseShort(response.substring(idx + 16, idx + 20), 16);
 
@@ -177,9 +177,9 @@ public final class LightControllerData extends RelayControllerData {
     }
 
     String GetStatusText() {
-        String now = DateFormat.getDateTimeInstance().format(this.getNow());
+        String now = DateFormat.getDateTimeInstance().format(this.getControllerCurrentTime());
         //SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-        //sdf.format(getNow)
+        //sdf.format(getControllerCurrentTime)
         return String.format(Locale.US, "%s, Sunrise: %d:%02d, Sunset: %d:%02d", now, sunriseMin / 60, sunriseMin % 60, sunsetMin / 60, sunsetMin % 60);
     }
 }

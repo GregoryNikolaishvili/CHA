@@ -82,7 +82,7 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
 
                 // Create the Preferences Manually - so that the key can be refresh programatically.
 
-                for (int id = 1; id <= ThermostatControllerData.RELAY_COUNT; id++) {
+                for (int id = 1; id <= ThermostatControllerData.HEATING_RELAY_COUNT; id++) {
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 
                     screen.setTitle(Integer.toString(id));
@@ -131,9 +131,9 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
                     screen.addPreference(p1);
 
                     TemperaturePreference p2 = new TemperaturePreference(prefContext);
-                    p2.setKey("t_desired_t_" + Integer.toString(id));
+                    p2.setKey("t_target_t_" + Integer.toString(id));
                     p2.setSummary("%s°");
-                    p2.setTitle("Desired temperature");
+                    p2.setTitle("Target temperature");
                     screen.addPreference(p2);
 
                     sensorsCat.addPreference(screen);
@@ -189,10 +189,10 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
                     if (sensors.getPreference(i) instanceof PreferenceScreen) {
                         PreferenceScreen screen = (PreferenceScreen) sensors.getPreference(i);
                         FriendlyEditTextPreference namePref = (FriendlyEditTextPreference) screen.getPreference(1);
-                        TemperaturePreference desiredTPref = (TemperaturePreference) screen.getPreference(2);
+                        TemperaturePreference targetTPref = (TemperaturePreference) screen.getPreference(2);
 
                         screen.setTitle(namePref.getText() == null ? "Sensor #" + Integer.toString(ThermostatControllerData.Instance.relays(i).getId()) : namePref.getText());
-                        screen.setSummary(String.format(Locale.US, "Set T: %s°", desiredTPref.getText() == null ? String.valueOf(Utils.DEFAULT_DESIRED_TEMPERATURE) : desiredTPref.getText()));
+                        screen.setSummary(String.format(Locale.US, "Set T: %s°", targetTPref.getText() == null ? String.valueOf(Utils.DEFAULT_TARGET_TEMPERATURE) : targetTPref.getText()));
                     }
                 }
             }

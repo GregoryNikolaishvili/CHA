@@ -33,7 +33,7 @@ public class LogTHActivity extends ChaActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_th);
 
-        CircularArrayList<Pair<Date, Double>> logBuffer = null;
+        CircularArrayList<Pair<Date, Float>> logBuffer = null;
 
         Intent intent = getIntent();
         String scope = intent.getStringExtra("scope");
@@ -66,10 +66,10 @@ public class LogTHActivity extends ChaActivity {
         }
     }
 
-    public class THLogAdapter extends ArrayAdapter<Pair<Date, Double>> {
+    public class THLogAdapter extends ArrayAdapter<Pair<Date, Float>> {
         private boolean isTemperature;
 
-        THLogAdapter(Context context, ArrayList<Pair<Date, Double>> points, boolean isTemperature) {
+        THLogAdapter(Context context, ArrayList<Pair<Date, Float>> points, boolean isTemperature) {
             super(context, 0, points);
 
             this.isTemperature = isTemperature;
@@ -84,7 +84,7 @@ public class LogTHActivity extends ChaActivity {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.log_view_temperature, parent, false);
             }
 
-            Pair<Date, Double> point = getItem(position);
+            Pair<Date, Float> point = getItem(position);
             if (point != null) {
                 ((TextView) convertView.findViewById(R.id.tvLogDateTime)).setText(sdf.format(point.first));
                 if (isTemperature)

@@ -14,7 +14,6 @@ import java.util.Random;
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 import ge.altasoft.gia.cha.Utils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,12 +27,19 @@ public final class ThermostatControllerData extends RelayControllerData {
     final static int BOILER_SOLAR_PUMP = 0;
     final static int BOILER_HEATING_PUMP = 1;
 
-    final static int RELAY_COUNT = 15;
+    final static int HEATING_RELAY_COUNT = 15;
+
     final public static int BOILER_SENSOR_COUNT = 4;
     final private static int BOILER_PUMP_COUNT = 2;
 
+    final public static char BOILER_MODE_OFF = 'N';
+    final public static char BOILER_MODE_SUMMER = 'S';
+    final public static char BOILER_MODE_SUMMER_POOL = 'P';
+    final public static char BOILER_MODE_WINTER = 'W';
+
     final public static ThermostatControllerData Instance = new ThermostatControllerData();
 
+    private char boilerMode;
     private BoilerSensorData[] boilerSensorsData;
     private BoilerPumpData[] boilerPumpsData;
 
@@ -46,6 +52,7 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         roomSensorsReordered = false;
 
+        boilerMode = BOILER_MODE_SUMMER;
         boilerSensorsData = new BoilerSensorData[BOILER_SENSOR_COUNT];
         boilerPumpsData = new BoilerPumpData[BOILER_PUMP_COUNT];
 
@@ -61,15 +68,21 @@ public final class ThermostatControllerData extends RelayControllerData {
         boilerPumpsData[BOILER_SOLAR_PUMP].setName("Solar pump");
         boilerPumpsData[BOILER_HEATING_PUMP].setName("Heating pump");
 
-        for (int i = 0; i < RELAY_COUNT; i++) {
+        for (int i = 0; i < HEATING_RELAY_COUNT; i++) {
             ThermostatRelayData relay = new ThermostatRelayData(i + 1);
             setRelay(i, relay);
+        }
+
+        if (Utils.DEBUG_THERMOSTAT) {
+            boilerSensorsData[BOILER_SENSOR_ROOM].setTargetTemperature(0f);
+            boilerSensorsData[BOILER_SENSOR_TOP].setTargetTemperature(0f);
+            boilerSensorsData[BOILER_SENSOR_SOLAR_PANEL].setTargetTemperature(80f);
         }
     }
 
     @Override
     public int relayCount() {
-        return RELAY_COUNT;
+        return HEATING_RELAY_COUNT;
     }
 
     public ThermostatRelayData relays(int index) {
@@ -151,7 +164,7 @@ public final class ThermostatControllerData extends RelayControllerData {
             if (haveSettings()) {
                 // Relays
                 sb.append(isActive() ? 'T' : 'F');
-                for (int i = 0; i < RELAY_COUNT; i++)
+                for (int i = 0; i < HEATING_RELAY_COUNT; i++)
                     relays(i).encodeState(sb);
                 jState.put("relays", sb.toString());
 
@@ -171,7 +184,10 @@ public final class ThermostatControllerData extends RelayControllerData {
                 } else {
                     sb.append(String.format(Locale.US, "%02X", roomSensorsMap.size()));
                     for (int id : roomSensorsMap.keySet()) {
-                        roomSensorsMap.get(id).encodeState(sb);
+                        {
+                            sb.append(String.format(Locale.US, "%02X", id));
+                            roomSensorsMap.get(id).encodeState(sb);
+                        }
                     }
                 }
                 jState.put("sensors", sb.toString());
@@ -191,7 +207,7 @@ public final class ThermostatControllerData extends RelayControllerData {
             } else {
                 // Relays
                 sb.append(isActive() ? 'T' : 'F');
-                for (int i = 0; i < RELAY_COUNT; i++)
+                for (int i = 0; i < HEATING_RELAY_COUNT; i++)
                     sb.append('0');
                 jState.put("relays", sb.toString());
 
@@ -209,7 +225,7 @@ public final class ThermostatControllerData extends RelayControllerData {
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-            jState.put("time", sdf.format(getNow()));
+            jState.put("time", sdf.format(getControllerCurrentTime()));
         } catch (JSONException e) {
             Log.e("JSON", e.getMessage());
         }
@@ -221,12 +237,12 @@ public final class ThermostatControllerData extends RelayControllerData {
         StringBuilder sb = new StringBuilder();
 
         sb.append(isActive() ? 'T' : 'F');
-        for (int i = 0; i < RELAY_COUNT; i++)
+        for (int i = 0; i < HEATING_RELAY_COUNT; i++)
             relays(i).encodeSettings(sb);
 
         sb.append('*');
         StringBuilder sb2 = new StringBuilder();
-        for (int i = 0; i < RELAY_COUNT; i++) {
+        for (int i = 0; i < HEATING_RELAY_COUNT; i++) {
             if (haveSettings())
                 relays(i).encodeOrderAndName(sb2);
             else
@@ -245,8 +261,10 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         if (haveSettings()) {
             sb.append(String.format(Locale.US, "%02X*", roomSensorsMap.size()));
-            for (int id : roomSensorsMap.keySet())
+            for (int id : roomSensorsMap.keySet()) {
+                sb.append(String.format(Locale.US, "%02X", id));
                 roomSensorsMap.get(id).encodeSettings(sb);
+            }
 
             sb.append('*');
             for (int id : roomSensorsMap.keySet())
@@ -254,9 +272,10 @@ public final class ThermostatControllerData extends RelayControllerData {
         } else {
             if (Utils.DEBUG_THERMOSTAT) {
                 sb.append(String.format(Locale.US, "%02X*", 10));
+                RoomSensorData roomSensor = new RoomSensorData(0);
                 for (int id = 1; id <= 10; id++) {
                     sb.append(String.format(Locale.US, "%02X", id));
-                    sb.append(id == 3 ? 'N' : 'C');
+                    roomSensor.encodeSettings(sb);
                 }
 
                 sb.append('*');
@@ -276,6 +295,8 @@ public final class ThermostatControllerData extends RelayControllerData {
 
     private String encodeBoilerSettings() {
         StringBuilder sb = new StringBuilder();
+
+        sb.append(boilerMode);
 
         //sb.append(isActive() ? 'T' : 'F');
         for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
@@ -311,7 +332,7 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         int idx = 0;
         setIsActive(response.charAt(idx++) != 'F');
-        for (int i = 0; i < RELAY_COUNT; i++)
+        for (int i = 0; i < HEATING_RELAY_COUNT; i++)
             idx = relays(i).decodeSettings(response, idx);
 
         if (response.charAt(idx++) != '*') {
@@ -324,12 +345,12 @@ public final class ThermostatControllerData extends RelayControllerData {
         response = response.substring(idx);
 
         String[] arr = response.split(";");
-        if (arr.length < RELAY_COUNT) {
+        if (arr.length < HEATING_RELAY_COUNT) {
             Log.e("ThermControllerData", "Invalid number of relays returned");
             return false;
         }
 
-        for (int i = 0; i < RELAY_COUNT; i++)
+        for (int i = 0; i < HEATING_RELAY_COUNT; i++)
             relays(i).decodeOrderAndName(arr[i]);
 
         return true;
@@ -453,7 +474,7 @@ public final class ThermostatControllerData extends RelayControllerData {
             // Relays
             String response = jState.getString("relays");
             setIsActive(response.charAt(0) != 'F');
-            for (int i = 0; i < RELAY_COUNT; i++)
+            for (int i = 0; i < HEATING_RELAY_COUNT; i++)
                 relays(i).setIsOn(response.charAt(i + 1) == '1');
 
             // room sensors
@@ -463,12 +484,12 @@ public final class ThermostatControllerData extends RelayControllerData {
 
             for (int i = 0; i < count; i++) {
                 Integer id = Integer.parseInt(response.substring(idx, idx + 2), 16);
+                idx += 2;
 
                 RoomSensorData roomSensorData = roomSensorsMap.get(id);
-                if (roomSensorData != null)
-                    idx = roomSensorData.decodeState(response, idx);
-                else
-                    idx += 11;
+                if (roomSensorData == null) // until we have real data, generate fake one
+                    roomSensorData = new RoomSensorData(id);
+                idx = roomSensorData.decodeState(response, idx);
             }
 
             // boiler sensors
@@ -486,10 +507,11 @@ public final class ThermostatControllerData extends RelayControllerData {
 
 
             response = jState.getString("time");
-            setNow(response.substring(0, 12));
+            setControllerCurrentTime(response.substring(0, 12));
         } catch (JSONException e) {
             Log.e("JSON", e.getMessage());
         }
+
         return Utils.FLAG_HAVE_STATE;
     }
 
@@ -497,7 +519,7 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         setIsActive(prefs.getBoolean("t_automatic_mode", false));
 
-        for (int i = 0; i < RELAY_COUNT; i++)
+        for (int i = 0; i < HEATING_RELAY_COUNT; i++)
             relays(i).decodeSettings(prefs);
 
         for (int id : roomSensorsMap.keySet())
@@ -511,7 +533,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("t_automatic_mode", isActive());
 
-        for (int i = 0; i < RELAY_COUNT; i++)
+        for (int i = 0; i < HEATING_RELAY_COUNT; i++)
             relays(i).encodeSettings(editor);
 
         for (RoomSensorData ss : roomSensorsMap.values())
@@ -524,6 +546,40 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
     String GetStatusText() {
-        return DateFormat.getDateTimeInstance().format(this.getNow());
+        return DateFormat.getDateTimeInstance().format(this.getControllerCurrentTime());
+    }
+
+    public char getBoilerMode() {
+        return boilerMode;
+    }
+
+    public String getBoilerModeText() {
+        switch (boilerMode) {
+            case BOILER_MODE_SUMMER:
+                return "Summer";
+            case BOILER_MODE_SUMMER_POOL:
+                return "Summer & Pool";
+            case BOILER_MODE_WINTER:
+                return "Winter";
+            default:
+                return "?";
+        }
+    }
+
+    public void setNextBoilerMode() {
+        switch (boilerMode) {
+            case BOILER_MODE_OFF:
+                boilerMode = BOILER_MODE_SUMMER;
+                break;
+            case BOILER_MODE_SUMMER:
+                boilerMode = BOILER_MODE_SUMMER_POOL;
+                break;
+            case BOILER_MODE_SUMMER_POOL:
+                boilerMode = BOILER_MODE_WINTER;
+                break;
+            case BOILER_MODE_WINTER:
+                boilerMode = BOILER_MODE_OFF;
+                break;
+        }
     }
 }

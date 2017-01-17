@@ -89,6 +89,9 @@ public class ThermostatBroadcastService extends Service {
                 } else if (args[0].equals("A")) {
                     ThermostatControllerData.Instance.setIsActive(true);
                     jState = ThermostatControllerData.Instance.encodeState();
+                } else if (args[0].equals("X")) {
+                    ThermostatControllerData.Instance.setNextBoilerMode();
+                    jState = ThermostatControllerData.Instance.encodeState();
                 } else if (args[0].equals("?") || args[0].equals("@") || args[0].startsWith("*") || args[0].startsWith("#")) {
                     jState = ThermostatControllerData.Instance.encodeState();
                 }

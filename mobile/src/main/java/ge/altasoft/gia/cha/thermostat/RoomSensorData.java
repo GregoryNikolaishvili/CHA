@@ -13,20 +13,20 @@ import ge.altasoft.gia.cha.classes.TempSensorData;
 
 public final class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
 
-    private double H;
+    private float H;
     private String name;
     private boolean canBeControlled;
-    private CircularArrayList<Pair<Date, Double>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
+    private CircularArrayList<Pair<Date, Float>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
     RoomSensorData(int id) {
         super(id);
 
         H = 99;
         canBeControlled = false;
-        setDeltaDesiredT(1.0);
+        setDeltaTargetT(1.0f);
     }
 
-    public CircularArrayList<Pair<Date, Double>> getLogBufferH() {
+    public CircularArrayList<Pair<Date, Float>> getLogBufferH() {
         return logBufferH;
     }
 
@@ -34,11 +34,11 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return this.name;
     }
 
-    public double getHumidity() {
+    public float getHumidity() {
         return this.H;
     }
 
-    private void setHumidity(double value) {
+    private void setHumidity(float value) {
         if (this.H != value) {
             this.H = value;
             logBufferH.add(new Pair<>(new Date(), value));
@@ -65,40 +65,40 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         name = Utils.DecodeArduinoString(s.substring(3));
     }
 
-    void encodeState(StringBuilder sb) {
-        sb.append(String.format(Locale.US, "%02X%04X%c%04X", id, ((Double) (getTemperature() * 10)).intValue(), getTemperatureTrend(), ((Double) (H * 10)).intValue()));
-    }
-
-    int decodeState(String value, int idx) {
-        setTemperature(Integer.parseInt(value.substring(idx + 2, idx + 6), 16) / 10.0);
-        setTemperatureTrend(value.charAt(idx + 6));
-
-        setHumidity(Integer.parseInt(value.substring(idx + 7, idx + 11), 16) / 10.0);
-        return idx + 11;
-    }
-
     public void encodeSettings(StringBuilder sb) {
-        sb.append(String.format(Locale.US, "%02X", this.id));
+        super.encodeSettings(sb);
         sb.append(canBeControlled ? 'C' : 'N');
     }
 
     public int decodeSettings(String response, int idx) {
+        idx = super.decodeSettings(response, idx);
         canBeControlled = response.charAt(idx) != 'N';
         return idx + 1;
+    }
+
+    public void encodeState(StringBuilder sb) {
+        super.encodeState(sb);
+        sb.append(String.format(Locale.US, "%04X", ((Float) (H * 10)).intValue()));
+    }
+
+    public int decodeState(String value, int idx) {
+        idx = super.decodeState(value, idx);
+        setHumidity(Integer.parseInt(value.substring(idx, idx + 4), 16) / 10.0f);
+        return idx + 4;
     }
 
     void decodeSettings(SharedPreferences prefs) {
         String suffix = Integer.toString(getId());
 
         name = prefs.getString("t_sensor_name_" + suffix, "Sensor #" + suffix);
-        setDesiredTemperature(Double.parseDouble(prefs.getString("t_desired_t_" + suffix, "25")));
+        setTargetTemperature(Float.parseFloat(prefs.getString("t_target_t_" + suffix, "25")));
     }
 
     void encodeSettings(SharedPreferences.Editor editor) {
         String suffix = Integer.toString(getId());
 
         editor.putString("t_sensor_name_" + suffix, getName());
-        editor.putString("t_desired_t_" + suffix, String.format(Locale.US, "%.1f°", (float) getDesiredTemperature()));
+        editor.putString("t_target_t_" + suffix, String.format(Locale.US, "%.1f°", (float) getTargetTemperature()));
     }
 
     @Override

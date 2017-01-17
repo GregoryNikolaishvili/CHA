@@ -13,7 +13,7 @@ public abstract class RelayControllerData {
 
     private boolean isActive;
     private boolean haveSettings;
-    private Date now;
+    private Date controllerCurrentTime;
 
     private RelayData[] relayDatas;
     private int[] savedRelayOrders;
@@ -25,7 +25,7 @@ public abstract class RelayControllerData {
         isActive = false;
         relaysReordered = false;
         haveSettings = false;
-        now = new Date();
+        this.controllerCurrentTime = new Date();
         relayDatas = new RelayData[relayCount()];
         savedRelayOrders = new int[relayCount()];
     }
@@ -52,14 +52,14 @@ public abstract class RelayControllerData {
         return relaysReordered;
     }
 
-    protected Date getNow() {
-        return this.now;
+    protected Date getControllerCurrentTime() {
+        return this.controllerCurrentTime;
     }
 
-    protected void setNow(String dateAndTime) {
+    protected void setControllerCurrentTime(String dateAndTime) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
         try {
-            now = sdf.parse(dateAndTime);
+            this.controllerCurrentTime = sdf.parse(dateAndTime);
         } catch (ParseException ignored) {
         }
     }
@@ -68,7 +68,6 @@ public abstract class RelayControllerData {
     protected void setRelay(int index, RelayData relay) {
         relayDatas[index] = relay;
     }
-
 
     public void setIsActive(boolean value) {
         this.isActive = value;

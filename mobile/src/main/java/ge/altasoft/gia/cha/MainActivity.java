@@ -18,11 +18,11 @@ import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightFragment;
 import ge.altasoft.gia.cha.light.LightSettingsActivity;
 import ge.altasoft.gia.cha.light.LightUtils;
-import ge.altasoft.gia.cha.thermostat.BoilerFragment;
-import ge.altasoft.gia.cha.thermostat.ThermostatSensorsFragment;
+import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
+import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;
 import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
-import ge.altasoft.gia.cha.thermostat.ThermostatRelaysFragment;
+import ge.altasoft.gia.cha.thermostat.FragmentHeaterRelays;
 import ge.altasoft.gia.cha.thermostat.ThermostatSettingsActivity;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
@@ -83,8 +83,8 @@ public class MainActivity extends ChaActivity {
                     this.mainMenu.getItem(I).setEnabled(true);
 
                 pagerAdapter.lightFragment.setDraggableViews(false);
-                pagerAdapter.thermostatRelaysFragment.setDraggableViews(false);
-                pagerAdapter.thermostatSensorsFragment.setDraggableViews(false);
+                pagerAdapter.fragmentHeaterRelays.setDraggableViews(false);
+                pagerAdapter.fragmentRoomSensors.setDraggableViews(false);
 
                 if (id == R.id.action_ok) {
                     if (LightControllerData.Instance.relayOrderChanged())
@@ -97,8 +97,8 @@ public class MainActivity extends ChaActivity {
 
                     ThermostatControllerData.Instance.restoreRelayOrders();
                     ThermostatControllerData.Instance.restoreRoomSensorRelayOrders();
-                    pagerAdapter.thermostatSensorsFragment.rebuildUI();
-                    pagerAdapter.thermostatRelaysFragment.rebuildUI();
+                    pagerAdapter.fragmentRoomSensors.rebuildUI();
+                    pagerAdapter.fragmentHeaterRelays.rebuildUI();
                 }
                 return true;
 
@@ -132,8 +132,8 @@ public class MainActivity extends ChaActivity {
                     this.mainMenu.getItem(I).setEnabled(false);
 
                 pagerAdapter.lightFragment.setDraggableViews(true);
-                pagerAdapter.thermostatRelaysFragment.setDraggableViews(true);
-                pagerAdapter.thermostatSensorsFragment.setDraggableViews(true);
+                pagerAdapter.fragmentHeaterRelays.setDraggableViews(true);
+                pagerAdapter.fragmentRoomSensors.setDraggableViews(true);
                 return true;
 
             //region Thermostat
@@ -163,12 +163,12 @@ public class MainActivity extends ChaActivity {
         if (pagerAdapter.lightFragment != null)
             pagerAdapter.lightFragment.rebuildUI();
 
-        if (pagerAdapter.boilerFragment != null)
-            pagerAdapter.boilerFragment.rebuildUI();
-        if (pagerAdapter.thermostatSensorsFragment != null)
-            pagerAdapter.thermostatSensorsFragment.rebuildUI();
-        if (pagerAdapter.thermostatRelaysFragment != null)
-            pagerAdapter.thermostatRelaysFragment.rebuildUI();
+        if (pagerAdapter.fragmentBoiler != null)
+            pagerAdapter.fragmentBoiler.rebuildUI();
+        if (pagerAdapter.fragmentRoomSensors != null)
+            pagerAdapter.fragmentRoomSensors.rebuildUI();
+        if (pagerAdapter.fragmentHeaterRelays != null)
+            pagerAdapter.fragmentHeaterRelays.rebuildUI();
     }
 
     @Override
@@ -197,9 +197,9 @@ public class MainActivity extends ChaActivity {
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
                 if (resultCode == Activity.RESULT_OK)
                     ThermostatBroadcastService.SetAllSettings = true;
-                pagerAdapter.boilerFragment.rebuildUI();
-                pagerAdapter.thermostatSensorsFragment.rebuildUI();
-                pagerAdapter.thermostatRelaysFragment.rebuildUI();
+                pagerAdapter.fragmentBoiler.rebuildUI();
+                pagerAdapter.fragmentRoomSensors.rebuildUI();
+                pagerAdapter.fragmentHeaterRelays.rebuildUI();
                 break;
         }
     }
@@ -220,13 +220,13 @@ public class MainActivity extends ChaActivity {
         super.processThermostatControllerData(flags);
 
         if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0) {
-            pagerAdapter.boilerFragment.rebuildUI();
-            pagerAdapter.thermostatSensorsFragment.rebuildUI();
-            pagerAdapter.thermostatRelaysFragment.rebuildUI();
+            pagerAdapter.fragmentBoiler.rebuildUI();
+            pagerAdapter.fragmentRoomSensors.rebuildUI();
+            pagerAdapter.fragmentHeaterRelays.rebuildUI();
         } else if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
-            pagerAdapter.boilerFragment.drawState();
-            pagerAdapter.thermostatSensorsFragment.drawState();
-            pagerAdapter.thermostatRelaysFragment.drawState();
+            pagerAdapter.fragmentBoiler.drawState();
+            pagerAdapter.fragmentRoomSensors.drawState();
+            pagerAdapter.fragmentHeaterRelays.drawState();
         }
     }
 
@@ -261,9 +261,9 @@ public class MainActivity extends ChaActivity {
         private boolean isLandscape;
 
         LightFragment lightFragment = null;
-        BoilerFragment boilerFragment = null;
-        ThermostatSensorsFragment thermostatSensorsFragment = null;
-        ThermostatRelaysFragment thermostatRelaysFragment = null;
+        FragmentBoiler fragmentBoiler = null;
+        FragmentRoomSensors fragmentRoomSensors = null;
+        FragmentHeaterRelays fragmentHeaterRelays = null;
 
         SectionsPagerAdapter(FragmentManager fm, boolean isLandscape) {
             super(fm);
@@ -271,9 +271,9 @@ public class MainActivity extends ChaActivity {
             this.isLandscape = isLandscape;
 
             lightFragment = LightFragment.newInstance();
-            boilerFragment = BoilerFragment.newInstance();
-            thermostatSensorsFragment = ThermostatSensorsFragment.newInstance();
-            thermostatRelaysFragment = ThermostatRelaysFragment.newInstance();
+            fragmentBoiler = FragmentBoiler.newInstance();
+            fragmentRoomSensors = FragmentRoomSensors.newInstance();
+            fragmentHeaterRelays = FragmentHeaterRelays.newInstance();
         }
 
         @Override
@@ -282,11 +282,11 @@ public class MainActivity extends ChaActivity {
                 case 0:
                     return lightFragment;
                 case 1:
-                    return boilerFragment;
+                    return fragmentBoiler;
                 case 2:
-                    return thermostatSensorsFragment;
+                    return fragmentRoomSensors;
                 case 3:
-                    return thermostatRelaysFragment;
+                    return fragmentHeaterRelays;
             }
             return null;
         }

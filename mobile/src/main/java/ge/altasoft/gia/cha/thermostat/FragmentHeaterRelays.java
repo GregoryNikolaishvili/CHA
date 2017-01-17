@@ -17,16 +17,16 @@ import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.DragLinearLayout;
 import ge.altasoft.gia.cha.views.ThermostatRelayView;
 
-public class ThermostatRelaysFragment extends Fragment {
+public class FragmentHeaterRelays extends Fragment {
 
     private View rootView = null;
     private DragLinearLayout dragLinearLayout = null;
 
-    public ThermostatRelaysFragment() {
+    public FragmentHeaterRelays() {
     }
 
-    public static ThermostatRelaysFragment newInstance() {
-        return new ThermostatRelaysFragment();
+    public static FragmentHeaterRelays newInstance() {
+        return new FragmentHeaterRelays();
     }
 
     @Override
@@ -98,7 +98,6 @@ public class ThermostatRelaysFragment extends Fragment {
     }
 
     public void drawState() {
-
         if (rootView == null)
             return;
 

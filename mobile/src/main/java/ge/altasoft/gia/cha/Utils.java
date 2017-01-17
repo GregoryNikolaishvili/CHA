@@ -30,7 +30,7 @@ public class Utils {
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
 
-    public static final double DEFAULT_DESIRED_TEMPERATURE = 25.0;
+    public static final float DEFAULT_TARGET_TEMPERATURE = 25.0f;
 
     public static boolean disableOnCheckedListener = false;
 
