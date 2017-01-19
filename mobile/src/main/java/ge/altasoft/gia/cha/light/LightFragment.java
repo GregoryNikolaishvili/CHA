@@ -11,6 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import java.util.Locale;
+
+import ge.altasoft.gia.cha.MqttClient;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.Utils;
@@ -50,7 +53,8 @@ public class LightFragment extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    LightUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
+                    //LightUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
+                    MqttClient.publish("chac/light/mode", isChecked ? "A" : "M");
                 }
             }
         });
@@ -111,6 +115,23 @@ public class LightFragment extends Fragment {
         }
 
         drawFooter();
+    }
+
+    public void drawState(int id) {
+
+        if (rootView == null)
+            return;
+
+        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
+            if (dragLinearLayout.getChildAt(i) instanceof LightRelayView) {
+                LightRelayView rv = (LightRelayView) dragLinearLayout.getChildAt(i);
+                LightRelayData data = rv.getRelayData();
+                if (data.getId() == id) {
+                    rv.setIsOn(data.isOn());
+                    break;
+                }
+            }
+        }
     }
 
     private void drawFooter() {

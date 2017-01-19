@@ -13,9 +13,9 @@ import android.widget.ToggleButton;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.LogBooleanActivity;
+import ge.altasoft.gia.cha.MqttClient;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.light.LightRelayData;
-import ge.altasoft.gia.cha.light.LightUtils;
 import ge.altasoft.gia.cha.R;
 
 public class LightRelayView extends LinearLayout {
@@ -52,7 +52,8 @@ public class LightRelayView extends LinearLayout {
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
 
-                    LightUtils.sendCommandToController(getContext(), String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
+                    MqttClient.publish(String.format(Locale.US, "chac/light/state/%01X", relayData.getId()), isChecked ? "1" : "0");
+                    //LightUtils.sendCommandToController(getContext(), String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
                 }
             }
         });

@@ -19,12 +19,22 @@ import ge.altasoft.gia.cha.classes.RunnableWithParams;
 
 public class Utils {
 
-    public final static boolean DEBUG_LIGHT = false;
+    public static String mqttBrokerLocalUrl = "192.168.2.99:1883";
+    public static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
+
+
+    public final static boolean DEBUG_LIGHT = true;
     public final static boolean DEBUG_THERMOSTAT = true;
 
     public static final int FLAG_HAVE_NOTHING = 0;
-    public static final int FLAG_HAVE_STATE = 1;
+    public static final int FLAG_HAVE_LIGHTS_ONE_STATE = 1;
     public static final int FLAG_HAVE_SETTINGS = 2;
+    public static final int FLAG_HAVE_NAME_AND_ORDER = 4;
+
+    public static final int FLAG_HAVE_THERMOSTAT_FULL_STATE = 8;
+
+    public static final int FLAG_HAVE_STATE = 32; //todo
+    //public static final int FLAG_HAVE_SETTINGS = 64; //todo
 
     public static final int LOG_BUFFER_SIZE = 100;
 
@@ -83,6 +93,34 @@ public class Utils {
         return sb.toString();
     }
 
+    static String GetMtqqBrokerUrl(Context context) {
+        if (Debug.isDebuggerConnected())
+            return mqttBrokerLocalUrl;
+
+        final ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (conMgr == null)
+            return null;
+        final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
+        if ((activeNetwork == null) || (!activeNetwork.isConnected()))
+            return null;
+
+
+        if (activeNetwork.getType() != ConnectivityManager.TYPE_WIFI)
+            return mqttBrokerGlobalUrl;
+
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager == null)
+            return mqttBrokerGlobalUrl;
+
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo == null)
+            return mqttBrokerGlobalUrl;
+
+        if (!Utils.IsGiaWifi(wifiInfo))
+            return mqttBrokerGlobalUrl;
+
+        return mqttBrokerLocalUrl;
+    }
     static String GetNetworkInfo(Context context) {
         if (Debug.isDebuggerConnected())
             return "Inside Debugger";
@@ -118,9 +156,8 @@ public class Utils {
         return wifiInfo.getSSID().trim().equals("\"GIA\"") || wifiInfo.getSSID().trim().equals("\"GIA2\"");
     }
 
-    public static int random(int min, int max)
-    {
-        return min + (int)Math.round(Math.random() * (max - min));
+    public static int random(int min, int max) {
+        return min + (int) Math.round(Math.random() * (max - min));
     }
 
     public static void ConfirmDialog(Context context, String title, String message, final Runnable positiveAction, final Runnable negativeAction) {

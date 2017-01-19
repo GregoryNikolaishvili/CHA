@@ -2,9 +2,11 @@ package ge.altasoft.gia.cha.light;
 
 import android.content.SharedPreferences;
 import android.util.Log;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 import ge.altasoft.gia.cha.Utils;
 
@@ -91,6 +93,34 @@ public final class LightControllerData extends RelayControllerData {
         sb.append(sb2);
 
         return sb.toString();
+    }
+
+    public void decodeSettings(String response) {
+        Log.d("decode light settings", response);
+
+        setIsActive(response.charAt(0) != 'F');
+
+        int idx = 1;
+        for (int i = 0; i < RELAY_COUNT; i++)
+            idx = relays(i).decodeSettings(response, idx);
+
+        setHaveSettings(true);
+    }
+
+
+    public void decodeNamesAndOrder(String response) {
+        Log.d("decode light names", response);
+
+        response = response.substring(4);
+
+        String[] arr = response.split(";");
+        if (arr.length != RELAY_COUNT) {
+            Log.e("LightControllerData", "Invalid number of relays returned");
+            return;
+        }
+
+        for (int i = 0; i < RELAY_COUNT; i++)
+            relays(i).decodeOrderAndName(arr[i]);
     }
 
     public int decode(String response) {

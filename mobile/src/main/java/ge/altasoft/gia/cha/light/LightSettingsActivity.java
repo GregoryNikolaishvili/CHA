@@ -15,6 +15,7 @@ import android.preference.PreferenceScreen;
 import android.view.KeyEvent;
 import android.widget.BaseAdapter;
 
+import ge.altasoft.gia.cha.MqttClient;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.FriendlyEditTextPreference;
@@ -47,6 +48,8 @@ public class LightSettingsActivity extends PreferenceActivity {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
                             LightControllerData.Instance.decode(prefs);
+
+                            MqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings());
 
                             //Log.d("Settings refresh", LightControllerData.Instance.Encode());
 

@@ -92,8 +92,8 @@ public class LogBooleanActivity extends ChaActivity {
     }
 
     @Override
-    protected void processThermostatControllerData(int flags) {
-        super.processThermostatControllerData(flags);
+    protected void processThermostatControllerData(int flags, Intent intent) {
+        super.processThermostatControllerData(flags, intent);
 
         if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
             if (adapter != null)

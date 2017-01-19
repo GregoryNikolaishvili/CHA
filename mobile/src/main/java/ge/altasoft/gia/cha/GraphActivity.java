@@ -1,5 +1,6 @@
 package ge.altasoft.gia.cha;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.jjoe64.graphview.GraphView;
@@ -26,8 +27,8 @@ public class GraphActivity extends ChaActivity {
     }
 
     @Override
-    protected void processThermostatControllerData(int flags) {
-        super.processThermostatControllerData(flags);
+    protected void processThermostatControllerData(int flags, Intent intent) {
+        super.processThermostatControllerData(flags, intent);
 
         if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
             for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {

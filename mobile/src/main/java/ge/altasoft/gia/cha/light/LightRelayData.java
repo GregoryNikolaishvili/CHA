@@ -38,7 +38,7 @@ public final class LightRelayData extends RelayData {
 
     public String getComment() {
         if (isActive)
-            return "On: " + getOnTime() + ", Off: " + getOffTime();
+            return getOnTime() + " - " + getOffTime();
         else
             return "";
     }

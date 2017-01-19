@@ -5,19 +5,19 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import ge.altasoft.gia.cha.light.LightBroadcastService;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightFragment;
 import ge.altasoft.gia.cha.light.LightSettingsActivity;
 import ge.altasoft.gia.cha.light.LightUtils;
+
 import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
 import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;
 import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
@@ -28,8 +28,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class MainActivity extends ChaActivity {
 
-    private Intent lightIntent;
-    private Intent thermostatIntent;
+    private Intent thermostatServiceIntent;
 
     private SectionsPagerAdapter pagerAdapter;
     private Menu mainMenu;
@@ -55,8 +54,7 @@ public class MainActivity extends ChaActivity {
         viewPager.setOffscreenPageLimit(8);
         viewPager.setAdapter(pagerAdapter);
 
-        lightIntent = new Intent(this, LightBroadcastService.class);
-        thermostatIntent = new Intent(this, ThermostatBroadcastService.class);
+        thermostatServiceIntent = new Intent(this, ThermostatBroadcastService.class);
     }
 
     @Override
@@ -88,7 +86,9 @@ public class MainActivity extends ChaActivity {
 
                 if (id == R.id.action_ok) {
                     if (LightControllerData.Instance.relayOrderChanged())
-                        LightUtils.sendCommandToController(this, LightControllerData.Instance.encodeSettings());
+                        //LightUtils.sendCommandToController(this, LightControllerData.Instance.encodeSettings());
+                        MqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings());
+
                     if (ThermostatControllerData.Instance.relayOrderChanged() || ThermostatControllerData.Instance.roomSensorOrderChanged())
                         ThermostatUtils.sendCommandToController(this, ThermostatControllerData.Instance.encodeSettings());
                 } else {
@@ -103,7 +103,8 @@ public class MainActivity extends ChaActivity {
                 return true;
 
             case R.id.action_refresh:
-                LightUtils.sendCommandToController(this, "?");
+                //LightUtils.sendCommandToController(this, "?");
+                MqttClient.publish("chac/light/refresh", "1");
                 return true;
 
             case R.id.action_show_info:
@@ -151,8 +152,9 @@ public class MainActivity extends ChaActivity {
     public void onStart() {
         super.onStart();
 
-        startService(lightIntent);
-        startService(thermostatIntent);
+        new MqttClient(this).start();
+
+        startService(thermostatServiceIntent);
 
     }
 
@@ -175,8 +177,9 @@ public class MainActivity extends ChaActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        stopService(thermostatIntent);
-        stopService(lightIntent);
+        MqttClient.stop();
+
+        stopService(thermostatServiceIntent);
     }
 
     @Override
@@ -190,9 +193,9 @@ public class MainActivity extends ChaActivity {
 //                }
 //                break;
             case LightUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
-                if (resultCode == Activity.RESULT_OK)
-                    LightBroadcastService.SetAllSettings = true;
-                pagerAdapter.lightFragment.rebuildUI();
+//                if (resultCode == Activity.RESULT_OK)
+//                    LightBroadcastService.SetAllSettings = true;
+                //pagerAdapter.lightFragment.rebuildUI();
                 break;
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
                 if (resultCode == Activity.RESULT_OK)
@@ -205,19 +208,23 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
-    protected void processLightControllerData(int flags) {
-        super.processLightControllerData(flags);
+    protected void processLightControllerData(int flags, Intent intent) {
+        super.processLightControllerData(flags, intent);
 
         if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0)
             pagerAdapter.lightFragment.rebuildUI();
         else if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
             pagerAdapter.lightFragment.drawState();
+        } else if ((flags & Utils.FLAG_HAVE_LIGHTS_ONE_STATE) != 0) {
+            int id = intent.getIntExtra("id", 0);
+            //boolean value = intent.getBooleanExtra("value", false);
+            pagerAdapter.lightFragment.drawState(id);
         }
     }
 
     @Override
-    protected void processThermostatControllerData(int flags) {
-        super.processThermostatControllerData(flags);
+    protected void processThermostatControllerData(int flags, Intent intent) {
+        super.processThermostatControllerData(flags, intent);
 
         if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0) {
             pagerAdapter.fragmentBoiler.rebuildUI();
@@ -237,21 +244,11 @@ public class MainActivity extends ChaActivity {
         if (info != null)
             sb.append(info);
 
-        String ip = LightUtils.GetControllerIp(this);
-        if (ip == null)
-            ip = "(null)";
-        sb.append("\nLight - ");
-        sb.append(ip);
-        sb.append(':');
-        sb.append(LightUtils.ServerPort);
-
-        ip = ThermostatUtils.GetControllerIp(this);
-        if (ip == null)
-            ip = "(null)";
-        sb.append("\nThermostat - ");
-        sb.append(ip);
-        sb.append(':');
-        sb.append(ThermostatUtils.ServerPort);
+        String url = Utils.GetMtqqBrokerUrl(this);
+        if (url == null)
+            url = "(null)";
+        sb.append("\nUrl - ");
+        sb.append(url);
 
         Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
     }

@@ -2,13 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ge.altasoft.gia.cha">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.hardware.wifi" />
-
     <application
         android:name=".ChaApplication"
         android:allowBackup="true"
@@ -26,9 +19,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".light.LightBroadcastService" />
-        <service android:name=".thermostat.ThermostatBroadcastService" />
-
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
@@ -41,7 +31,29 @@
 
         <activity android:name=".GraphActivity" />
         <activity android:name=".LogTHActivity" />
-        <activity android:name=".LogBooleanActivity"></activity>
+        <activity android:name=".LogBooleanActivity" />
+
+        <service android:name=".mqtt.MqttWorkerService" />
+        <service android:name=".light.LightBroadcastService" />
+        <service android:name=".thermostat.ThermostatBroadcastService" />
+
+        <service android:name="org.eclipse.paho.android.service.MqttService">
+
+        </service>
+
     </application>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.hardware.wifi" />
+
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
 </manifest>

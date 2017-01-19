@@ -422,7 +422,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
 
-    int decode(String response) {
+    public int decode(String response) {
         if (response == null) return Utils.FLAG_HAVE_NOTHING;
 
         Log.d("decode thermostat", response);

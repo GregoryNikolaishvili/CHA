@@ -6,34 +6,47 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 
-import ge.altasoft.gia.cha.light.LightBroadcastService;
-import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
-import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public abstract class ChaActivity extends AppCompatActivity {
 
-    private BroadcastReceiver lightBroadcastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver broadcastStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int flags = intent.getIntExtra("result", Utils.FLAG_HAVE_NOTHING);
-            processLightControllerData(flags);
+            String status = intent.getStringExtra(MqttClient.MQTT_MSG);
+            getSupportActionBar().setTitle(status);
         }
     };
+
+    private BroadcastReceiver broadcastDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int what = intent.getIntExtra("what", Utils.FLAG_HAVE_NOTHING);
+            processLightControllerData(what, intent);
+        }
+    };
+
 
     private BroadcastReceiver thermostatBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int flags = intent.getIntExtra("result", Utils.FLAG_HAVE_NOTHING);
-            processThermostatControllerData(flags);
+            processThermostatControllerData(flags, null);
         }
     };
+
 
     @Override
     public void onResume() {
         super.onResume();
 
-        registerReceiver(lightBroadcastReceiver, new IntentFilter(LightBroadcastService.BROADCAST_ACTION_GET));
+        IntentFilter intentFilter = new IntentFilter(MqttClient.MQTT_STATUS_INTENT);
+        registerReceiver(broadcastStatusReceiver, intentFilter);
+
+        intentFilter = new IntentFilter(MqttClient.MQTT_DATA_INTENT);
+        registerReceiver(broadcastDataReceiver, intentFilter);
+
+
         registerReceiver(thermostatBroadcastReceiver, new IntentFilter(ThermostatBroadcastService.BROADCAST_ACTION_GET));
     }
 
@@ -42,12 +55,11 @@ public abstract class ChaActivity extends AppCompatActivity {
         super.onPause();
 
         unregisterReceiver(thermostatBroadcastReceiver);
-        unregisterReceiver(lightBroadcastReceiver);
     }
 
-    protected void processLightControllerData(int flags) {
+    protected void processLightControllerData(int flags, Intent intent) {
     }
 
-    protected void processThermostatControllerData(int flags) {
+    protected void processThermostatControllerData(int flags, Intent intent) {
     }
 }

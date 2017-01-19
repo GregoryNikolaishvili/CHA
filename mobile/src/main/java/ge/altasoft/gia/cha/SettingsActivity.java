@@ -37,11 +37,8 @@ public class SettingsActivity extends PreferenceActivity {
                         public void run() {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-                            LightUtils.LocalIP = prefs.getString("light_controller_ip", LightUtils.LocalIP);
-                            LightUtils.REFRESH_TIMEOUT = Integer.parseInt(prefs.getString("light_controller_polling", Integer.toString(LightUtils.REFRESH_TIMEOUT)));
-
-                            ThermostatUtils.LocalIP = prefs.getString("thermostat_controller_ip", ThermostatUtils.LocalIP);
-                            ThermostatUtils.REFRESH_TIMEOUT = Integer.parseInt(prefs.getString("thermostat_controller_polling", Integer.toString(ThermostatUtils.REFRESH_TIMEOUT)));
+                            Utils.mqttBrokerLocalUrl = prefs.getString("mtqq_url_local", Utils.mqttBrokerLocalUrl);
+                            Utils.mqttBrokerGlobalUrl = prefs.getString("mtqq_url_global", Utils.mqttBrokerGlobalUrl);
 
                             setResult(Activity.RESULT_OK, null); //The data you want to send back
                             context.finish();
