@@ -14,7 +14,7 @@ public abstract class ChaActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String status = intent.getStringExtra(MqttClient.MQTT_MSG);
-            getSupportActionBar().setTitle(status);
+            getSupportActionBar().setSubtitle(status);
         }
     };
 
