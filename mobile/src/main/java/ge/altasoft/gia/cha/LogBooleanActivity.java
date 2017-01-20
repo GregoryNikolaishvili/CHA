@@ -24,7 +24,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class LogBooleanActivity extends ChaActivity {
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
+    final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
     private BooleanLogAdapter adapter = null;
 
     @Override
@@ -37,26 +37,33 @@ public class LogBooleanActivity extends ChaActivity {
         Intent intent = getIntent();
         String scope = intent.getStringExtra("scope");
 
-        if (scope.equals("BoilerPump")) {
-            int id = intent.getIntExtra("id", -1);
+        switch (scope) {
+            case "BoilerPump": {
+                int id = intent.getIntExtra("id", -1);
 
-            if (id >= 0) {
-                RelayData sensorData = ThermostatControllerData.Instance.boilerPumps(id);
-                logBuffer = sensorData.getLogBuffer();
+                if (id >= 0) {
+                    RelayData sensorData = ThermostatControllerData.Instance.boilerPumps(id);
+                    logBuffer = sensorData.getLogBuffer();
+                }
+                break;
             }
-        } else if (scope.equals("ThermostatRelay")) {
-            int id = intent.getIntExtra("id", 0);
+            case "ThermostatRelay": {
+                int id = intent.getIntExtra("id", 0);
 
-            if (id > 0) {
-                RelayData sensorData = ThermostatControllerData.Instance.relays(id - 1);
-                logBuffer = sensorData.getLogBuffer();
+                if (id > 0) {
+                    RelayData sensorData = ThermostatControllerData.Instance.relays(id - 1);
+                    logBuffer = sensorData.getLogBuffer();
+                }
+                break;
             }
-        } else if (scope.equals("LightRelay")) {
-            int id = intent.getIntExtra("id", 0);
+            case "LightRelay": {
+                int id = intent.getIntExtra("id", 0);
 
-            if (id > 0) {
-                RelayData sensorData = LightControllerData.Instance.relays(id - 1);
-                logBuffer = sensorData.getLogBuffer();
+                if (id > 0) {
+                    RelayData sensorData = LightControllerData.Instance.relays(id - 1);
+                    logBuffer = sensorData.getLogBuffer();
+                }
+                break;
             }
         }
 

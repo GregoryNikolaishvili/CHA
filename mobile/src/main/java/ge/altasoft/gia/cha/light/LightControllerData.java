@@ -4,11 +4,9 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.classes.RelayControllerData;
-import ge.altasoft.gia.cha.Utils;
 
 
 public final class LightControllerData extends RelayControllerData {
@@ -50,24 +48,24 @@ public final class LightControllerData extends RelayControllerData {
     }
 
 
-    String encodeState() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append('$');
-        sb.append(isActive() ? 'T' : 'F');
-
-        if (haveSettings()) {
-            for (int i = 0; i < RELAY_COUNT; i++)
-                relays(i).encodeState(sb);
-        } else {
-            for (int i = 0; i < RELAY_COUNT; i++)
-                sb.append('0');
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-        sb.append(sdf.format(getControllerCurrentTime()));
-        sb.append(String.format(Locale.US, "%04X%04X", sunriseMin, sunsetMin));
-        return sb.toString();
-    }
+//    String encodeState() {
+//        StringBuilder sb = new StringBuilder();
+//
+//        sb.append('$');
+//        sb.append(isActive() ? 'T' : 'F');
+//
+//        if (haveSettings()) {
+//            for (int i = 0; i < RELAY_COUNT; i++)
+//                relays(i).encodeState(sb);
+//        } else {
+//            for (int i = 0; i < RELAY_COUNT; i++)
+//                sb.append('0');
+//        }
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+//        sb.append(sdf.format(getControllerCurrentTime()));
+//        sb.append(String.format(Locale.US, "%04X%04X", sunriseMin, sunsetMin));
+//        return sb.toString();
+//    }
 
     public String encodeSettings() {
         StringBuilder sb = new StringBuilder();
@@ -104,7 +102,7 @@ public final class LightControllerData extends RelayControllerData {
         for (int i = 0; i < RELAY_COUNT; i++)
             idx = relays(i).decodeSettings(response, idx);
 
-        setHaveSettings(true);
+        setHaveSettings();
     }
 
 
@@ -123,70 +121,70 @@ public final class LightControllerData extends RelayControllerData {
             relays(i).decodeOrderAndName(arr[i]);
     }
 
-    public int decode(String response) {
-
-        if (response == null) return Utils.FLAG_HAVE_NOTHING;
-
-        Log.d("decode light", response);
-
-        if ((response.charAt(0) != '$') && (response.charAt(0) != '*')) {
-            Log.e("LightControllerData", "Not '$' or '*'");
-            return Utils.FLAG_HAVE_NOTHING;
-        }
-
-        if (response.charAt(0) == '$') { // received state
-            if (!haveSettings())
-                return Utils.FLAG_HAVE_NOTHING;
-
-            setIsActive(response.charAt(1) != 'F');
-
-            for (int i = 0; i < RELAY_COUNT; i++)
-                relays(i).setIsOn(response.charAt(i + 2) == '1');
-
-            int idx = RELAY_COUNT + 2;
-            setControllerCurrentTime(response.substring(idx, idx + 12));
-            sunriseMin = Short.parseShort(response.substring(idx + 12, idx + 16), 16);
-            sunsetMin = Short.parseShort(response.substring(idx + 16, idx + 20), 16);
-
-            return Utils.FLAG_HAVE_STATE;
-        }
-
-        setIsActive(response.charAt(1) != 'F');
-
-        int idx = 2;
-        for (int i = 0; i < RELAY_COUNT; i++)
-            idx = relays(i).decodeSettings(response, idx);
-
-        setHaveSettings(true);
-
-        if (response.charAt(idx) != '*') {
-            Log.e("LightControllerData", "Not '*'");
-            return Utils.FLAG_HAVE_NOTHING;
-        }
-        //int length = Integer.parseInt(response.substring(idx + 1, idx + 5), 16);
-
-        response = response.substring(idx + 5);
-
-        String[] arr = response.split("\\$"); // maybe there's also state data
-        response = arr[0];
-        String stateResponse = null;
-        if (arr.length == 2)
-            stateResponse = '$' + arr[1];
-
-        arr = response.split(";");
-        if (arr.length != RELAY_COUNT) {
-            Log.e("LightControllerData", "Invalid number of relays returned");
-            return Utils.FLAG_HAVE_NOTHING;
-        }
-
-        for (int i = 0; i < RELAY_COUNT; i++)
-            relays(i).decodeOrderAndName(arr[i]);
-
-        if (stateResponse != null)
-            return Utils.FLAG_HAVE_SETTINGS | decode(stateResponse);
-
-        return Utils.FLAG_HAVE_SETTINGS;
-    }
+//    private int decode(String response) {
+//
+//        if (response == null) return Utils.FLAG_HAVE_NOTHING;
+//
+//        Log.d("decode light", response);
+//
+//        if ((response.charAt(0) != '$') && (response.charAt(0) != '*')) {
+//            Log.e("LightControllerData", "Not '$' or '*'");
+//            return Utils.FLAG_HAVE_NOTHING;
+//        }
+//
+//        if (response.charAt(0) == '$') { // received state
+//            if (!haveSettings())
+//                return Utils.FLAG_HAVE_NOTHING;
+//
+//            setIsActive(response.charAt(1) != 'F');
+//
+//            for (int i = 0; i < RELAY_COUNT; i++)
+//                relays(i).setIsOn(response.charAt(i + 2) == '1');
+//
+//            int idx = RELAY_COUNT + 2;
+//            setControllerCurrentTime(response.substring(idx, idx + 12));
+//            sunriseMin = Short.parseShort(response.substring(idx + 12, idx + 16), 16);
+//            sunsetMin = Short.parseShort(response.substring(idx + 16, idx + 20), 16);
+//
+//            return Utils.FLAG_HAVE_STATE;
+//        }
+//
+//        setIsActive(response.charAt(1) != 'F');
+//
+//        int idx = 2;
+//        for (int i = 0; i < RELAY_COUNT; i++)
+//            idx = relays(i).decodeSettings(response, idx);
+//
+//        setHaveSettings();
+//
+//        if (response.charAt(idx) != '*') {
+//            Log.e("LightControllerData", "Not '*'");
+//            return Utils.FLAG_HAVE_NOTHING;
+//        }
+//        //int length = Integer.parseInt(response.substring(idx + 1, idx + 5), 16);
+//
+//        response = response.substring(idx + 5);
+//
+//        String[] arr = response.split("\\$"); // maybe there's also state data
+//        response = arr[0];
+//        String stateResponse = null;
+//        if (arr.length == 2)
+//            stateResponse = '$' + arr[1];
+//
+//        arr = response.split(";");
+//        if (arr.length != RELAY_COUNT) {
+//            Log.e("LightControllerData", "Invalid number of relays returned");
+//            return Utils.FLAG_HAVE_NOTHING;
+//        }
+//
+//        for (int i = 0; i < RELAY_COUNT; i++)
+//            relays(i).decodeOrderAndName(arr[i]);
+//
+//        if (stateResponse != null)
+//            return Utils.FLAG_HAVE_SETTINGS | decode(stateResponse);
+//
+//        return Utils.FLAG_HAVE_SETTINGS;
+//    }
 
     void decode(SharedPreferences prefs) {
 

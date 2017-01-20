@@ -8,9 +8,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 
-import ge.altasoft.gia.cha.light.LightUtils;
-import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
-
 public class SettingsActivity extends PreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {

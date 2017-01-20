@@ -2,7 +2,7 @@ package ge.altasoft.gia.cha;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
+//import android.net.ConnectivityManager;
 import android.util.Log;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
@@ -19,69 +19,59 @@ import java.io.UnsupportedEncodingException;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
-import static android.content.Context.CONNECTIVITY_SERVICE;
+//import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class MqttClient {
 
-    public static final String TOPIC_CHA_LIGHTS_STATE = "cha/light/state";
-    public static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
-    public static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
+    private static final String TOPIC_CHA_LIGHTS_STATE = "cha/light/state";
+    private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
+    private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
 
-    public static final String TOPIC_CHA_THERMOSTAT_FULL = "cha/thermostat/full";
+    private static final String TOPIC_CHA_THERMOSTAT_FULL = "cha/thermostat/full";
 
     private enum MQTTConnectionStatus {
         INITIAL,                            // initial status
         CONNECTING,                         // attempting to connect
         CONNECTED,                          // connected
-        NOTCONNECTED_WAITINGFORINTERNET,    // can't connect because the phone
+        //NOTCONNECTED_WAITINGFORINTERNET,    // can't connect because the phone
         //     does not have Internet access
         NOTCONNECTED_USERDISCONNECT,        // user has explicitly requested
         //     disconnection
-        NOTCONNECTED_DATADISABLED,          // can't connect because the user
+        //NOTCONNECTED_DATADISABLED,          // can't connect because the user
         //     has disabled data access
         NOTCONNECTED_UNKNOWNREASON          // failed to connect for some reason
     }
 
-    public static MqttClient Instance = null;
-
-    private MqttAndroidClient mqttClient;
+    //public static MqttClient Instance = null;
+    //private MqttAndroidClient mqttClient;
 
     private MQTTConnectionStatus connectionStatus = MQTTConnectionStatus.INITIAL;
-    private boolean subscribed = false;
-    private Context context;
+    //private Context context;
 
     // constants used to tell the Activity UI the connection status
     public static final String MQTT_STATUS_INTENT = "ge.altasoft.gia.cha.STATUS";
     public static final String MQTT_DATA_INTENT = "ge.altasoft.gia.cha.DATA";
     public static final String MQTT_MSG = "ge.altasoft.gia.cha.MSG";
+    public static final String MQTT_MSG_IS_ERROR = "ge.altasoft.gia.cha.MSG.IS_ERROR";
 
+    final private Context context;
+    private MqttAndroidClient mtqqClient = null;
+    private String url;
 
-    public MqttClient(Context context) {
-        Instance = this;
-
+    MqttClient(Context context) {
         this.context = context;
-
-        mqttClient = new MqttAndroidClient(context, "tcp://" + Utils.GetMtqqBrokerUrl(context), "acha." + String.valueOf(System.currentTimeMillis()));
-        mqttClient.setCallback(new MqttCallbackHandler());
     }
 
-    public static void start() {
-        if (Instance != null)
-            Instance._start();
-    }
+    void start() {
+        if (mtqqClient != null)
+            stop();
 
-    public static void stop() {
-        if (Instance != null)
-            Instance._stop();
-    }
+        Utils.readUrlSettings(context);
+        url = "tcp://" + Utils.getMtqqBrokerUrl(context);
 
-    public static void publish(String topic, String payload) {
-        if (Instance != null)
-            Instance._publish(topic, payload, false);
-    }
-
-    private void _start() {
-        mqttClient.registerResources(context);
+        mtqqClient = new MqttAndroidClient(context, url, "acha." + String.valueOf(System.currentTimeMillis()));
+        mtqqClient.registerResources(context);
+        mtqqClient.setCallback(new MqttCallbackHandler());
 
         new Thread(new Runnable() {
             @Override
@@ -89,33 +79,30 @@ public class MqttClient {
                 connectToBroker();
             }
         }, "MQTTservice").start();
-
     }
 
-    private void _stop() {
+    void stop() {
         broadcastServiceStatus("Disconnecting", false);
 
         try {
-            if (mqttClient != null) {
-                mqttClient.unregisterResources();
-                IMqttToken disconToken = mqttClient.disconnect();
-                disconToken.setActionCallback(new IMqttActionListener() {
-                    @Override
-                    public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.d("mqtt", "disconnect.onSuccess");
-                        connectionStatus = MQTTConnectionStatus.NOTCONNECTED_USERDISCONNECT;
-                        broadcastServiceStatus("Disconnected", false);
-                    }
+            mtqqClient.unregisterResources();
+            IMqttToken disconToken = mtqqClient.disconnect();
+            disconToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.d("mqtt", "disconnect.onSuccess");
+                    connectionStatus = MQTTConnectionStatus.NOTCONNECTED_USERDISCONNECT;
+                    broadcastServiceStatus("Disconnected", false);
+                }
 
-                    @Override
-                    public void onFailure(IMqttToken asyncActionToken,
-                                          Throwable exception) {
-                        // something went wrong, but probably we are disconnected anyway
-                        connectionStatus = MQTTConnectionStatus.NOTCONNECTED_UNKNOWNREASON;
-                        broadcastServiceStatus("Disconnected", false);
-                    }
-                });
-            }
+                @Override
+                public void onFailure(IMqttToken asyncActionToken,
+                                      Throwable exception) {
+                    // something went wrong, but probably we are disconnected anyway
+                    connectionStatus = MQTTConnectionStatus.NOTCONNECTED_UNKNOWNREASON;
+                    broadcastServiceStatus("Disconnected", false);
+                }
+            });
         } catch (MqttPersistenceException e) {
             Log.e("mqtt", "disconnect failed - persistence exception", e);
             broadcastServiceStatus("disconnect failed - persistence exception: " + e.getMessage(), true);
@@ -123,19 +110,21 @@ public class MqttClient {
             Log.e("mqtt", "disconnect failed - MQTT exception", e);
             broadcastServiceStatus("disconnect failed - MQTT exception: " + e.getMessage(), true);
         } finally {
-            mqttClient = null;
+            mtqqClient = null;
         }
     }
 
-    private void _publish(String topic, String payload, boolean retained) {
+    public void publish(String topic, String payload) {
+        if (mtqqClient == null)
+            return;
+
         Log.d("mqtt", String.format("publish. topic='%s', payload='%s'", topic, payload));
 
-        byte[] encodedPayload = new byte[0];
         try {
-            encodedPayload = payload.getBytes("UTF-8");
+            byte[] encodedPayload = payload.getBytes("UTF-8");
             MqttMessage message = new MqttMessage(encodedPayload);
-            message.setRetained(retained);
-            mqttClient.publish(topic, message);
+            message.setRetained(false);
+            mtqqClient.publish(topic, message);
         } catch (UnsupportedEncodingException e) {
             Log.e("mqtt", "publish failed - UnsupportedEncodingException", e);
             broadcastServiceStatus("publish failed - MQTT exception: " + e.getMessage(), true);
@@ -145,11 +134,11 @@ public class MqttClient {
         }
     }
 
-
     private void broadcastServiceStatus(String statusDescription, boolean isError) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MQTT_STATUS_INTENT);
         broadcastIntent.putExtra(MQTT_MSG, statusDescription);
+        broadcastIntent.putExtra(MQTT_MSG_IS_ERROR, isError);
         //MQTTConnectionStatus status,
 
         context.sendBroadcast(broadcastIntent);
@@ -162,7 +151,7 @@ public class MqttClient {
         broadcastServiceStatus("Connecting...", false);
 
         try {
-            IMqttToken token = mqttClient.connect();
+            IMqttToken token = mtqqClient.connect();
             token.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
@@ -204,13 +193,13 @@ public class MqttClient {
         broadcastServiceStatus("Subscribing...", false);
 
         try {
-            IMqttToken subToken = mqttClient.subscribe("cha/#", 1);
+            IMqttToken subToken = mtqqClient.subscribe("cha/#", 1);
             subToken.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.d("mqtt", "subscribe.onSuccess");
                     broadcastServiceStatus("connect.subscribed", false);
-                    broadcastServiceStatus(mqttClient.getServerURI(), false);
+                    broadcastServiceStatus(url, false);
                 }
 
                 @Override
@@ -230,20 +219,20 @@ public class MqttClient {
 
 
     //Checks if the MQTT client thinks it has an active connection
-    private boolean isAlreadyConnected() {
-        return (mqttClient != null) && mqttClient.isConnected();
-    }
+//    private boolean isAlreadyConnected() {
+//        return (mqttClient != null) && mqttClient.isConnected();
+//    }
 
-    private boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo() != null &&
-                cm.getActiveNetworkInfo().isAvailable() &&
-                cm.getActiveNetworkInfo().isConnected();
-    }
+//    private boolean isOnline() {
+//        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+//        return cm.getActiveNetworkInfo() != null &&
+//                cm.getActiveNetworkInfo().isAvailable() &&
+//                cm.getActiveNetworkInfo().isConnected();
+//    }
 
     private class MqttCallbackHandler implements MqttCallback {
 
-        public MqttCallbackHandler() {
+        MqttCallbackHandler() {
         }
 
         @Override

@@ -24,7 +24,7 @@ public class ThermostatRelayView extends LinearLayout {
     private TextView tvComment;
     private ToggleButton tbButton;
 
-    ThermostatRelayData relayData;
+    private ThermostatRelayData relayData;
 
     public ThermostatRelayView(Context context) {
         super(context);
@@ -90,11 +90,11 @@ public class ThermostatRelayView extends LinearLayout {
         return tbButton;
     }
 
-    public void setRelayName(CharSequence value) {
+    private void setRelayName(CharSequence value) {
         getRelayNameTextView().setText(value);
     }
 
-    public void setComment(CharSequence value) {
+    private void setComment(CharSequence value) {
         getCommentTextView().setText(value);
     }
 

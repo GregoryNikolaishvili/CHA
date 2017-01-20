@@ -10,7 +10,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class GraphActivity extends ChaActivity {
 
-    private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
+    final private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

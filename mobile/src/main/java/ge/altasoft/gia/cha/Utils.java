@@ -4,24 +4,22 @@ package ge.altasoft.gia.cha;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Debug;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.widget.EditText;
 
 import java.util.Locale;
-
-import ge.altasoft.gia.cha.classes.RunnableWithParams;
 
 public class Utils {
 
     public static String mqttBrokerLocalUrl = "192.168.2.99:1883";
     public static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
-
 
     public final static boolean DEBUG_LIGHT = true;
     public final static boolean DEBUG_THERMOSTAT = true;
@@ -34,17 +32,18 @@ public class Utils {
     public static final int FLAG_HAVE_THERMOSTAT_FULL_STATE = 8;
 
     public static final int FLAG_HAVE_STATE = 32; //todo
-    //public static final int FLAG_HAVE_SETTINGS = 64; //todo
 
     public static final int LOG_BUFFER_SIZE = 100;
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
+    static final int ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS = 2;
 
     public static final float DEFAULT_TARGET_TEMPERATURE = 25.0f;
 
     public static boolean disableOnCheckedListener = false;
 
-    public static String ShortToHex4(short value) {
+
+    public static String shortToHex4(short value) {
         return String.format(Locale.US, "%04X", value);
     }
 
@@ -54,8 +53,15 @@ public class Utils {
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
+    public static void readUrlSettings(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        mqttBrokerLocalUrl = prefs.getString("mtqq_url_local", mqttBrokerLocalUrl);
+        mqttBrokerLocalUrl = prefs.getString("mtqq_url_global", mqttBrokerLocalUrl);
+    }
+
     @NonNull
-    public static String DecodeArduinoString(String encodedName) {
+    public static String decodeArduinoString(String encodedName) {
         StringBuilder sb = new StringBuilder();
         boolean prevCharIsEscape = false;
         char[] carr = encodedName.toCharArray();
@@ -74,7 +80,7 @@ public class Utils {
         return sb.toString();
     }
 
-    public static String EncodeArduinoString(String name) {
+    public static String encodeArduinoString(String name) {
         StringBuilder sb = new StringBuilder();
 
         char[] carr = name.toCharArray();
@@ -93,7 +99,7 @@ public class Utils {
         return sb.toString();
     }
 
-    static String GetMtqqBrokerUrl(Context context) {
+    static String getMtqqBrokerUrl(Context context) {
         if (Debug.isDebuggerConnected())
             return mqttBrokerLocalUrl;
 
@@ -116,12 +122,13 @@ public class Utils {
         if (wifiInfo == null)
             return mqttBrokerGlobalUrl;
 
-        if (!Utils.IsGiaWifi(wifiInfo))
+        if (!Utils.isGiaWifi(wifiInfo))
             return mqttBrokerGlobalUrl;
 
         return mqttBrokerLocalUrl;
     }
-    static String GetNetworkInfo(Context context) {
+
+    static String getNetworkInfo(Context context) {
         if (Debug.isDebuggerConnected())
             return "Inside Debugger";
 
@@ -146,13 +153,13 @@ public class Utils {
         if (wifiInfo == null)
             return "No WiFi info";
 
-        if (!IsGiaWifi(wifiInfo))
+        if (!isGiaWifi(wifiInfo))
             return "SSID = ".concat(wifiInfo.getSSID());
 
         return null;
     }
 
-    public static boolean IsGiaWifi(WifiInfo wifiInfo) {
+    public static boolean isGiaWifi(WifiInfo wifiInfo) {
         return wifiInfo.getSSID().trim().equals("\"GIA\"") || wifiInfo.getSSID().trim().equals("\"GIA2\"");
     }
 
@@ -190,35 +197,35 @@ public class Utils {
         alert.show();
     }
 
-    public static void InputDialog(Context context, String title, String value, int type, final RunnableWithParams positiveAction) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(title);
-
-        final EditText input = new EditText(context);
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(type);
-        input.setText(value);
-        builder.setView(input);
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String strValue = input.getText().toString();
-                if (positiveAction != null)
-                    positiveAction.run(strValue);
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
+//    public static void InputDialog(Context context, String title, String value, int type, final RunnableWithParams positiveAction) {
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//        builder.setTitle(title);
+//
+//        final EditText input = new EditText(context);
+//        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//        input.setInputType(type);
+//        input.setText(value);
+//        builder.setView(input);
+//
+//        // Set up the buttons
+//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                String strValue = input.getText().toString();
+//                if (positiveAction != null)
+//                    positiveAction.run(strValue);
+//                dialog.dismiss();
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        AlertDialog alert = builder.create();
+//        alert.show();
+//    }
 }

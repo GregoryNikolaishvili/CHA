@@ -33,18 +33,18 @@ public final class ThermostatControllerData extends RelayControllerData {
     final private static int BOILER_PUMP_COUNT = 2;
 
     final public static char BOILER_MODE_OFF = 'N';
-    final public static char BOILER_MODE_SUMMER = 'S';
-    final public static char BOILER_MODE_SUMMER_POOL = 'P';
-    final public static char BOILER_MODE_WINTER = 'W';
+    final private static char BOILER_MODE_SUMMER = 'S';
+    final private static char BOILER_MODE_SUMMER_POOL = 'P';
+    final private static char BOILER_MODE_WINTER = 'W';
 
     final public static ThermostatControllerData Instance = new ThermostatControllerData();
 
     private char boilerMode;
-    private BoilerSensorData[] boilerSensorsData;
-    private BoilerPumpData[] boilerPumpsData;
+    final private BoilerSensorData[] boilerSensorsData;
+    final private BoilerPumpData[] boilerPumpsData;
 
-    private HashMap<Integer, RoomSensorData> roomSensorsMap;
-    private SparseIntArray savedRoomSensorOrders;
+    final private HashMap<Integer, RoomSensorData> roomSensorsMap;
+    final private SparseIntArray savedRoomSensorOrders;
     private boolean roomSensorsReordered;
 
     private ThermostatControllerData() {
@@ -281,7 +281,7 @@ public final class ThermostatControllerData extends RelayControllerData {
                 sb.append('*');
                 for (int id = 1; id <= 10; id++) {
                     sb2.append(String.format(Locale.US, "%02X%01X", id, id));
-                    sb2.append(Utils.EncodeArduinoString("Sensor #" + id));
+                    sb2.append(Utils.encodeArduinoString("Sensor #" + id));
                     sb2.append(';');
                 }
             } else
@@ -432,7 +432,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         String boilerSettings = null;
         JSONObject jState = null;
 
-        JSONObject jMain = null;
+        JSONObject jMain;
         try {
             jMain = new JSONObject(response);
 
@@ -456,7 +456,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         int result = Utils.FLAG_HAVE_NOTHING;
 
         if (decodeRelaySettings(relaySettings) && decodeRoomSensorSettings(sensorSettings) && decodeBoilerSettings(boilerSettings)) {
-            setHaveSettings(true);
+            setHaveSettings();
             result = Utils.FLAG_HAVE_SETTINGS;
         }
 

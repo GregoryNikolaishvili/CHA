@@ -15,15 +15,12 @@ import android.preference.PreferenceScreen;
 import android.view.KeyEvent;
 import android.widget.BaseAdapter;
 
-import ge.altasoft.gia.cha.MqttClient;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.FriendlyEditTextPreference;
 import ge.altasoft.gia.cha.views.TimePreference;
 
 public class LightSettingsActivity extends PreferenceActivity {
-
-    PrefsFragment prefsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +30,6 @@ public class LightSettingsActivity extends PreferenceActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         LightControllerData.Instance.saveToPreferences(prefs);
 
-        prefsFragment = new PrefsFragment();
         getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
     }
 
@@ -48,10 +44,6 @@ public class LightSettingsActivity extends PreferenceActivity {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
                             LightControllerData.Instance.decode(prefs);
-
-                            MqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings());
-
-                            //Log.d("Settings refresh", LightControllerData.Instance.Encode());
 
                             setResult(Activity.RESULT_OK, null); //The data you want to send back
                             context.finish();

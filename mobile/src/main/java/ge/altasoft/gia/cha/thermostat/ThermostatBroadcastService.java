@@ -64,7 +64,7 @@ public class ThermostatBroadcastService extends Service {
         super.onDestroy();
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    final private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             setData(intent);
@@ -177,7 +177,7 @@ public class ThermostatBroadcastService extends Service {
         new AsyncAction().execute(data);
     }
 
-    private Runnable sendUpdatesToUI = new Runnable() {
+    final private Runnable sendUpdatesToUI = new Runnable() {
         public void run() {
             if (SetAllSettings) {
                 SetAllSettings = false;

@@ -49,7 +49,7 @@ public final class ThermostatUtils {
         if (wifiInfo == null)
             return externalUrl;
 
-        if (!Utils.IsGiaWifi(wifiInfo))
+        if (!Utils.isGiaWifi(wifiInfo))
             return externalUrl;
 
         return LocalIP;

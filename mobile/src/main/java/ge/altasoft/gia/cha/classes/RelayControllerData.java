@@ -15,13 +15,13 @@ public abstract class RelayControllerData {
     private boolean haveSettings;
     private Date controllerCurrentTime;
 
-    private RelayData[] relayDatas;
-    private int[] savedRelayOrders;
+    final private RelayData[] relayDatas;
+    final private int[] savedRelayOrders;
     private boolean relaysReordered;
 
-    public abstract int relayCount();
+    protected abstract int relayCount();
 
-    public RelayControllerData() {
+    protected RelayControllerData() {
         isActive = false;
         relaysReordered = false;
         haveSettings = false;
@@ -34,7 +34,7 @@ public abstract class RelayControllerData {
         return haveSettings;
     }
 
-    public RelayData relays(int index) {
+    protected RelayData relays(int index) {
         return relayDatas[index];
     }
 
@@ -73,8 +73,8 @@ public abstract class RelayControllerData {
         this.isActive = value;
     }
 
-    protected void setHaveSettings(boolean value) {
-        this.haveSettings = value;
+    protected void setHaveSettings() {
+        this.haveSettings = true;
     }
 
     public void saveRelayOrders() {

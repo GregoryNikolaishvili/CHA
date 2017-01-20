@@ -22,7 +22,7 @@ public class BoilerSensorView extends LinearLayout {
     private TextView tvTargetTemperature;
     private LinearLayout llTargetTemperature;
 
-    BoilerSensorData sensorData;
+    private BoilerSensorData sensorData;
 
     public BoilerSensorView(Context context) {
         super(context);

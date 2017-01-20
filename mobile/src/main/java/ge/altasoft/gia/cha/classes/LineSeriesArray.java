@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class LineSeriesArray {
 
-    private TemperatureLineSeries[] series;
+    final private TemperatureLineSeries[] series;
 
     public LineSeriesArray(int count) {
         series = new TemperatureLineSeries[count];

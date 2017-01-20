@@ -23,8 +23,6 @@ import ge.altasoft.gia.cha.views.TemperaturePreference;
 
 public class ThermostatSettingsActivity extends PreferenceActivity {
 
-    PrefsFragment prefsFragment;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +31,6 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         ThermostatControllerData.Instance.saveToPreferences(prefs);
 
-        prefsFragment = new PrefsFragment();
         getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
     }
 
@@ -112,7 +109,7 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
 
                 Map<Integer, RoomSensorData> sensors = ThermostatControllerData.Instance.sortedRoomSensors();
                 for (int id : sensors.keySet()) {
-                    RoomSensorData data = ThermostatControllerData.Instance.roomSensors(id);
+                    //RoomSensorData data = ThermostatControllerData.Instance.roomSensors(id);
 
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 

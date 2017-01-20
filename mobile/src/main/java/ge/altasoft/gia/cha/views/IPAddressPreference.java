@@ -1,7 +1,6 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
-import android.preference.EditTextPreference;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -64,7 +63,7 @@ public class IPAddressPreference extends FriendlyEditTextPreference {
 
         getEditText().addTextChangedListener(new TextWatcher() {
             boolean deleting = false;
-            int lastCount = 0;
+            final int lastCount = 0;
 
             @Override
             public void afterTextChanged(Editable s) {

@@ -9,7 +9,7 @@ import java.util.Locale;
 public class TimeAsXAxisLabelFormatter extends DefaultLabelFormatter {
 
     //private final String mFormat;
-    private SimpleDateFormat sdf;
+    final private SimpleDateFormat sdf;
 
     public TimeAsXAxisLabelFormatter(String format) {
         //mFormat = format;

@@ -5,57 +5,49 @@
     android:orientation="horizontal">
 
     <LinearLayout
+        android:id="@+id/minus_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/minus_container"
+        <NumberPicker
+            android:id="@+id/numberPicker0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <NumberPicker
-                android:id="@+id/numberPicker0"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/hour_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <NumberPicker
-                android:id="@+id/numberPicker1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/min_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <NumberPicker
-                android:id="@+id/numberPicker2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical" />
-        </LinearLayout>
+            android:layout_gravity="center_vertical" />
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/hour_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <NumberPicker
+            android:id="@+id/numberPicker1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/min_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <NumberPicker
+            android:id="@+id/numberPicker2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
 </LinearLayout>

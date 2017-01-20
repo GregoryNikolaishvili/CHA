@@ -24,7 +24,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class LogTHActivity extends ChaActivity {
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
+    final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
     private THLogAdapter adapter = null;
     private boolean isTemperature = true;
 
@@ -38,24 +38,31 @@ public class LogTHActivity extends ChaActivity {
         Intent intent = getIntent();
         String scope = intent.getStringExtra("scope");
 
-        if (scope.equals("BoilerSensor")) {
-            int id = intent.getIntExtra("id", 0);
+        switch (scope) {
+            case "BoilerSensor": {
+                int id = intent.getIntExtra("id", 0);
 
-            if (id > 0) {
-                TempSensorData sensorData = ThermostatControllerData.Instance.boilerSensors(id - 1);
-                logBuffer = sensorData.getLogBuffer();
+                if (id > 0) {
+                    TempSensorData sensorData = ThermostatControllerData.Instance.boilerSensors(id - 1);
+                    logBuffer = sensorData.getLogBuffer();
+                }
+                break;
             }
-        } else if (scope.equals("RoomSensorT")) {
-            int id = intent.getIntExtra("id", 0);
+            case "RoomSensorT": {
+                int id = intent.getIntExtra("id", 0);
 
-            TempSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id);
-            logBuffer = sensorData.getLogBuffer();
-        } else if (scope.equals("RoomSensorH")) {
-            int id = intent.getIntExtra("id", 0);
+                TempSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id);
+                logBuffer = sensorData.getLogBuffer();
+                break;
+            }
+            case "RoomSensorH": {
+                int id = intent.getIntExtra("id", 0);
 
-            isTemperature = false;
-            RoomSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id);
-            logBuffer = sensorData.getLogBufferH();
+                isTemperature = false;
+                RoomSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id);
+                logBuffer = sensorData.getLogBufferH();
+                break;
+            }
         }
 
         if (logBuffer != null) {
@@ -67,7 +74,7 @@ public class LogTHActivity extends ChaActivity {
     }
 
     public class THLogAdapter extends ArrayAdapter<Pair<Date, Float>> {
-        private boolean isTemperature;
+        final private boolean isTemperature;
 
         THLogAdapter(Context context, ArrayList<Pair<Date, Float>> points, boolean isTemperature) {
             super(context, 0, points);

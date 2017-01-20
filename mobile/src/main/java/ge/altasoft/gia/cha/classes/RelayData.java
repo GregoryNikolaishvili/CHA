@@ -10,15 +10,15 @@ import ge.altasoft.gia.cha.Utils;
 
 public abstract class RelayData implements Comparable<RelayData> {
 
-    private int id;
+    final private int id;
     private int order;
     private boolean isOn;
 
     private String name;
 
-    private CircularArrayList<Pair<Date, Boolean>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
+    final private CircularArrayList<Pair<Date, Boolean>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
-    public RelayData(int id) {
+    protected RelayData(int id) {
         this.id = id;
         this.order = id;
         this.isOn = false;
@@ -48,7 +48,7 @@ public abstract class RelayData implements Comparable<RelayData> {
     public void setIsOn(boolean value) {
         if (this.isOn != value) {
             this.isOn = value;
-            logBuffer.add(new Pair<Date, Boolean>(new Date(), value));
+            logBuffer.add(new Pair<>(new Date(), value));
         }
     }
 
@@ -62,7 +62,7 @@ public abstract class RelayData implements Comparable<RelayData> {
 
     public void decodeOrderAndName(String s) {
         order = Character.digit(s.charAt(0), 16);
-        name = Utils.DecodeArduinoString(s.substring(1));
+        name = Utils.decodeArduinoString(s.substring(1));
         if (name.equals(""))
             name = "Relay #" + order;
     }
@@ -80,13 +80,13 @@ public abstract class RelayData implements Comparable<RelayData> {
 
     public void encodeOrderAndName(StringBuilder sb2) {
         sb2.append(String.format(Locale.US, "%01X", order));
-        sb2.append(Utils.EncodeArduinoString(name));
+        sb2.append(Utils.encodeArduinoString(name));
         sb2.append(';');
     }
 
     public static void encodeOrderAndNameDebug(StringBuilder sb2, int i) {
         sb2.append(String.format(Locale.US, "%01X", i));
-        sb2.append(Utils.EncodeArduinoString("Relay #" + String.valueOf(i + 1)));
+        sb2.append(Utils.encodeArduinoString("Relay #" + String.valueOf(i + 1)));
         sb2.append(';');
     }
 

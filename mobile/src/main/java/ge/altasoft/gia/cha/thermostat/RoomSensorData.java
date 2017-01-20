@@ -16,7 +16,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     private float H;
     private String name;
     private boolean canBeControlled;
-    private CircularArrayList<Pair<Date, Float>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
+    final private CircularArrayList<Pair<Date, Float>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
     RoomSensorData(int id) {
         super(id);
@@ -56,13 +56,13 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     void encodeOrderAndName(StringBuilder sb2) {
         sb2.append(String.format(Locale.US, "%02X", this.id));
         sb2.append(String.format(Locale.US, "%01X", this.order));
-        sb2.append(Utils.EncodeArduinoString(name));
+        sb2.append(Utils.encodeArduinoString(name));
         sb2.append(';');
     }
 
     void decodeOrderAndName(String s) {
         order = Character.digit(s.charAt(2), 16);
-        name = Utils.DecodeArduinoString(s.substring(3));
+        name = Utils.decodeArduinoString(s.substring(3));
     }
 
     public void encodeSettings(StringBuilder sb) {

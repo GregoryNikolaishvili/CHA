@@ -16,7 +16,6 @@ import android.widget.Toast;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightFragment;
 import ge.altasoft.gia.cha.light.LightSettingsActivity;
-import ge.altasoft.gia.cha.light.LightUtils;
 
 import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
 import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;
@@ -29,7 +28,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 public class MainActivity extends ChaActivity {
 
     private Intent thermostatServiceIntent;
-
+    private MqttClient mqttClient;
     private SectionsPagerAdapter pagerAdapter;
     private Menu mainMenu;
 
@@ -56,10 +55,8 @@ public class MainActivity extends ChaActivity {
 
         thermostatServiceIntent = new Intent(this, ThermostatBroadcastService.class);
 
-        if (MqttClient.Instance == null) {
-            new MqttClient(this);
-            MqttClient.start();
-        }
+        mqttClient = new MqttClient(this);
+        mqttClient.start();
     }
 
     @Override
@@ -92,7 +89,7 @@ public class MainActivity extends ChaActivity {
                 if (id == R.id.action_ok) {
                     if (LightControllerData.Instance.relayOrderChanged())
                         //LightUtils.sendCommandToController(this, LightControllerData.Instance.encodeSettings());
-                        MqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings());
+                        mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings());
 
                     if (ThermostatControllerData.Instance.relayOrderChanged() || ThermostatControllerData.Instance.roomSensorOrderChanged())
                         ThermostatUtils.sendCommandToController(this, ThermostatControllerData.Instance.encodeSettings());
@@ -109,7 +106,7 @@ public class MainActivity extends ChaActivity {
 
             case R.id.action_refresh:
                 //LightUtils.sendCommandToController(this, "?");
-                MqttClient.publish("chac/light/refresh", "1");
+                mqttClient.publish("chac/light/refresh", "1");
                 return true;
 
             case R.id.action_show_info:
@@ -122,7 +119,7 @@ public class MainActivity extends ChaActivity {
 
             //region Light
             case R.id.action_light_settings:
-                startActivityForResult(new Intent(this, LightSettingsActivity.class), LightUtils.ACTIVITY_REQUEST_SETTINGS_CODE);
+                startActivityForResult(new Intent(this, LightSettingsActivity.class), Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS);
                 return true;
 
             case R.id.action_light_reorder:
@@ -161,6 +158,13 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
+    protected void onStop() {
+        mqttClient.stop();
+
+        super.onStop();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -175,14 +179,12 @@ public class MainActivity extends ChaActivity {
             pagerAdapter.fragmentHeaterRelays.rebuildUI();
     }
 
+
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
-        MqttClient.stop();
-        MqttClient.Instance = null;
-
         stopService(thermostatServiceIntent);
+
+        super.onDestroy();
     }
 
     @Override
@@ -195,11 +197,12 @@ public class MainActivity extends ChaActivity {
 //
 //                }
 //                break;
-            case LightUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
-//                if (resultCode == Activity.RESULT_OK)
-//                    LightBroadcastService.SetAllSettings = true;
-                //pagerAdapter.lightFragment.rebuildUI();
+
+            case Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS:
+                if (resultCode == Activity.RESULT_OK)
+                    mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings());
                 break;
+
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
                 if (resultCode == Activity.RESULT_OK)
                     ThermostatBroadcastService.SetAllSettings = true;
@@ -243,11 +246,11 @@ public class MainActivity extends ChaActivity {
     private void showNetworkInfo() {
         StringBuilder sb = new StringBuilder();
 
-        String info = Utils.GetNetworkInfo(this);
+        String info = Utils.getNetworkInfo(this);
         if (info != null)
             sb.append(info);
 
-        String url = Utils.GetMtqqBrokerUrl(this);
+        String url = Utils.getMtqqBrokerUrl(this);
         if (url == null)
             url = "(null)";
         sb.append("\nUrl - ");
@@ -256,9 +259,13 @@ public class MainActivity extends ChaActivity {
         Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
     }
 
+    public MqttClient getMqttClient() {
+        return mqttClient;
+    }
+
     public static class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        private boolean isLandscape;
+        final private boolean isLandscape;
 
         LightFragment lightFragment = null;
         FragmentBoiler fragmentBoiler = null;

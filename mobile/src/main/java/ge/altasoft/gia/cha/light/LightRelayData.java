@@ -90,16 +90,16 @@ public final class LightRelayData extends RelayData {
 
     public void encodeSettings(StringBuilder sb) {
         sb.append(isActive ? 'T' : 'F');
-        sb.append(Utils.ShortToHex4(onOffset));
+        sb.append(Utils.shortToHex4(onOffset));
         sb.append(offMode);
-        sb.append(Utils.ShortToHex4(offValue));
+        sb.append(Utils.shortToHex4(offValue));
     }
 
     public static void encodeSettingsDebug(StringBuilder sb) {
         sb.append('F');
-        sb.append(Utils.ShortToHex4((short) 0));
+        sb.append(Utils.shortToHex4((short) 0));
         sb.append(LightRelayData.OFF_SUNRISE);
-        sb.append(Utils.ShortToHex4((short) 0));
+        sb.append(Utils.shortToHex4((short) 0));
     }
 
     void encodeSettings(SharedPreferences.Editor editor) {

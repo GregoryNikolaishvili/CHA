@@ -22,7 +22,7 @@ public class RoomSensorView extends LinearLayout {
     private TextView tvTemperatureTrend;
     private TextView tvHumidity;
 
-    RoomSensorData sensorData;
+    private RoomSensorData sensorData;
 
     public RoomSensorView(Context context) {
         super(context);

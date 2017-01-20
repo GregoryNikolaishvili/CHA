@@ -11,9 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.util.Locale;
-
-import ge.altasoft.gia.cha.MqttClient;
+import ge.altasoft.gia.cha.MainActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.Utils;
@@ -22,7 +20,7 @@ import ge.altasoft.gia.cha.views.LightRelayView;
 
 public class LightFragment extends Fragment {
 
-    public DragLinearLayout dragLinearLayout = null;
+    private DragLinearLayout dragLinearLayout = null;
     private View rootView = null;
 
     public LightFragment() {
@@ -54,7 +52,7 @@ public class LightFragment extends Fragment {
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
                     //LightUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
-                    MqttClient.publish("chac/light/mode", isChecked ? "A" : "M");
+                    ((MainActivity) getActivity()).getMqttClient().publish("chac/light/mode", isChecked ? "A" : "M");
                 }
             }
         });

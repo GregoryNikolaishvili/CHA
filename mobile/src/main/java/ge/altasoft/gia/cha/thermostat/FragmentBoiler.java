@@ -30,7 +30,7 @@ public class FragmentBoiler extends Fragment {
 
     private View rootView = null;
 
-    private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
+    final private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
 
     public FragmentBoiler() {
     }

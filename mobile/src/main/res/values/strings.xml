@@ -39,7 +39,7 @@
     <string name="sample_temperature">25.5</string>
     <string name="centigrade">°</string>
     <string name="sample_humidity">80 %</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading&#8230;</string>
 
     <string-array name="listArray">
         <item>Sunrise</item>

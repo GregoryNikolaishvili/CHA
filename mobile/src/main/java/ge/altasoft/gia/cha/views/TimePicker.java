@@ -32,7 +32,7 @@ public class TimePicker extends LinearLayout {
         initializeReference();
     }
 
-    public class MyTwoDigitFormatter implements NumberPicker.Formatter {
+    private class MyTwoDigitFormatter implements NumberPicker.Formatter {
         public String format(int value) {
             return String.format(Locale.US, "%02d", value);
         }
