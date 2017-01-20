@@ -55,6 +55,11 @@ public class MainActivity extends ChaActivity {
         viewPager.setAdapter(pagerAdapter);
 
         thermostatServiceIntent = new Intent(this, ThermostatBroadcastService.class);
+
+        if (MqttClient.Instance == null) {
+            new MqttClient(this);
+            MqttClient.start();
+        }
     }
 
     @Override
@@ -152,10 +157,7 @@ public class MainActivity extends ChaActivity {
     public void onStart() {
         super.onStart();
 
-        new MqttClient(this).start();
-
         startService(thermostatServiceIntent);
-
     }
 
     @Override
@@ -178,6 +180,7 @@ public class MainActivity extends ChaActivity {
         super.onDestroy();
 
         MqttClient.stop();
+        MqttClient.Instance = null;
 
         stopService(thermostatServiceIntent);
     }

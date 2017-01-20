@@ -61,7 +61,6 @@ public class MqttClient {
 
         this.context = context;
 
-        //mqttClient = new MqttAndroidClient(context, "tcp://192.168.2.99:1883", "acha." + String.valueOf(System.currentTimeMillis()));
         mqttClient = new MqttAndroidClient(context, "tcp://" + Utils.GetMtqqBrokerUrl(context), "acha." + String.valueOf(System.currentTimeMillis()));
         mqttClient.setCallback(new MqttCallbackHandler());
     }
