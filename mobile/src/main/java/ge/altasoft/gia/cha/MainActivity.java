@@ -28,7 +28,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 public class MainActivity extends ChaActivity {
 
     private Intent thermostatServiceIntent;
-    private MqttClient mqttClient;
+    private MqttClient mqttClient = null;
     private SectionsPagerAdapter pagerAdapter;
     private Menu mainMenu;
 
@@ -54,9 +54,6 @@ public class MainActivity extends ChaActivity {
         viewPager.setAdapter(pagerAdapter);
 
         thermostatServiceIntent = new Intent(this, ThermostatBroadcastService.class);
-
-        mqttClient = new MqttClient(this);
-        mqttClient.start();
     }
 
     @Override
@@ -154,12 +151,17 @@ public class MainActivity extends ChaActivity {
     public void onStart() {
         super.onStart();
 
+        mqttClient = new MqttClient(this);
+        mqttClient.start();
+
         startService(thermostatServiceIntent);
     }
 
     @Override
     protected void onStop() {
-        mqttClient.stop();
+        if (mqttClient != null) {
+            mqttClient.stop();
+        }
 
         super.onStop();
     }
