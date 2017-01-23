@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 //import android.net.ConnectivityManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -23,7 +24,8 @@ import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class MqttClient {
 
-    private static final String TOPIC_CHA_SYS = "cha/sys";
+    public static final String TOPIC_CHA_SYS = "cha/sys";
+    private static final String TOPIC_CHA_SYS_ME = "cha/sys/me";
     private static final String TOPIC_CHA_LIGHTS_STATE = "cha/light/state";
     private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
     private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
@@ -257,15 +259,23 @@ public class MqttClient {
 
             Log.i("mqtt", String.format("message arrived. topic='%s', payload='%s'", topic, payload));
 
-            if (topic.equals(TOPIC_CHA_SYS)) {
-                {
-                    if ((connectionStatus == MQTTConnectionStatus.CONNECTED_CHA_IS_OFFLINE) && payload.equals("light controller connected"))
-                        connectionStatus = MQTTConnectionStatus.CONNECTED_CHA_IS_ONLINE;
-                    else if ((connectionStatus == MQTTConnectionStatus.CONNECTED_CHA_IS_ONLINE) && payload.equals("light controller disconnected"))
-                        connectionStatus = MQTTConnectionStatus.CONNECTED_CHA_IS_OFFLINE;
+            if (topic.equals(TOPIC_CHA_SYS_ME)) {
+                //Toast.makeText(context, payload, Toast.LENGTH_SHORT).show();
+                Intent broadcastIntent = new Intent();
+                broadcastIntent.setAction(MQTT_DATA_INTENT);
+                broadcastIntent.putExtra("what", Utils.FLAG_HAVE_WHO_IS_ACTIVE);
+                broadcastIntent.putExtra("value", payload);
+                context.sendBroadcast(broadcastIntent);
+            } else if (topic.equals(TOPIC_CHA_SYS)) {
+                if (payload.equals("who")) {
+                    publish(TOPIC_CHA_SYS_ME, Utils.getDeviceName());
+                } else if ((connectionStatus == MQTTConnectionStatus.CONNECTED_CHA_IS_OFFLINE) && payload.equals("light controller connected")) {
+                    connectionStatus = MQTTConnectionStatus.CONNECTED_CHA_IS_ONLINE;
+                    broadcastServiceStatus(url, false);
+                } else if ((connectionStatus == MQTTConnectionStatus.CONNECTED_CHA_IS_ONLINE) && payload.equals("light controller disconnected")) {
+                    connectionStatus = MQTTConnectionStatus.CONNECTED_CHA_IS_OFFLINE;
+                    broadcastServiceStatus(url, false);
                 }
-
-                broadcastServiceStatus(url, false);
             } else if (topic.equals(TOPIC_CHA_LIGHTS_SETTINGS)) {
                 LightControllerData.Instance.decodeSettings(payload);
 

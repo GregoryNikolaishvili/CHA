@@ -108,6 +108,8 @@ public class MainActivity extends ChaActivity {
 
             case R.id.action_show_info:
                 showNetworkInfo();
+                startActivity(new Intent(this, WhoIsOnlineActivity.class));
+                mqttClient.publish(MqttClient.TOPIC_CHA_SYS, "who");
                 return true;
 
             case R.id.action_settings:
@@ -216,8 +218,8 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
-    protected void processLightControllerData(int flags, Intent intent) {
-        super.processLightControllerData(flags, intent);
+    protected void processMqttData(int flags, Intent intent) {
+        super.processMqttData(flags, intent);
 
         if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0)
             pagerAdapter.lightFragment.rebuildUI();
@@ -258,7 +260,7 @@ public class MainActivity extends ChaActivity {
         sb.append("\nUrl - ");
         sb.append(url);
 
-        Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, sb.toString(), Toast.LENGTH_SHORT).show();
     }
 
     public MqttClient getMqttClient() {

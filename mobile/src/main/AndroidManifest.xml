@@ -45,6 +45,7 @@
         <activity android:name=".GraphActivity" />
         <activity android:name=".LogTHActivity" />
         <activity android:name=".LogBooleanActivity" />
+        <activity android:name=".WhoIsOnlineActivity" />
 
         <service android:name=".thermostat.ThermostatBroadcastService" />
 

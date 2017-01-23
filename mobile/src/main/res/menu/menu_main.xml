@@ -24,50 +24,43 @@
         android:title="@string/action_refresh"
         app:showAsAction="ifRoom" />
 
-    <group android:id="@+id/grp1">
-        <item
-            android:id="@+id/action_show_info"
-            android:orderInCategory="10"
-            android:title="@string/action_show_info"
-            app:showAsAction="never" />
+    <item
+        android:id="@+id/action_show_info"
+        android:orderInCategory="10"
+        android:title="@string/action_show_info"
+        app:showAsAction="never" />
 
-    </group>
 
-    <group android:id="@+id/grp2">
-        <item
-            android:id="@+id/action_light_reorder"
-            android:orderInCategory="200"
-            android:title="@string/action_reorder"
-            app:showAsAction="never" />
-    </group>
+    <item
+        android:id="@+id/action_light_reorder"
+        android:orderInCategory="200"
+        android:title="@string/action_reorder"
+        app:showAsAction="never" />
 
-    <group android:id="@+id/grp3">
+    <item
+        android:orderInCategory="150"
+        android:title="@string/action_settings"
+        app:showAsAction="never">
 
-        <item
-            android:orderInCategory="150"
-            android:title="@string/action_settings"
-            app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/action_settings"
+                android:orderInCategory="20"
+                android:title="@string/action_settings"
+                app:showAsAction="never" />
 
-            <menu>
-                <item
-                    android:id="@+id/action_settings"
-                    android:orderInCategory="20"
-                    android:title="@string/action_settings"
-                    app:showAsAction="never" />
+            <item
+                android:id="@+id/action_light_settings"
+                android:orderInCategory="100"
+                android:title="@string/action_light_settings"
+                app:showAsAction="never" />
 
-                <item
-                    android:id="@+id/action_light_settings"
-                    android:orderInCategory="100"
-                    android:title="@string/action_light_settings"
-                    app:showAsAction="never" />
+            <item
+                android:id="@+id/action_thermostat_settings"
+                android:orderInCategory="110"
+                android:title="@string/action_thermostat_settings"
+                app:showAsAction="never" />
 
-                <item
-                    android:id="@+id/action_thermostat_settings"
-                    android:orderInCategory="110"
-                    android:title="@string/action_thermostat_settings"
-                    app:showAsAction="never" />
-
-            </menu>
-        </item>
-    </group>
+        </menu>
+    </item>
 </menu>

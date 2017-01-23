@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -28,6 +29,7 @@ public class Utils {
     public static final int FLAG_HAVE_LIGHTS_ONE_STATE = 1;
     public static final int FLAG_HAVE_SETTINGS = 2;
     public static final int FLAG_HAVE_NAME_AND_ORDER = 4;
+    public static final int FLAG_HAVE_WHO_IS_ACTIVE = 5;
 
     public static final int FLAG_HAVE_THERMOSTAT_FULL_STATE = 8;
 
@@ -165,6 +167,28 @@ public class Utils {
 
     public static int random(int min, int max) {
         return min + (int) Math.round(Math.random() * (max - min));
+    }
+
+    public static String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return capitalize(model);
+        } else {
+            return capitalize(manufacturer) + " " + model;
+        }
+    }
+
+    private static String capitalize(String s) {
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+        char first = s.charAt(0);
+        if (Character.isUpperCase(first)) {
+            return s;
+        } else {
+            return Character.toUpperCase(first) + s.substring(1);
+        }
     }
 
     public static void ConfirmDialog(Context context, String title, String message, final Runnable positiveAction, final Runnable negativeAction) {

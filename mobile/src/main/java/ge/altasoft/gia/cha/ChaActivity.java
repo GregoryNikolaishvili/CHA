@@ -24,23 +24,25 @@ public abstract class ChaActivity extends AppCompatActivity {
             if (actionBar != null) {
                 actionBar.setSubtitle(statusMessage);
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                switch (status) {
-                    case INITIAL:
-                        toolbar.setSubtitleTextColor(Color.DKGRAY);
-                        break;
-                    case CONNECTING:
-                        toolbar.setSubtitleTextColor(Color.LTGRAY);
-                        break;
-                    case CONNECTED_CHA_IS_OFFLINE:
-                        toolbar.setSubtitleTextColor(Color.YELLOW);
-                        break;
-                    case CONNECTED_CHA_IS_ONLINE:
-                        toolbar.setSubtitleTextColor(Color.WHITE);
-                        break;
-                    case NOTCONNECTED_UNKNOWNREASON:
-                    case NOTCONNECTED_USERDISCONNECT:
-                        toolbar.setSubtitleTextColor(Color.RED);
-                        break;
+                if (toolbar != null) {
+                    switch (status) {
+                        case INITIAL:
+                            toolbar.setSubtitleTextColor(Color.DKGRAY);
+                            break;
+                        case CONNECTING:
+                            toolbar.setSubtitleTextColor(Color.LTGRAY);
+                            break;
+                        case CONNECTED_CHA_IS_OFFLINE:
+                            toolbar.setSubtitleTextColor(Color.YELLOW);
+                            break;
+                        case CONNECTED_CHA_IS_ONLINE:
+                            toolbar.setSubtitleTextColor(Color.WHITE);
+                            break;
+                        case NOTCONNECTED_UNKNOWNREASON:
+                        case NOTCONNECTED_USERDISCONNECT:
+                            toolbar.setSubtitleTextColor(Color.RED);
+                            break;
+                    }
                 }
             }
         }
@@ -50,7 +52,7 @@ public abstract class ChaActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             int what = intent.getIntExtra("what", Utils.FLAG_HAVE_NOTHING);
-            processLightControllerData(what, intent);
+            processMqttData(what, intent);
         }
     };
 
@@ -92,7 +94,7 @@ public abstract class ChaActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    void processLightControllerData(int flags, Intent intent) {
+    void processMqttData(int flags, Intent intent) {
     }
 
     void processThermostatControllerData(int flags, Intent intent) {

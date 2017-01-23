@@ -91,8 +91,8 @@ public class LogBooleanActivity extends ChaActivity {
 
             Pair<Date, Boolean> point = getItem(position);
             if (point != null) {
-                ((TextView) convertView.findViewById(R.id.tvLogDateTime)).setText(sdf.format(point.first));
-                ((TextView) convertView.findViewById(R.id.tvLogValue)).setText(point.second ? "On" : "Off");
+                ((TextView) convertView.findViewById(R.id.tvListViewItemKey)).setText(sdf.format(point.first));
+                ((TextView) convertView.findViewById(R.id.tvListViewItemValue)).setText(point.second ? "On" : "Off");
             }
             return convertView;
         }
