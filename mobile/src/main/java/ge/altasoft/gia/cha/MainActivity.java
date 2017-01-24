@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import ge.altasoft.gia.cha.light.LightControllerData;
@@ -86,7 +87,7 @@ public class MainActivity extends ChaActivity {
                 if (id == R.id.action_ok) {
                     if (LightControllerData.Instance.relayOrderChanged())
                         //LightUtils.sendCommandToController(this, LightControllerData.Instance.encodeSettings());
-                        mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings());
+                        mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
 
                     if (ThermostatControllerData.Instance.relayOrderChanged() || ThermostatControllerData.Instance.roomSensorOrderChanged())
                         ThermostatUtils.sendCommandToController(this, ThermostatControllerData.Instance.encodeSettings());
@@ -103,13 +104,14 @@ public class MainActivity extends ChaActivity {
 
             case R.id.action_refresh:
                 //LightUtils.sendCommandToController(this, "?");
-                mqttClient.publish("chac/light/refresh", "1");
+                mqttClient.publish("chac/light/refresh", "1", false);
                 return true;
 
             case R.id.action_show_info:
                 showNetworkInfo();
-                startActivity(new Intent(this, WhoIsOnlineActivity.class));
-                mqttClient.publish(MqttClient.TOPIC_CHA_SYS, "who");
+                Intent intent = new Intent(this, WhoIsOnlineActivity.class);
+                intent.putStringArrayListExtra("list", mqttClient.getConnectedClientList());
+                startActivity(intent);
                 return true;
 
             case R.id.action_settings:
@@ -204,7 +206,7 @@ public class MainActivity extends ChaActivity {
 
             case Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS:
                 if (resultCode == Activity.RESULT_OK)
-                    mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings());
+                    mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
                 break;
 
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
@@ -218,17 +220,30 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
-    protected void processMqttData(int flags, Intent intent) {
-        super.processMqttData(flags, intent);
+    protected void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
+        super.processMqttData(dataType, intent);
 
-        if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0)
-            pagerAdapter.lightFragment.rebuildUI();
-        else if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
-            pagerAdapter.lightFragment.drawState();
-        } else if ((flags & Utils.FLAG_HAVE_LIGHTS_ONE_STATE) != 0) {
-            int id = intent.getIntExtra("id", 0);
-            //boolean value = intent.getBooleanExtra("value", false);
-            pagerAdapter.lightFragment.drawState(id);
+        switch (dataType) {
+            case LightControllerConnected:
+                ImageView image = (ImageView) findViewById(R.id.lightsIsOnline);
+                boolean value = intent.getBooleanExtra("value", false);
+                if (image != null)
+                    image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                break;
+
+            case LightSettings:
+                pagerAdapter.lightFragment.rebuildUI();
+                break;
+
+            case LightOneState:
+                int id = intent.getIntExtra("id", 0);
+                pagerAdapter.lightFragment.drawState(id);
+                break;
+
+            case LightAllStates:
+                State:
+                pagerAdapter.lightFragment.drawState();
+                break;
         }
     }
 

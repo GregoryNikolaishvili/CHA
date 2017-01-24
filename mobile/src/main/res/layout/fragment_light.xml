@@ -29,10 +29,18 @@
         android:orientation="horizontal"
         android:paddingBottom="4dp"
         android:paddingEnd="8dp"
-        android:paddingLeft="8dp"
+        android:paddingLeft="4dp"
         android:paddingRight="8dp"
         android:paddingStart="8dp"
         android:paddingTop="4dp">
+
+        <ImageView
+            android:id="@+id/lightsIsOnline"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:paddingRight="4dp"
+            android:paddingEnd="4dp"
+            android:src="@drawable/circle_red" />
 
         <ToggleButton
             android:id="@+id/lightsAutoMode"

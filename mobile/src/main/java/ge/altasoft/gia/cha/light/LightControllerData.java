@@ -181,9 +181,9 @@ public final class LightControllerData extends RelayControllerData {
 //            relays(i).decodeOrderAndName(arr[i]);
 //
 //        if (stateResponse != null)
-//            return Utils.FLAG_HAVE_SETTINGS | decode(stateResponse);
+//            return Utils.FLAG_LIGHTS_SETTINGS | decode(stateResponse);
 //
-//        return Utils.FLAG_HAVE_SETTINGS;
+//        return Utils.FLAG_LIGHTS_SETTINGS;
 //    }
 
     void decode(SharedPreferences prefs) {

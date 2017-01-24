@@ -13,9 +13,12 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Debug;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 
 import java.util.Locale;
+
+import ge.altasoft.gia.cha.light.LightControllerData;
 
 public class Utils {
 
@@ -25,15 +28,11 @@ public class Utils {
     public final static boolean DEBUG_LIGHT = true;
     public final static boolean DEBUG_THERMOSTAT = true;
 
-    public static final int FLAG_HAVE_NOTHING = 0;
-    public static final int FLAG_HAVE_LIGHTS_ONE_STATE = 1;
-    public static final int FLAG_HAVE_SETTINGS = 2;
-    public static final int FLAG_HAVE_NAME_AND_ORDER = 4;
-    public static final int FLAG_HAVE_WHO_IS_ACTIVE = 5;
+    public static final int FLAG_HAVE_THERMOSTAT_FULL_STATE = 100;
 
-    public static final int FLAG_HAVE_THERMOSTAT_FULL_STATE = 8;
-
+    public static final int FLAG_HAVE_NOTHING = 0; //todo
     public static final int FLAG_HAVE_STATE = 32; //todo
+    public static final int FLAG_HAVE_SETTINGS = 33; //todo
 
     public static final int LOG_BUFFER_SIZE = 100;
 
@@ -189,6 +188,10 @@ public class Utils {
         } else {
             return Character.toUpperCase(first) + s.substring(1);
         }
+    }
+
+    public static String getDeviceUniqueId(Context context) {
+        return Build.SERIAL.concat(".").concat(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
     }
 
     public static void ConfirmDialog(Context context, String title, String message, final Runnable positiveAction, final Runnable negativeAction) {

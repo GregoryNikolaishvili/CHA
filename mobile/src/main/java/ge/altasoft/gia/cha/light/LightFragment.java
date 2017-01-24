@@ -52,7 +52,7 @@ public class LightFragment extends Fragment {
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
                     //LightUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
-                    ((MainActivity) getActivity()).getMqttClient().publish("chac/light/mode", isChecked ? "A" : "M");
+                    ((MainActivity) getActivity()).getMqttClient().publish("chac/light/mode", isChecked ? "A" : "M", false);
                 }
             }
         });

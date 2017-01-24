@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
 
@@ -18,11 +19,15 @@ public abstract class ChaActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String statusMessage = intent.getStringExtra(MqttClient.MQTT_MSG);
             boolean isError = intent.getBooleanExtra(MqttClient.MQTT_MSG_IS_ERROR, false);
-            MqttClient.MQTTConnectionStatus status = (MqttClient.MQTTConnectionStatus) intent.getSerializableExtra(MqttClient.MQTT_CONN_STATUS);
 
+            if (isError)
+                Toast.makeText(context, statusMessage, Toast.LENGTH_SHORT).show();
+
+            MqttClient.MQTTConnectionStatus status = (MqttClient.MQTTConnectionStatus) intent.getSerializableExtra(MqttClient.MQTT_CONN_STATUS);
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
-                actionBar.setSubtitle(statusMessage);
+                if (!isError)
+                    actionBar.setSubtitle(statusMessage);
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 if (toolbar != null) {
                     switch (status) {
@@ -32,10 +37,7 @@ public abstract class ChaActivity extends AppCompatActivity {
                         case CONNECTING:
                             toolbar.setSubtitleTextColor(Color.LTGRAY);
                             break;
-                        case CONNECTED_CHA_IS_OFFLINE:
-                            toolbar.setSubtitleTextColor(Color.YELLOW);
-                            break;
-                        case CONNECTED_CHA_IS_ONLINE:
+                        case CONNECTED:
                             toolbar.setSubtitleTextColor(Color.WHITE);
                             break;
                         case NOTCONNECTED_UNKNOWNREASON:
@@ -51,8 +53,8 @@ public abstract class ChaActivity extends AppCompatActivity {
     final private BroadcastReceiver broadcastDataReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int what = intent.getIntExtra("what", Utils.FLAG_HAVE_NOTHING);
-            processMqttData(what, intent);
+            MqttClient.MQTTReceivedDataType dataType = (MqttClient.MQTTReceivedDataType) intent.getSerializableExtra(MqttClient.MQTT_DATA_TYPE);
+            processMqttData(dataType, intent);
         }
     };
 
@@ -60,7 +62,7 @@ public abstract class ChaActivity extends AppCompatActivity {
     final private BroadcastReceiver thermostatBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int flags = intent.getIntExtra("result", Utils.FLAG_HAVE_NOTHING);
+            int flags = intent.getIntExtra("result", 0);
             processThermostatControllerData(flags, null);
         }
     };
@@ -94,7 +96,7 @@ public abstract class ChaActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    void processMqttData(int flags, Intent intent) {
+    void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
     }
 
     void processThermostatControllerData(int flags, Intent intent) {

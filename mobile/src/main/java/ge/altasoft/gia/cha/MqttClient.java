@@ -2,55 +2,56 @@ package ge.altasoft.gia.cha;
 
 import android.content.Context;
 import android.content.Intent;
-//import android.net.ConnectivityManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 import ge.altasoft.gia.cha.light.LightControllerData;
-import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
-//import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class MqttClient {
 
-    public static final String TOPIC_CHA_SYS = "cha/sys";
-    private static final String TOPIC_CHA_SYS_ME = "cha/sys/me";
-    private static final String TOPIC_CHA_LIGHTS_STATE = "cha/light/state";
+    private static final String TOPIC_CHA_SYS_OLD = "cha/sys";
+
+    private static final String TOPIC_CHA_SYS = "cha/sys/";
+    private static final String TOPIC_CHA_LIGHTS_STATE = "cha/light/state/";
+
+    private static final String TOPIC_CHA_LIGHTS_SYS = "cha/light/sys";
     private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
     private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
 
     private static final String TOPIC_CHA_THERMOSTAT_FULL = "cha/thermostat/full";
 
+    public static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
+
+    public static enum MQTTReceivedDataType {
+        HaveNothing,
+        LightControllerConnected,
+        LightOneState,
+        LightAllStates,
+        LightSettings,
+        LightNameAndOrders,
+        ThermostatOneState
+    }
+
     public enum MQTTConnectionStatus {
         INITIAL,                            // initial status
         CONNECTING,                         // attempting to connect
-        CONNECTED_CHA_IS_ONLINE,           // connected, cha controller is online
-        CONNECTED_CHA_IS_OFFLINE,           // connected, cha controller is offline
-        //NOTCONNECTED_WAITINGFORINTERNET,    // can't connect because the phone
-        //     does not have Internet access
+        CONNECTED,                          // connected
         NOTCONNECTED_USERDISCONNECT,        // user has explicitly requested
-        //     disconnection
-        //NOTCONNECTED_DATADISABLED,          // can't connect because the user
-        //     has disabled data access
         NOTCONNECTED_UNKNOWNREASON          // failed to connect for some reason
     }
-
-    //public static MqttClient Instance = null;
-    //private MqttAndroidClient mqttClient;
-
-    private MQTTConnectionStatus connectionStatus = MQTTConnectionStatus.INITIAL;
-    //private Context context;
 
     // constants used to tell the Activity UI the connection status
     public static final String MQTT_STATUS_INTENT = "ge.altasoft.gia.cha.STATUS";
@@ -60,11 +61,23 @@ public class MqttClient {
     public static final String MQTT_MSG_IS_ERROR = "ge.altasoft.gia.cha.MSG.IS_ERROR";
 
     final private Context context;
+
     private MqttAndroidClient mqttClient = null;
-    private String url;
+
+    private String clientId;
+    private String brokerUrl;
+
+    private ArrayList<String> connectedClients = new ArrayList<>();
+
+    private MQTTConnectionStatus connectionStatus = MQTTConnectionStatus.INITIAL;
 
     MqttClient(Context context) {
         this.context = context;
+        clientId = Utils.getDeviceName().concat("-").concat(Utils.getDeviceUniqueId(context));
+    }
+
+    public ArrayList<String> getConnectedClientList() {
+        return connectedClients;
     }
 
     void start() {
@@ -72,9 +85,9 @@ public class MqttClient {
             stop();
 
         Utils.readUrlSettings(context);
-        url = "tcp://" + Utils.getMtqqBrokerUrl(context);
+        brokerUrl = "tcp://" + Utils.getMtqqBrokerUrl(context);
 
-        mqttClient = new MqttAndroidClient(context, url, "acha." + String.valueOf(System.currentTimeMillis()));
+        mqttClient = new MqttAndroidClient(context, brokerUrl, "acha." + String.valueOf(System.currentTimeMillis()));
         mqttClient.registerResources(context);
         mqttClient.setCallback(new MqttCallbackHandler());
 
@@ -83,15 +96,20 @@ public class MqttClient {
             public void run() {
                 connectToBroker();
             }
-        }, "MQTTservice").start();
+        }, "MQTTservice_start").start();
     }
 
     void stop() {
+        if (mqttClient == null)
+            return;
+
         broadcastServiceStatus("Disconnecting", false);
 
+        publish(TOPIC_CHA_SYS.concat(clientId), "", true);
         try {
-            mqttClient.unregisterResources();
+            mqttClient.unsubscribe("cha/#");
             mqttClient.disconnect();
+            mqttClient.unregisterResources();
 //                IMqttToken disconToken = mqttClient.disconnect();
 //                disconToken.setActionCallback(new IMqttActionListener() {
 //                    @Override
@@ -120,20 +138,22 @@ public class MqttClient {
         }
     }
 
-    public void publish(String topic, String payload) {
+    public void publish(String topic, String message, boolean retained) {
         if (mqttClient == null)
             return;
 
-        Log.d("mqtt", String.format("publish. topic='%s', payload='%s'", topic, payload));
+        Log.d("mqtt", String.format("publish. topic='%s', payload='%s'", topic, message));
 
         try {
-            byte[] encodedPayload = payload.getBytes("UTF-8");
-            MqttMessage message = new MqttMessage(encodedPayload);
-            message.setRetained(false);
-            mqttClient.publish(topic, message);
+            byte[] payload;
+            if (message.equals(""))
+                payload = new byte[0];
+            else
+                payload = message.getBytes("UTF-8");
+            mqttClient.publish(topic, payload, 1, retained);
         } catch (UnsupportedEncodingException e) {
             Log.e("mqtt", "publish failed - UnsupportedEncodingException", e);
-            broadcastServiceStatus("publish failed - MQTT exception: " + e.getMessage(), true);
+            broadcastServiceStatus("publish failed - UnsupportedEncodingException: " + e.getMessage(), true);
         } catch (MqttException e) {
             Log.e("mqtt", "publish failed - MQTT exception", e);
             broadcastServiceStatus("publish failed - MQTT exception: " + e.getMessage(), true);
@@ -159,7 +179,10 @@ public class MqttClient {
         broadcastServiceStatus("Connecting...", false);
 
         try {
-            IMqttToken token = mqttClient.connect();
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setWill(TOPIC_CHA_SYS.concat(clientId), new byte[0], 1, true);
+
+            IMqttToken token = mqttClient.connect(options);
             token.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
@@ -167,15 +190,17 @@ public class MqttClient {
                     Log.d("mqtt", "connect.onSuccess");
                     if (connectionStatus == MQTTConnectionStatus.CONNECTING) //todo workaround for strange bug. onsuccess was called twice
                     {
-                        connectionStatus = MQTTConnectionStatus.CONNECTED_CHA_IS_OFFLINE;
+                        connectionStatus = MQTTConnectionStatus.CONNECTED;
                         broadcastServiceStatus("Connected", false);
+
+                        publish(TOPIC_CHA_SYS.concat(clientId), "connected", true);
 
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 subscribeToTopics();
                             }
-                        }, "MQTTservice").start();
+                        }, "MQTTservice_subscribe").start();
                     }
                 }
 
@@ -207,7 +232,7 @@ public class MqttClient {
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.d("mqtt", "subscribe.onSuccess");
                     broadcastServiceStatus("connect.subscribed", false);
-                    broadcastServiceStatus(url, false);
+                    broadcastServiceStatus(brokerUrl, false);
                 }
 
                 @Override
@@ -259,55 +284,95 @@ public class MqttClient {
 
             Log.i("mqtt", String.format("message arrived. topic='%s', payload='%s'", topic, payload));
 
-            if (topic.equals(TOPIC_CHA_SYS_ME)) {
-                //Toast.makeText(context, payload, Toast.LENGTH_SHORT).show();
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(MQTT_DATA_INTENT);
-                broadcastIntent.putExtra("what", Utils.FLAG_HAVE_WHO_IS_ACTIVE);
-                broadcastIntent.putExtra("value", payload);
-                context.sendBroadcast(broadcastIntent);
-            } else if (topic.equals(TOPIC_CHA_SYS)) {
-                if (payload.equals("who")) {
-                    publish(TOPIC_CHA_SYS_ME, Utils.getDeviceName());
-                } else if ((connectionStatus == MQTTConnectionStatus.CONNECTED_CHA_IS_OFFLINE) && payload.equals("light controller connected")) {
-                    connectionStatus = MQTTConnectionStatus.CONNECTED_CHA_IS_ONLINE;
-                    broadcastServiceStatus(url, false);
-                } else if ((connectionStatus == MQTTConnectionStatus.CONNECTED_CHA_IS_ONLINE) && payload.equals("light controller disconnected")) {
-                    connectionStatus = MQTTConnectionStatus.CONNECTED_CHA_IS_OFFLINE;
-                    broadcastServiceStatus(url, false);
-                }
-            } else if (topic.equals(TOPIC_CHA_LIGHTS_SETTINGS)) {
-                LightControllerData.Instance.decodeSettings(payload);
+            Intent broadcastDataIntent = new Intent();
+            broadcastDataIntent.setAction(MQTT_DATA_INTENT);
 
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(MQTT_DATA_INTENT);
-                broadcastIntent.putExtra("what", Utils.FLAG_HAVE_SETTINGS);
-                context.sendBroadcast(broadcastIntent);
-            } else if (topic.equals(TOPIC_CHA_LIGHTS_NAMES_AND_ORDER)) {
-                LightControllerData.Instance.decodeNamesAndOrder(payload);
+            switch (topic) {
+                case TOPIC_CHA_SYS_OLD: // TODO: 1/24/2017  obsolete
+                    switch (payload) {
+                        case "light controller connected":
+                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
+                            broadcastDataIntent.putExtra("value", true);
+                            context.sendBroadcast(broadcastDataIntent);
+                            break;
 
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(MQTT_DATA_INTENT);
-                broadcastIntent.putExtra("what", Utils.FLAG_HAVE_NAME_AND_ORDER);
-                context.sendBroadcast(broadcastIntent);
-            } else if (topic.startsWith(TOPIC_CHA_LIGHTS_STATE)) {
-                int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHTS_STATE.length() + 1), 16);
+                        case "light controller disconnected":
+                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
+                            broadcastDataIntent.putExtra("value", false);
+                            context.sendBroadcast(broadcastDataIntent);
+                            break;
+                    }
+                    break;
+
+                // TODO: 1/25/2017
+                // აქ აღარ მინდა ეს. ქვემოთ იყოს
+                case TOPIC_CHA_LIGHTS_SYS:
+                    switch (payload) {
+                        case "connected":
+                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
+                            broadcastDataIntent.putExtra("value", true);
+                            context.sendBroadcast(broadcastDataIntent);
+                            break;
+
+                        case "disconnected":
+                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
+                            broadcastDataIntent.putExtra("value", false);
+                            context.sendBroadcast(broadcastDataIntent);
+                            break;
+                    }
+                    break;
+
+                case TOPIC_CHA_LIGHTS_SETTINGS:
+                    LightControllerData.Instance.decodeSettings(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightSettings);
+                    context.sendBroadcast(broadcastDataIntent);
+                    break;
+
+                case TOPIC_CHA_LIGHTS_NAMES_AND_ORDER:
+                    LightControllerData.Instance.decodeNamesAndOrder(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightNameAndOrders);
+                    context.sendBroadcast(broadcastDataIntent);
+                    break;
+
+//                case TOPIC_CHA_THERMOSTAT_FULL:
+//                    ThermostatControllerData.Instance.decode(payload);
+//
+//                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, Utils.FLAG_HAVE_THERMOSTAT_FULL_STATE);
+//                    context.sendBroadcast(broadcastDataIntent);
+//                    break;
+            }
+
+            if (topic.startsWith(TOPIC_CHA_LIGHTS_STATE)) {
+                int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHTS_STATE.length()), 16);
                 boolean value = !payload.equals("0");
                 LightControllerData.Instance.relays(id - 1).setIsOn(value);
 
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(MQTT_DATA_INTENT);
-                broadcastIntent.putExtra("what", Utils.FLAG_HAVE_LIGHTS_ONE_STATE);
-                broadcastIntent.putExtra("id", id);
-                broadcastIntent.putExtra("value", value);
-                context.sendBroadcast(broadcastIntent);
-            } else if (topic.equals(TOPIC_CHA_THERMOSTAT_FULL)) {
-                ThermostatControllerData.Instance.decode(payload);
+                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightOneState);
+                broadcastDataIntent.putExtra("id", id);
+                broadcastDataIntent.putExtra("value", value);
+                context.sendBroadcast(broadcastDataIntent);
 
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(MQTT_DATA_INTENT);
-                broadcastIntent.putExtra("what", Utils.FLAG_HAVE_THERMOSTAT_FULL_STATE);
-                context.sendBroadcast(broadcastIntent);
+                return;
+            }
+
+            // TODO: 1/25/2017
+            // აქ დავამატო შუქის და თერმოსტატის კონტროლერიც
+            if (topic.startsWith(TOPIC_CHA_SYS)) {
+                String clientId = topic.substring(TOPIC_CHA_SYS.length());
+                switch (payload) {
+                    case "connected":
+                        if (!connectedClients.contains(clientId))
+                            connectedClients.add(clientId);
+                        break;
+
+                    case "disconnected":
+                    case "":
+                        if (connectedClients.contains(clientId))
+                            connectedClients.remove(clientId);
+                        break;
+                }
             }
         }
 
