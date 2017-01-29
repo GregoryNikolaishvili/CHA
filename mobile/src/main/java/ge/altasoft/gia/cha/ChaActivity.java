@@ -10,8 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
-import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
-
 public abstract class ChaActivity extends AppCompatActivity {
 
     final private BroadcastReceiver broadcastStatusReceiver = new BroadcastReceiver() {
@@ -59,34 +57,12 @@ public abstract class ChaActivity extends AppCompatActivity {
     };
 
 
-    final private BroadcastReceiver thermostatBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int flags = intent.getIntExtra("result", 0);
-            processThermostatControllerData(flags, null);
-        }
-    };
-
     @Override
     protected void onStart() {
         super.onStart();
 
         registerReceiver(broadcastStatusReceiver, new IntentFilter(MqttClient.MQTT_STATUS_INTENT));
         registerReceiver(broadcastDataReceiver, new IntentFilter(MqttClient.MQTT_DATA_INTENT));
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        registerReceiver(thermostatBroadcastReceiver, new IntentFilter(ThermostatBroadcastService.BROADCAST_ACTION_GET));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        unregisterReceiver(thermostatBroadcastReceiver);
     }
 
     @Override
@@ -97,8 +73,5 @@ public abstract class ChaActivity extends AppCompatActivity {
     }
 
     void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
-    }
-
-    void processThermostatControllerData(int flags, Intent intent) {
     }
 }

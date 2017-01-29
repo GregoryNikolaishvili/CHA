@@ -18,16 +18,16 @@ import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.DragLinearLayout;
 import ge.altasoft.gia.cha.views.LightRelayView;
 
-public class LightFragment extends Fragment {
+public class FragmentLight extends Fragment {
 
     private DragLinearLayout dragLinearLayout = null;
     private View rootView = null;
 
-    public LightFragment() {
+    public FragmentLight() {
     }
 
-    public static LightFragment newInstance() {
-        return new LightFragment();
+    public static FragmentLight newInstance() {
+        return new FragmentLight();
     }
 
     @Override
@@ -51,7 +51,6 @@ public class LightFragment extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    //LightUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
                     ((MainActivity) getActivity()).getMqttClient().publish("chac/light/mode", isChecked ? "A" : "M", false);
                 }
             }
@@ -99,24 +98,23 @@ public class LightFragment extends Fragment {
         drawFooter();
     }
 
-    public void drawState() {
-
-        if (rootView == null)
-            return;
-
-        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
-            if (dragLinearLayout.getChildAt(i) instanceof LightRelayView) {
-                LightRelayView rv = (LightRelayView) dragLinearLayout.getChildAt(i);
-                LightRelayData data = rv.getRelayData();
-                rv.setIsOn(data.isOn());
-            }
-        }
-
-        drawFooter();
-    }
+//    public void drawState() {
+//
+//        if (rootView == null)
+//            return;
+//
+//        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
+//            if (dragLinearLayout.getChildAt(i) instanceof LightRelayView) {
+//                LightRelayView rv = (LightRelayView) dragLinearLayout.getChildAt(i);
+//                LightRelayData data = rv.getRelayData();
+//                rv.setIsOn(data.isOn());
+//            }
+//        }
+//
+//        drawFooter();
+//    }
 
     public void drawState(int id) {
-
         if (rootView == null)
             return;
 

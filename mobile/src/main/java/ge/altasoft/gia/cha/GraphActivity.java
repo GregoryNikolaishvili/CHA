@@ -26,11 +26,13 @@ public class GraphActivity extends ChaActivity {
         graph.getViewport().scrollToEnd();
     }
 
-    @Override
-    protected void processThermostatControllerData(int flags, Intent intent) {
-        super.processThermostatControllerData(flags, intent);
 
-        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
+    @Override
+    void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
+        super.processMqttData(dataType, intent);
+
+        if (dataType == MqttClient.MQTTReceivedDataType.ThermostatBoilerSensorState) {
+            // TODO: 1/29/2017
             for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
                 pointSeries.getItem(i).append(ThermostatControllerData.Instance.boilerSensors(i));
             }

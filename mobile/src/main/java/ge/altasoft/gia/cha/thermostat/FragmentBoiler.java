@@ -19,6 +19,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import java.util.Date;
 
 import ge.altasoft.gia.cha.GraphActivity;
+import ge.altasoft.gia.cha.MainActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.CircularArrayList;
@@ -61,7 +62,7 @@ public class FragmentBoiler extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    ThermostatUtils.sendCommandToController(getContext(), "X");
+                    ((MainActivity) getActivity()).getMqttClient().publish("chac/light/thermostat", "X", false);
                 }
             }
         });
@@ -180,15 +181,44 @@ public class FragmentBoiler extends Fragment {
         drawSensorAndRelayStates();
     }
 
-    public void drawState() {
+//    public void drawState() {
+//        if (rootView == null)
+//            return;
+//
+//        drawSensorAndRelayStates();
+//
+//        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
+//            pointSeries.getItem(i).append(ThermostatControllerData.Instance.boilerSensors(i));
+//        }
+//    }
+
+    public void drawState(int id) {
         if (rootView == null)
             return;
 
-        drawSensorAndRelayStates();
-
-        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-            pointSeries.getItem(i).append(ThermostatControllerData.Instance.boilerSensors(i));
+        id--;
+        int resId;
+        switch (id) {
+            case ThermostatControllerData.BOILER_SENSOR_SOLAR_PANEL:
+                resId = R.id.boilerSensorSolarPanel;
+                break;
+            case ThermostatControllerData.BOILER_SENSOR_BOTTOM:
+                resId = R.id.boilerSensorTankBottom;
+                break;
+            case ThermostatControllerData.BOILER_SENSOR_TOP:
+                resId = R.id.boilerSensorTankTop;
+                break;
+            case ThermostatControllerData.BOILER_SENSOR_ROOM:
+                resId = R.id.boilerSensorRoom;
+                break;
+            default:
+                resId = 0;
         }
+
+        if (resId != 0)
+            ((BoilerSensorView) rootView.findViewById(resId)).setSensorData(ThermostatControllerData.Instance.boilerSensors(id));
+
+        pointSeries.getItem(id).append(ThermostatControllerData.Instance.boilerSensors(id));
     }
 
     private void drawSensorAndRelayStates() {

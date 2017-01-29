@@ -1,3 +1,4 @@
+// 0200003F2000200030Y00002733002000300Y
 package ge.altasoft.gia.cha.thermostat;
 
 import android.content.SharedPreferences;
@@ -5,11 +6,9 @@ import android.util.Log;
 import android.util.SparseIntArray;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 import ge.altasoft.gia.cha.Utils;
@@ -103,8 +102,15 @@ public final class ThermostatControllerData extends RelayControllerData {
         return sortByOrder(roomSensorsMap);
     }
 
-    public RoomSensorData roomSensors(int id) {
-        return roomSensorsMap.get(id);
+    public RoomSensorData roomSensors(int id, boolean createNewIfNotFound) {
+        RoomSensorData roomSensorData = roomSensorsMap.get(id);
+
+        if (createNewIfNotFound && (roomSensorData == null)) {
+            roomSensorData = new RoomSensorData(id);
+            roomSensorsMap.put(id, roomSensorData);
+        }
+
+        return roomSensorData;
     }
 
     public void saveRoomSensorOrders() {
@@ -156,82 +162,82 @@ public final class ThermostatControllerData extends RelayControllerData {
         roomSensorsReordered = true;
     }
 
-    JSONObject encodeState() {
-        StringBuilder sb = new StringBuilder();
-
-        JSONObject jState = new JSONObject();
-        try {
-            if (haveSettings()) {
-                // Relays
-                sb.append(isActive() ? 'T' : 'F');
-                for (int i = 0; i < HEATING_RELAY_COUNT; i++)
-                    relays(i).encodeState(sb);
-                jState.put("relays", sb.toString());
-
-                // Room sensors
-                sb.setLength(0);
-                if (Utils.DEBUG_THERMOSTAT) {
-                    sb.append(String.format(Locale.US, "%02X", 10));
-                    for (int id = 1; id <= 10; id++) {
-                        int trend = Utils.random(0, 2);
-                        char c = RoomSensorData.NO_CHANGE;
-                        if (trend == 1)
-                            c = RoomSensorData.GOING_UP;
-                        else if (trend == 2)
-                            c = RoomSensorData.GOING_DOWN;
-                        sb.append(String.format(Locale.US, "%02X%04X%c%04X", id, Utils.random(10, 100) * 10, c, Utils.random(10, 100) * 10));
-                    }
-                } else {
-                    sb.append(String.format(Locale.US, "%02X", roomSensorsMap.size()));
-                    for (int id : roomSensorsMap.keySet()) {
-                        {
-                            sb.append(String.format(Locale.US, "%02X", id));
-                            roomSensorsMap.get(id).encodeState(sb);
-                        }
-                    }
-                }
-                jState.put("sensors", sb.toString());
-
-                // boiler sensors
-                sb.setLength(0);
-
-                for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
-                    boilerSensorsData[i].encodeState(sb);
-
-                // boiler relays
-                for (int i = 0; i < BOILER_PUMP_COUNT; i++)
-                    //boilerPumpsData[i].encodeState(sb);
-                    sb.append((new Random()).nextBoolean() ? '1' : '0');
-
-                jState.put("boiler", sb.toString());
-            } else {
-                // Relays
-                sb.append(isActive() ? 'T' : 'F');
-                for (int i = 0; i < HEATING_RELAY_COUNT; i++)
-                    sb.append('0');
-                jState.put("relays", sb.toString());
-
-                // Room sensors
-                jState.put("sensors", "00");
-
-                // boiler sensors
-                sb.setLength(0);
-                for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
-                    sb.append(String.format(Locale.US, "%04XN", (i + 1) * 100));
-                // boiler relays
-                for (int i = 0; i < BOILER_PUMP_COUNT; i++)
-                    sb.append('0');
-                jState.put("boiler", sb.toString());
-            }
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-            jState.put("time", sdf.format(getControllerCurrentTime()));
-        } catch (JSONException e) {
-            Log.e("JSON", e.getMessage());
-        }
-
-        return jState;
-    }
+//    JSONObject encodeState() {
+//        StringBuilder sb = new StringBuilder();
+//
+//        JSONObject jState = new JSONObject();
+//        try {
+//            if (haveSettings()) {
+//                // Relays
+//                sb.append(isActive() ? 'T' : 'F');
+//                for (int i = 0; i < HEATING_RELAY_COUNT; i++)
+//                    relays(i).encodeState(sb);
+//                jState.put("relays", sb.toString());
+//
+//                // Room sensors
+//                sb.setLength(0);
+//                if (Utils.DEBUG_THERMOSTAT) {
+//                    sb.append(String.format(Locale.US, "%02X", 10));
+//                    for (int id = 1; id <= 10; id++) {
+//                        int trend = Utils.random(0, 2);
+//                        char c = RoomSensorData.NO_CHANGE;
+//                        if (trend == 1)
+//                            c = RoomSensorData.GOING_UP;
+//                        else if (trend == 2)
+//                            c = RoomSensorData.GOING_DOWN;
+//                        sb.append(String.format(Locale.US, "%02X%04X%c%04X", id, Utils.random(10, 100) * 10, c, Utils.random(10, 100) * 10));
+//                    }
+//                } else {
+//                    sb.append(String.format(Locale.US, "%02X", roomSensorsMap.size()));
+//                    for (int id : roomSensorsMap.keySet()) {
+//                        {
+//                            sb.append(String.format(Locale.US, "%02X", id));
+//                            roomSensorsMap.get(id).encodeState(sb);
+//                        }
+//                    }
+//                }
+//                jState.put("sensors", sb.toString());
+//
+//                // boiler sensors
+//                sb.setLength(0);
+//
+//                for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
+//                    boilerSensorsData[i].encodeState(sb);
+//
+//                // boiler relays
+//                for (int i = 0; i < BOILER_PUMP_COUNT; i++)
+//                    //boilerPumpsData[i].encodeState(sb);
+//                    sb.append((new Random()).nextBoolean() ? '1' : '0');
+//
+//                jState.put("boiler", sb.toString());
+//            } else {
+//                // Relays
+//                sb.append(isActive() ? 'T' : 'F');
+//                for (int i = 0; i < HEATING_RELAY_COUNT; i++)
+//                    sb.append('0');
+//                jState.put("relays", sb.toString());
+//
+//                // Room sensors
+//                jState.put("sensors", "00");
+//
+//                // boiler sensors
+//                sb.setLength(0);
+//                for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
+//                    sb.append(String.format(Locale.US, "%04XN", (i + 1) * 100));
+//                // boiler relays
+//                for (int i = 0; i < BOILER_PUMP_COUNT; i++)
+//                    sb.append('0');
+//                jState.put("boiler", sb.toString());
+//            }
+//
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+//            jState.put("time", sdf.format(getControllerCurrentTime()));
+//        } catch (JSONException e) {
+//            Log.e("JSON", e.getMessage());
+//        }
+//
+//        return jState;
+//    }
 
     private String encodeRelaySettings() {
         StringBuilder sb = new StringBuilder();
@@ -326,6 +332,36 @@ public final class ThermostatControllerData extends RelayControllerData {
         return "*" + jMain.toString();
     }
 
+    public void decodeRoomSensorSettings(String response) {
+        Log.d("decode sensor settings", response);
+
+        int count = Integer.parseInt(response.substring(0, 2), 16);
+
+        int idx = 2;
+        for (int i = 0; i < count; i++) {
+            int id = Integer.parseInt(response.substring(idx, idx + 8), 16);
+
+            RoomSensorData roomSensorData = roomSensors(id, true);
+            idx = roomSensorData.decodeSettings(response, idx + 8);
+        }
+
+        setHaveSettings();
+    }
+    public void decodeRoomSensorNamesAndOrder(String response) {
+        Log.d("decode sensor names", response);
+
+        response = response.substring(4); // first 4 digits is length in hex
+
+        String[] arr = response.split(";");
+
+        for (int i = 0; i < arr.length; i++) {
+            int id = Integer.parseInt(response.substring(0, 4), 16);
+
+            RoomSensorData roomSensorData = roomSensors(id, true);
+            roomSensorData.decodeOrderAndName(arr[i].substring(4));
+        }
+    }
+
     private boolean decodeRelaySettings(String response) {
         if (response == null)
             return false;
@@ -356,52 +392,52 @@ public final class ThermostatControllerData extends RelayControllerData {
         return true;
     }
 
-    private boolean decodeRoomSensorSettings(String response) {
-        if (response == null)
-            return false;
-
-        int count = Integer.parseInt(response.substring(0, 2), 16);
-
-        int idx = 2;
-        if (response.charAt(idx++) != '*') {
-            Log.e("ThermControllerData", "Not '*'");
-            return false;
-        }
-
-        for (int i = 0; i < count; i++) {
-            int id = Integer.parseInt(response.substring(idx, idx + 2), 16);
-
-            RoomSensorData roomSensorData = roomSensorsMap.get(id);
-            if (roomSensorData == null) {
-                roomSensorData = new RoomSensorData(id);
-                roomSensorsMap.put(id, roomSensorData);
-            }
-
-            idx = roomSensorData.decodeSettings(response, idx + 2);
-        }
-
-        if (response.charAt(idx++) != '*') {
-            Log.e("ThermControllerData", "Not '*'");
-            return false;
-        }
-
-        response = response.substring(idx);
-
-        String[] arr = response.split(";");
-        if (count != arr.length) {
-            Log.e("ThermControllerData", "Invalid number of sensors returned");
-            return false;
-        }
-
-        for (int i = 0; i < count; i++) {
-            int id = Integer.parseInt(arr[i].substring(0, 2), 16);
-
-            RoomSensorData roomSensorData = roomSensorsMap.get(id);
-            roomSensorData.decodeOrderAndName(arr[i]);
-        }
-
-        return true;
-    }
+//    private boolean decodeRoomSensorSettings(String response) {
+//        if (response == null)
+//            return false;
+//
+//        int count = Integer.parseInt(response.substring(0, 2), 16);
+//
+//        int idx = 2;
+//        if (response.charAt(idx++) != '*') {
+//            Log.e("ThermControllerData", "Not '*'");
+//            return false;
+//        }
+//
+//        for (int i = 0; i < count; i++) {
+//            int id = Integer.parseInt(response.substring(idx, idx + 2), 16);
+//
+//            RoomSensorData roomSensorData = roomSensorsMap.get(id);
+//            if (roomSensorData == null) {
+//                roomSensorData = new RoomSensorData(id);
+//                roomSensorsMap.put(id, roomSensorData);
+//            }
+//
+//            idx = roomSensorData.decodeSettings(response, idx + 2);
+//        }
+//
+//        if (response.charAt(idx++) != '*') {
+//            Log.e("ThermControllerData", "Not '*'");
+//            return false;
+//        }
+//
+//        response = response.substring(idx);
+//
+//        String[] arr = response.split(";");
+//        if (count != arr.length) {
+//            Log.e("ThermControllerData", "Invalid number of sensors returned");
+//            return false;
+//        }
+//
+//        for (int i = 0; i < count; i++) {
+//            int id = Integer.parseInt(arr[i].substring(0, 2), 16);
+//
+//            RoomSensorData roomSensorData = roomSensorsMap.get(id);
+//            roomSensorData.decodeOrderAndName(arr[i]);
+//        }
+//
+//        return true;
+//    }
 
     private boolean decodeBoilerSettings(String response) {
         if (response == null)
@@ -422,98 +458,98 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
 
-    public int decode(String response) {
-        if (response == null) return Utils.FLAG_HAVE_NOTHING;
+//    public int decode(String response) {
+//        if (response == null) return Utils.FLAG_HAVE_NOTHING;
+//
+//        Log.d("decode thermostat", response);
+//
+//        String relaySettings = null;
+//        String sensorSettings = null;
+//        String boilerSettings = null;
+//        JSONObject jState = null;
+//
+//        JSONObject jMain;
+//        try {
+//            jMain = new JSONObject(response);
+//
+//            if (jMain.has("state"))
+//                jState = jMain.getJSONObject("state");
+//
+//            JSONObject jSettings = null;
+//            if (jMain.has("settings"))
+//                jSettings = jMain.getJSONObject("settings");
+//
+//            if (jSettings != null) {
+//                relaySettings = jSettings.getString("relays");
+//                sensorSettings = jSettings.getString("sensors");
+//                boilerSettings = jSettings.getString("boiler");
+//            }
+//        } catch (JSONException e) {
+//            Log.e("JSON", e.getMessage());
+//            return Utils.FLAG_HAVE_NOTHING;
+//        }
+//
+//        int result = Utils.FLAG_HAVE_NOTHING;
+//
+//        if (decodeRelaySettings(relaySettings) && decodeRoomSensorSettings(sensorSettings) && decodeBoilerSettings(boilerSettings)) {
+//            setHaveSettings();
+//            result = Utils.FLAG_HAVE_SETTINGS;
+//        }
+//
+//        if (jState != null)
+//            result = result | decodeState(jState);
+//
+//        return result;
+//    }
 
-        Log.d("decode thermostat", response);
-
-        String relaySettings = null;
-        String sensorSettings = null;
-        String boilerSettings = null;
-        JSONObject jState = null;
-
-        JSONObject jMain;
-        try {
-            jMain = new JSONObject(response);
-
-            if (jMain.has("state"))
-                jState = jMain.getJSONObject("state");
-
-            JSONObject jSettings = null;
-            if (jMain.has("settings"))
-                jSettings = jMain.getJSONObject("settings");
-
-            if (jSettings != null) {
-                relaySettings = jSettings.getString("relays");
-                sensorSettings = jSettings.getString("sensors");
-                boilerSettings = jSettings.getString("boiler");
-            }
-        } catch (JSONException e) {
-            Log.e("JSON", e.getMessage());
-            return Utils.FLAG_HAVE_NOTHING;
-        }
-
-        int result = Utils.FLAG_HAVE_NOTHING;
-
-        if (decodeRelaySettings(relaySettings) && decodeRoomSensorSettings(sensorSettings) && decodeBoilerSettings(boilerSettings)) {
-            setHaveSettings();
-            result = Utils.FLAG_HAVE_SETTINGS;
-        }
-
-        if (jState != null)
-            result = result | decodeState(jState);
-
-        return result;
-    }
-
-    private int decodeState(JSONObject jState) {
-        if (!haveSettings())
-            return Utils.FLAG_HAVE_NOTHING;
-
-        try {
-            // Relays
-            String response = jState.getString("relays");
-            setIsActive(response.charAt(0) != 'F');
-            for (int i = 0; i < HEATING_RELAY_COUNT; i++)
-                relays(i).setIsOn(response.charAt(i + 1) == '1');
-
-            // room sensors
-            response = jState.getString("sensors");
-            short count = Short.parseShort(response.substring(0, 2), 16);
-            int idx = 2;
-
-            for (int i = 0; i < count; i++) {
-                Integer id = Integer.parseInt(response.substring(idx, idx + 2), 16);
-                idx += 2;
-
-                RoomSensorData roomSensorData = roomSensorsMap.get(id);
-                if (roomSensorData == null) // until we have real data, generate fake one
-                    roomSensorData = new RoomSensorData(id);
-                idx = roomSensorData.decodeState(response, idx);
-            }
-
-            // boiler sensors
-            response = jState.getString("boiler");
-            idx = 0;
-            for (int i = 0; i < BOILER_SENSOR_COUNT; i++) {
-                idx = boilerSensorsData[i].decodeState(response, idx);
-            }
-
-            // boiler relays
-            idx = 0;
-            for (int i = 0; i < BOILER_PUMP_COUNT; i++)
-                boilerPumpsData[i].setIsOn(response.charAt(idx + i) == '1');
-            idx += BOILER_PUMP_COUNT;
-
-
-            response = jState.getString("time");
-            setControllerCurrentTime(response.substring(0, 12));
-        } catch (JSONException e) {
-            Log.e("JSON", e.getMessage());
-        }
-
-        return Utils.FLAG_HAVE_STATE;
-    }
+//    private int decodeState(JSONObject jState) {
+//        if (!haveSettings())
+//            return Utils.FLAG_HAVE_NOTHING;
+//
+//        try {
+//            // Relays
+//            String response = jState.getString("relays");
+//            setIsActive(response.charAt(0) != 'F');
+//            for (int i = 0; i < HEATING_RELAY_COUNT; i++)
+//                relays(i).setIsOn(response.charAt(i + 1) == '1');
+//
+//            // room sensors
+//            response = jState.getString("sensors");
+//            short count = Short.parseShort(response.substring(0, 2), 16);
+//            int idx = 2;
+//
+//            for (int i = 0; i < count; i++) {
+//                Integer id = Integer.parseInt(response.substring(idx, idx + 2), 16);
+//                idx += 2;
+//
+//                RoomSensorData roomSensorData = roomSensorsMap.get(id);
+//                if (roomSensorData == null) // until we have real data, generate fake one
+//                    roomSensorData = new RoomSensorData(id);
+//                idx = roomSensorData.decodeState(response, idx);
+//            }
+//
+//            // boiler sensors
+//            response = jState.getString("boiler");
+//            idx = 0;
+//            for (int i = 0; i < BOILER_SENSOR_COUNT; i++) {
+//                idx = boilerSensorsData[i].decodeState(response, idx);
+//            }
+//
+//            // boiler relays
+//            idx = 0;
+//            for (int i = 0; i < BOILER_PUMP_COUNT; i++)
+//                boilerPumpsData[i].setIsOn(response.charAt(idx + i) == '1');
+//            idx += BOILER_PUMP_COUNT;
+//
+//
+//            response = jState.getString("time");
+//            setControllerCurrentTime(response.substring(0, 12));
+//        } catch (JSONException e) {
+//            Log.e("JSON", e.getMessage());
+//        }
+//
+//        return Utils.FLAG_HAVE_STATE;
+//    }
 
     void decode(SharedPreferences prefs) {
 
@@ -523,7 +559,7 @@ public final class ThermostatControllerData extends RelayControllerData {
             relays(i).decodeSettings(prefs);
 
         for (int id : roomSensorsMap.keySet())
-            roomSensors(id).decodeSettings(prefs);
+            roomSensors(id, false).decodeSettings(prefs);
 
         for (BoilerSensorData bs : boilerSensorsData)
             bs.decodeSettings(prefs);

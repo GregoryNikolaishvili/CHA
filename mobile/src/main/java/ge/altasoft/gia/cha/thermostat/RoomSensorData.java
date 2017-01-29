@@ -1,5 +1,6 @@
 package ge.altasoft.gia.cha.thermostat;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Pair;
@@ -7,13 +8,18 @@ import android.util.Pair;
 import java.util.Date;
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.MqttClient;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.CircularArrayList;
 import ge.altasoft.gia.cha.classes.TempSensorData;
 
+import static ge.altasoft.gia.cha.MqttClient.MQTT_DATA_TYPE;
+
 public final class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
 
     private float H;
+    private int signalLevel;
+    private String batteryLevel;
     private String name;
     private boolean canBeControlled;
     final private CircularArrayList<Pair<Date, Float>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
@@ -21,9 +27,12 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     RoomSensorData(int id) {
         super(id);
 
-        H = 99;
+        H = Float.NaN;
         canBeControlled = false;
         setDeltaTargetT(1.0f);
+        name = String.valueOf(id);
+        signalLevel = 0;
+        batteryLevel = "unknown";
     }
 
     public CircularArrayList<Pair<Date, Float>> getLogBufferH() {
@@ -38,11 +47,19 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return this.H;
     }
 
-    private void setHumidity(float value) {
+    public void setHumidity(float value) {
         if (this.H != value) {
             this.H = value;
             logBufferH.add(new Pair<>(new Date(), value));
         }
+    }
+
+    public int getSignalLevel() {
+        return signalLevel;
+    }
+
+    public String getBatteryLevel() {
+        return batteryLevel;
     }
 
     public boolean canBeControlled() {
@@ -54,7 +71,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     }
 
     void encodeOrderAndName(StringBuilder sb2) {
-        sb2.append(String.format(Locale.US, "%02X", this.id));
+        sb2.append(String.format(Locale.US, "%08X", this.id));
         sb2.append(String.format(Locale.US, "%01X", this.order));
         sb2.append(Utils.encodeArduinoString(name));
         sb2.append(';');
@@ -76,16 +93,16 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return idx + 1;
     }
 
-    public void encodeState(StringBuilder sb) {
-        super.encodeState(sb);
-        sb.append(String.format(Locale.US, "%04X", ((Float) (H * 10)).intValue()));
-    }
-
-    public int decodeState(String value, int idx) {
-        idx = super.decodeState(value, idx);
-        setHumidity(Integer.parseInt(value.substring(idx, idx + 4), 16) / 10.0f);
-        return idx + 4;
-    }
+//    public void encodeState(StringBuilder sb) {
+//        super.encodeState(sb);
+//        sb.append(String.format(Locale.US, "%04X", ((Float) (H * 10)).intValue()));
+//    }
+//
+//    public int decodeState(String value, int idx) {
+//        idx = super.decodeState(value, idx);
+//        setHumidity(Integer.parseInt(value.substring(idx, idx + 4), 16) / 10.0f);
+//        return idx + 4;
+//    }
 
     void decodeSettings(SharedPreferences prefs) {
         String suffix = Integer.toString(getId());
@@ -107,6 +124,36 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
             return Integer.valueOf(this.id).compareTo(o.id);
         } else {
             return Integer.valueOf(this.order).compareTo(o.order);
+        }
+    }
+
+    public void decodeState(String payload, String type) {
+        int value;
+
+        switch (type) {
+            case "temp":
+                super.decodeState(payload);
+                break;
+
+            case "hum":
+                char lastChar = payload.charAt(payload.length() - 1);
+                if ((lastChar == '+') || (lastChar == '-')) {
+                    setTemperatureTrend(lastChar);
+                    payload = payload.substring(0, payload.length() - 1);
+                } else
+                    setTemperatureTrend('=');
+                value = Integer.parseInt(payload);
+                setHumidity(value);
+                break;
+
+            case "rssi":
+                value = Integer.parseInt(payload);
+                signalLevel = value;
+                break;
+
+            case "battery":
+                batteryLevel = payload;
+                break;
         }
     }
 }

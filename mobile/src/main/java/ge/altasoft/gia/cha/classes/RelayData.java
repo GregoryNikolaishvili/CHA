@@ -1,12 +1,16 @@
 package ge.altasoft.gia.cha.classes;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 
 import java.util.Date;
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.MqttClient;
 import ge.altasoft.gia.cha.Utils;
+
+import static ge.altasoft.gia.cha.MqttClient.MQTT_DATA_TYPE;
 
 public abstract class RelayData implements Comparable<RelayData> {
 
@@ -67,9 +71,9 @@ public abstract class RelayData implements Comparable<RelayData> {
             name = "Relay #" + order;
     }
 
-    public void encodeState(StringBuilder sb) {
-        sb.append(isOn ? '1' : '0');
-    }
+//    public void encodeState(StringBuilder sb) {
+//        sb.append(isOn ? '1' : '0');
+//    }
 
     public void encodeSettings(StringBuilder sb) {
     }
@@ -97,5 +101,10 @@ public abstract class RelayData implements Comparable<RelayData> {
         } else {
             return Integer.valueOf(this.order).compareTo(o.order);
         }
+    }
+
+    public void decodeState(String payload) {
+        boolean value = !payload.equals("0");
+        setIsOn(value);
     }
 }

@@ -109,7 +109,7 @@ public final class LightControllerData extends RelayControllerData {
     public void decodeNamesAndOrder(String response) {
         Log.d("decode light names", response);
 
-        response = response.substring(4);
+        response = response.substring(4); // first 4 digits is length in hex
 
         String[] arr = response.split(";");
         if (arr.length != RELAY_COUNT) {

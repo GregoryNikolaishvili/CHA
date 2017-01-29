@@ -43,18 +43,18 @@ public class FragmentHeaterRelays extends Fragment {
             }
         });
 
-        ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.thermostatAutoMode));
-        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                if (!Utils.disableOnCheckedListener) {
-                    ((ToggleButton) button).setTextOn("");
-                    ((ToggleButton) button).setTextOff("");
-                    button.setEnabled(false);
-                    ThermostatUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
-                }
-            }
-        });
-
+//        ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.thermostatAutoMode));
+//        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+//                if (!Utils.disableOnCheckedListener) {
+//                    ((ToggleButton) button).setTextOn("");
+//                    ((ToggleButton) button).setTextOff("");
+//                    button.setEnabled(false);
+//                    ThermostatUtils.sendCommandToController(getContext(), isChecked ? "A" : "M");
+//                }
+//            }
+//        });
+//
         rebuildUI();
 
         return rootView;

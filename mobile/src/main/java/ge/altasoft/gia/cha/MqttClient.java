@@ -18,6 +18,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import ge.altasoft.gia.cha.light.LightControllerData;
+import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
+import ge.altasoft.gia.cha.thermostat.RoomSensorData;
+import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 
 public class MqttClient {
@@ -25,24 +28,33 @@ public class MqttClient {
     private static final String TOPIC_CHA_SYS_OLD = "cha/sys";
 
     private static final String TOPIC_CHA_SYS = "cha/sys/";
-    private static final String TOPIC_CHA_LIGHTS_STATE = "cha/light/state/";
+    private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/light/state/";
 
     private static final String TOPIC_CHA_LIGHTS_SYS = "cha/light/sys";
     private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
     private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
 
-    private static final String TOPIC_CHA_THERMOSTAT_FULL = "cha/thermostat/full";
+    private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/ts/";
+    private static final String TOPIC_CHA_BOILER_SENSOR_STATE = "cha/bs/";
+
+    private static final String TOPIC_CHA_THERMOSTAT_SETTINGS = "cha/thermostat/settings";
+    private static final String TOPIC_CHA_THERMOSTAT_NAMES_AND_ORDER = "cha/thermostat/names";
+
 
     public static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
 
     public static enum MQTTReceivedDataType {
         HaveNothing,
         LightControllerConnected,
-        LightOneState,
-        LightAllStates,
+        LightRelayState,
+        //LightAllStates,
         LightSettings,
         LightNameAndOrders,
-        ThermostatOneState
+
+        ThermostatRoomSensorState,
+        ThermostatBoilerSensorState,
+        ThermostatSettings,
+        ThermostatNameAndOrders
     }
 
     public enum MQTTConnectionStatus {
@@ -288,6 +300,8 @@ public class MqttClient {
             broadcastDataIntent.setAction(MQTT_DATA_INTENT);
 
             switch (topic) {
+
+                //region SYS
                 case TOPIC_CHA_SYS_OLD: // TODO: 1/24/2017  obsolete
                     switch (payload) {
                         case "light controller connected":
@@ -321,7 +335,9 @@ public class MqttClient {
                             break;
                     }
                     break;
+                //endregion
 
+                //region Lights
                 case TOPIC_CHA_LIGHTS_SETTINGS:
                     LightControllerData.Instance.decodeSettings(payload);
 
@@ -335,27 +351,66 @@ public class MqttClient {
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightNameAndOrders);
                     context.sendBroadcast(broadcastDataIntent);
                     break;
+                //endregion
 
-//                case TOPIC_CHA_THERMOSTAT_FULL:
-//                    ThermostatControllerData.Instance.decode(payload);
-//
-//                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, Utils.FLAG_HAVE_THERMOSTAT_FULL_STATE);
-//                    context.sendBroadcast(broadcastDataIntent);
-//                    break;
+                //region Thermostat
+                case TOPIC_CHA_THERMOSTAT_SETTINGS:
+                    ThermostatControllerData.Instance.decodeRoomSensorSettings(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatSettings);
+                    context.sendBroadcast(broadcastDataIntent);
+                    break;
+
+                case TOPIC_CHA_THERMOSTAT_NAMES_AND_ORDER:
+                    ThermostatControllerData.Instance.decodeRoomSensorNamesAndOrder(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatNameAndOrders);
+                    context.sendBroadcast(broadcastDataIntent);
+                    break;
+                //endregion
+
             }
 
-            if (topic.startsWith(TOPIC_CHA_LIGHTS_STATE)) {
-                int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHTS_STATE.length()), 16);
-                boolean value = !payload.equals("0");
-                LightControllerData.Instance.relays(id - 1).setIsOn(value);
+            if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE)) {
+                int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHT_RELAY_STATE.length()), 16);
+                LightControllerData.Instance.relays(id - 1).decodeState(payload);
 
-                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightOneState);
+                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MqttClient.MQTTReceivedDataType.LightRelayState);
                 broadcastDataIntent.putExtra("id", id);
-                broadcastDataIntent.putExtra("value", value);
                 context.sendBroadcast(broadcastDataIntent);
 
                 return;
             }
+
+            if (topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE)) {
+                String[] parts = topic.substring(TOPIC_CHA_ROOM_SENSOR_STATE.length()).split("/");
+                if (parts.length != 2)
+                    Log.e("mqtt", "Invalid topic. cannot split in 2 parts");
+                else {
+                    int id = Integer.parseInt(parts[0]);
+                    RoomSensorData rs = ThermostatControllerData.Instance.roomSensors(id, false);
+                    if (rs == null)
+                        broadcastDataIntent.putExtra("new_sensor", true);
+
+                    ThermostatControllerData.Instance.roomSensors(id, true).decodeState(payload, parts[1]);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+                }
+                return;
+            }
+
+            if (topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE)) {
+                int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_SENSOR_STATE.length()), 16);
+                ThermostatControllerData.Instance.boilerSensors(id - 1).decodeState(payload);
+
+                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSensorState);
+                broadcastDataIntent.putExtra("id", id);
+                context.sendBroadcast(broadcastDataIntent);
+                return;
+            }
+
 
             // TODO: 1/25/2017
             // აქ დავამატო შუქის და თერმოსტატის კონტროლერიც

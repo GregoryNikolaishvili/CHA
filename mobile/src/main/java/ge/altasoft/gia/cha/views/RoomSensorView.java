@@ -21,6 +21,8 @@ public class RoomSensorView extends LinearLayout {
     private TextView tvTemperature;
     private TextView tvTemperatureTrend;
     private TextView tvHumidity;
+    private TextView tvSignalLevel;
+    private TextView tvBatteryLevel;
 
     private RoomSensorData sensorData;
 
@@ -93,6 +95,19 @@ public class RoomSensorView extends LinearLayout {
             tvHumidity = (TextView) this.findViewById(R.id.humidity_value);
         return tvHumidity;
     }
+
+    private TextView getSignalLevelTextView() {
+        if (tvSignalLevel == null)
+            tvSignalLevel = (TextView) this.findViewById(R.id.signal_level);
+        return tvSignalLevel;
+    }
+
+    private TextView getBatteryLevelTextView() {
+        if (tvBatteryLevel == null)
+            tvBatteryLevel = (TextView) this.findViewById(R.id.battery_value);
+        return tvBatteryLevel;
+    }
+
 //    public void setSensorName(CharSequence value) {
 //        getSensorNameTextView().setText(value);
 //    }
@@ -114,23 +129,35 @@ public class RoomSensorView extends LinearLayout {
         getSensorNameTextView().setText(value.getName() + ", order=" + String.valueOf(value.getOrder()));
 
         getTemperatureTextView();
-        tvTemperature.setText(String.format(Locale.US, "%.1f°", value.getTemperature()));
+        float v = value.getTemperature();
+        if (Float.isNaN(v))
+            tvTemperature.setText("--");
+        else
+            tvTemperature.setText(String.format(Locale.US, "%.1f°", v));
 
         tvTemperature.setTextColor(value.getTemperatureColor());
 
         switch (value.getTemperatureTrend()) {
-            case RoomSensorData.NO_CHANGE:
+            case '=':
                 getTemperatureTrendTextView().setText("");
                 break;
-            case RoomSensorData.GOING_UP:
+            case '+':
                 getTemperatureTrendTextView().setText("↑"); // ▲
                 getTemperatureTrendTextView().setTextColor(Color.RED);
                 break;
-            case RoomSensorData.GOING_DOWN:
+            case '-':
                 getTemperatureTrendTextView().setText("↓"); // ▼
                 getTemperatureTrendTextView().setTextColor(Color.BLUE);
                 break;
         }
-        getHumidityTextView().setText(String.format(Locale.US, "%.0f%%", value.getHumidity()));
+        v = value.getHumidity();
+        if (Float.isNaN(v))
+            getHumidityTextView().setText("--");
+        else
+            getHumidityTextView().setText(String.format(Locale.US, "%.0f%%", v));
+
+        getSignalLevelTextView().setText(String.valueOf(value.getSignalLevel()));
+
+        getBatteryLevelTextView().setText(value.getBatteryLevel());
     }
 }

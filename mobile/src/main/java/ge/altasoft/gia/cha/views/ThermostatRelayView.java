@@ -45,17 +45,17 @@ public class ThermostatRelayView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.thermostat_relay_layout, this);
 
-        getOnOffButton().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                if (!Utils.disableOnCheckedListener) {
-                    ((ToggleButton) button).setTextOn("");
-                    ((ToggleButton) button).setTextOff("");
-                    button.setEnabled(false);
-
-                    ThermostatUtils.sendCommandToController(getContext(), String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
-                }
-            }
-        });
+//        getOnOffButton().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+//                if (!Utils.disableOnCheckedListener) {
+//                    ((ToggleButton) button).setTextOn("");
+//                    ((ToggleButton) button).setTextOff("");
+//                    button.setEnabled(false);
+//
+//                    ThermostatUtils.sendCommandToController(getContext(), String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
+//                }
+//            }
+//        });
 
         this.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

@@ -98,13 +98,14 @@ public class LogBooleanActivity extends ChaActivity {
         }
     }
 
-    @Override
-    protected void processThermostatControllerData(int flags, Intent intent) {
-        super.processThermostatControllerData(flags, intent);
-
-        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
-            if (adapter != null)
-                adapter.notifyDataSetChanged();
-        }
-    }
+    // TODO: 1/29/2017
+//    @Override
+//    protected void processThermostatControllerData(int flags, Intent intent) {
+//        super.processThermostatControllerData(flags, intent);
+//
+//        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
+//            if (adapter != null)
+//                adapter.notifyDataSetChanged();
+//        }
+//    }
 }

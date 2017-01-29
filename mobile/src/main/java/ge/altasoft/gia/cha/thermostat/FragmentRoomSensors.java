@@ -72,7 +72,7 @@ public class FragmentRoomSensors extends Fragment {
 
         Map<Integer, RoomSensorData> sensors = ThermostatControllerData.Instance.sortedRoomSensors();
         for (int id : sensors.keySet()) {
-            RoomSensorData data = ThermostatControllerData.Instance.roomSensors(id);
+            RoomSensorData data = ThermostatControllerData.Instance.roomSensors(id, false);
 
             RoomSensorView sensor = new RoomSensorView(context);
             sensor.setSensorData(data);
@@ -91,6 +91,22 @@ public class FragmentRoomSensors extends Fragment {
                 RoomSensorView rv = (RoomSensorView) dragLinearLayout.getChildAt(i);
                 RoomSensorData data = rv.getSensorData();
                 rv.setSensorData(data);
+            }
+        }
+    }
+
+    public void drawState(int id) {
+        if (rootView == null)
+            return;
+
+        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
+            if (dragLinearLayout.getChildAt(i) instanceof RoomSensorView) {
+                RoomSensorView rv = (RoomSensorView) dragLinearLayout.getChildAt(i);
+                RoomSensorData data = rv.getSensorData();
+                if (data.getId() == id) {
+                    rv.setSensorData(data);
+                    break;
+                }
             }
         }
     }

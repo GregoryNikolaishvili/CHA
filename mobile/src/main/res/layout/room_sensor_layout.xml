@@ -34,4 +34,23 @@
 
         android:gravity="right"
         android:text="@string/sample_humidity" />
+
+    <TextView
+        android:id="@+id/signal_level"
+        style="@android:style/TextAppearance.Small"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+
+        android:gravity="right"
+        android:text="@string/sample_4" />
+
+    <TextView
+        android:id="@+id/battery_value"
+        style="@android:style/TextAppearance.Small"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+
+        android:gravity="right"
+        android:text="@string/sample_normal" />
+
 </LinearLayout>

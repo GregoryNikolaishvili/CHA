@@ -18,12 +18,12 @@ public final class ThermostatUtils {
 
     public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 3; // $ + 12 switches + autoatic_mode + datetime  + sunrise/sunset 123456789012TYYMMDDHHmmssxxxxxxxx. 34 chars
 
-    public static void sendCommandToController(Context context, String command) {
-        Intent intent;
-        intent = new Intent(ThermostatBroadcastService.BROADCAST_ACTION_SET);
-        intent.putExtra("command", command);
-        context.sendBroadcast(intent);
-    }
+//    public static void sendCommandToController(Context context, String command) {
+//        Intent intent;
+//        intent = new Intent(ThermostatBroadcastService.BROADCAST_ACTION_SET);
+//        intent.putExtra("command", command);
+//        context.sendBroadcast(intent);
+//    }
 
     public static String GetControllerIp(Context context) {
         if (Debug.isDebuggerConnected())

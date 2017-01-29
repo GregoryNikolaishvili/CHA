@@ -88,18 +88,19 @@ public class BoilerSensorView extends LinearLayout {
         getTemperatureTrendTextView();
         getTargetTemperatureLayout();
 
-        tvTemperature.setText(String.format(Locale.US, "%.1f°", value.getTemperature()));
+        float v = value.getTemperature();
+        if (Float.isNaN(v))
+            tvTemperature.setText("--");
+        else
+            tvTemperature.setText(String.format(Locale.US, "%.1f°", value.getTemperature()));
         tvTemperature.setTextColor(value.getTemperatureColor());
 
         switch (value.getTemperatureTrend()) {
-            case BoilerSensorData.NO_CHANGE:
-                tvTemperatureTrend.setText("");
-                break;
-            case BoilerSensorData.GOING_UP:
+            case '+':
                 tvTemperatureTrend.setText("↑");
                 tvTemperatureTrend.setTextColor(Color.RED);
                 break;
-            case BoilerSensorData.GOING_DOWN:
+            case '-':
                 tvTemperatureTrend.setText("↓");
                 tvTemperatureTrend.setTextColor(Color.BLUE);
                 break;

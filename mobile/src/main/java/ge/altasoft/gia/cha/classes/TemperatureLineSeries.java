@@ -22,7 +22,9 @@ public class TemperatureLineSeries extends LineGraphSeries<DataPoint> {
     }
 
     public void append(TempSensorData data) {
-        appendData(new DataPoint(data.getLastActivitySec() * 1000, data.getTemperature()), true, Utils.LOG_BUFFER_SIZE);
+        double x = data.getLastActivitySec() * 1000;
+        if (x > getHighestValueX())
+            appendData(new DataPoint(x, data.getTemperature()), true, Utils.LOG_BUFFER_SIZE);
     }
 
 }

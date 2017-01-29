@@ -10,8 +10,6 @@ import ge.altasoft.gia.cha.Utils;
 
 public class TempSensorData {
 
-    //private boolean enabled;
-
     final protected int id;
     protected int order;
 
@@ -25,14 +23,10 @@ public class TempSensorData {
 
     final private CircularArrayList<Pair<Date, Float>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
-    public final static char NO_CHANGE = 'N';
-    public final static char GOING_UP = 'U';
-    public final static char GOING_DOWN = 'D';
-
     protected TempSensorData(int id) {
         this.id = id;
         //this.enabled = false;
-        this.T = 99;
+        this.T = Float.NaN;
         this.targetT = Utils.DEFAULT_TARGET_TEMPERATURE;
     }
 
@@ -48,7 +42,7 @@ public class TempSensorData {
         return this.T;
     }
 
-    private void setTemperature(float value) {
+    public void setTemperature(float value) {
         this.lastActivitySec = System.currentTimeMillis() / 1000;
 
         if (this.T != value) {
@@ -61,7 +55,7 @@ public class TempSensorData {
         return this.temperatureTrend;
     }
 
-    private void setTemperatureTrend(char value) {
+    protected void setTemperatureTrend(char value) {
         this.temperatureTrend = value;
     }
 
@@ -115,24 +109,27 @@ public class TempSensorData {
         return idx + 8;
     }
 
-    public void encodeState(StringBuilder sb) {
-        if (Utils.DEBUG_THERMOSTAT) {
-            int trend = Utils.random(0, 2);
-            char c = NO_CHANGE;
-            if (trend == 1)
-                c = GOING_UP;
-            else if (trend == 2)
-                c = GOING_DOWN;
+//    public void encodeState(StringBuilder sb) {
+//        if (Utils.DEBUG_THERMOSTAT) {
+//            int trend = Utils.random(0, 2);
+//            char c = NO_CHANGE;
+//            if (trend == 1)
+//                c = GOING_UP;
+//            else if (trend == 2)
+//                c = GOING_DOWN;
+//
+//            sb.append(String.format(Locale.US, "%04X%c", Utils.random(10, 100) * 10, c));
+//        } else
+//            sb.append(String.format(Locale.US, "%04X%c", ((Float) (T * 10)).intValue(), getTemperatureTrend()));
+//    }
 
-            sb.append(String.format(Locale.US, "%04X%c", Utils.random(10, 100) * 10, c));
-        } else
-            sb.append(String.format(Locale.US, "%04X%c", ((Float) (T * 10)).intValue(), getTemperatureTrend()));
-    }
-
-    public int decodeState(String value, int idx) {
-        setTemperature(Integer.parseInt(value.substring(idx, idx + 4), 16) / 10.0f);
-        setTemperatureTrend(value.charAt(idx + 4));
-
-        return idx + 5;
+    public void decodeState(String payload) {
+        char lastChar = payload.charAt(payload.length() - 1);
+        if ((lastChar == '+') || (lastChar == '-')) {
+            setTemperatureTrend(lastChar);
+            payload = payload.substring(0, payload.length() - 1);
+        }
+        int value = Integer.parseInt(payload);
+        setTemperature(value / 10f);
     }
 }

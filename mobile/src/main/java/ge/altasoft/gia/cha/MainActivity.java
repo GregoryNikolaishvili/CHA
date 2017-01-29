@@ -15,12 +15,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import ge.altasoft.gia.cha.light.LightControllerData;
-import ge.altasoft.gia.cha.light.LightFragment;
+import ge.altasoft.gia.cha.light.FragmentLight;
 import ge.altasoft.gia.cha.light.LightSettingsActivity;
 
 import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
 import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;
-import ge.altasoft.gia.cha.thermostat.ThermostatBroadcastService;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.thermostat.FragmentHeaterRelays;
 import ge.altasoft.gia.cha.thermostat.ThermostatSettingsActivity;
@@ -28,7 +27,6 @@ import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class MainActivity extends ChaActivity {
 
-    private Intent thermostatServiceIntent;
     private MqttClient mqttClient = null;
     private SectionsPagerAdapter pagerAdapter;
     private Menu mainMenu;
@@ -53,8 +51,6 @@ public class MainActivity extends ChaActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setOffscreenPageLimit(8);
         viewPager.setAdapter(pagerAdapter);
-
-        thermostatServiceIntent = new Intent(this, ThermostatBroadcastService.class);
     }
 
     @Override
@@ -80,20 +76,18 @@ public class MainActivity extends ChaActivity {
                 for (int I = 2; I < this.mainMenu.size(); I++)
                     this.mainMenu.getItem(I).setEnabled(true);
 
-                pagerAdapter.lightFragment.setDraggableViews(false);
+                pagerAdapter.fragmentLight.setDraggableViews(false);
                 pagerAdapter.fragmentHeaterRelays.setDraggableViews(false);
                 pagerAdapter.fragmentRoomSensors.setDraggableViews(false);
 
                 if (id == R.id.action_ok) {
                     if (LightControllerData.Instance.relayOrderChanged())
-                        //LightUtils.sendCommandToController(this, LightControllerData.Instance.encodeSettings());
                         mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
-
                     if (ThermostatControllerData.Instance.relayOrderChanged() || ThermostatControllerData.Instance.roomSensorOrderChanged())
-                        ThermostatUtils.sendCommandToController(this, ThermostatControllerData.Instance.encodeSettings());
+                        mqttClient.publish("chac/thermostat/settings", ThermostatControllerData.Instance.encodeSettings(), false);
                 } else {
                     LightControllerData.Instance.restoreRelayOrders();
-                    pagerAdapter.lightFragment.rebuildUI();
+                    pagerAdapter.fragmentLight.rebuildUI();
 
                     ThermostatControllerData.Instance.restoreRelayOrders();
                     ThermostatControllerData.Instance.restoreRoomSensorRelayOrders();
@@ -135,7 +129,7 @@ public class MainActivity extends ChaActivity {
                 for (int I = 2; I < this.mainMenu.size(); I++)
                     this.mainMenu.getItem(I).setEnabled(false);
 
-                pagerAdapter.lightFragment.setDraggableViews(true);
+                pagerAdapter.fragmentLight.setDraggableViews(true);
                 pagerAdapter.fragmentHeaterRelays.setDraggableViews(true);
                 pagerAdapter.fragmentRoomSensors.setDraggableViews(true);
                 return true;
@@ -157,8 +151,6 @@ public class MainActivity extends ChaActivity {
 
         mqttClient = new MqttClient(this);
         mqttClient.start();
-
-        startService(thermostatServiceIntent);
     }
 
     @Override
@@ -174,8 +166,8 @@ public class MainActivity extends ChaActivity {
     public void onResume() {
         super.onResume();
 
-        if (pagerAdapter.lightFragment != null)
-            pagerAdapter.lightFragment.rebuildUI();
+        if (pagerAdapter.fragmentLight != null)
+            pagerAdapter.fragmentLight.rebuildUI();
 
         if (pagerAdapter.fragmentBoiler != null)
             pagerAdapter.fragmentBoiler.rebuildUI();
@@ -185,13 +177,6 @@ public class MainActivity extends ChaActivity {
             pagerAdapter.fragmentHeaterRelays.rebuildUI();
     }
 
-
-    @Override
-    public void onDestroy() {
-        stopService(thermostatServiceIntent);
-
-        super.onDestroy();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -211,10 +196,7 @@ public class MainActivity extends ChaActivity {
 
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
                 if (resultCode == Activity.RESULT_OK)
-                    ThermostatBroadcastService.SetAllSettings = true;
-                pagerAdapter.fragmentBoiler.rebuildUI();
-                pagerAdapter.fragmentRoomSensors.rebuildUI();
-                pagerAdapter.fragmentHeaterRelays.rebuildUI();
+                    mqttClient.publish("chac/thermostat/settings", ThermostatControllerData.Instance.encodeSettings(), false);
                 break;
         }
     }
@@ -222,6 +204,8 @@ public class MainActivity extends ChaActivity {
     @Override
     protected void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
         super.processMqttData(dataType, intent);
+
+        int id;
 
         switch (dataType) {
             case LightControllerConnected:
@@ -232,33 +216,39 @@ public class MainActivity extends ChaActivity {
                 break;
 
             case LightSettings:
-                pagerAdapter.lightFragment.rebuildUI();
+            case LightNameAndOrders:
+                pagerAdapter.fragmentLight.rebuildUI();
                 break;
 
-            case LightOneState:
-                int id = intent.getIntExtra("id", 0);
-                pagerAdapter.lightFragment.drawState(id);
+            case LightRelayState:
+                id = intent.getIntExtra("id", 0);
+                pagerAdapter.fragmentLight.drawState(id);
                 break;
 
-            case LightAllStates:
-                State:
-                pagerAdapter.lightFragment.drawState();
+            case ThermostatSettings:
+            case ThermostatNameAndOrders:
+                pagerAdapter.fragmentBoiler.rebuildUI();
+                pagerAdapter.fragmentRoomSensors.rebuildUI();
+                pagerAdapter.fragmentHeaterRelays.rebuildUI();
                 break;
-        }
-    }
 
-    @Override
-    protected void processThermostatControllerData(int flags, Intent intent) {
-        super.processThermostatControllerData(flags, intent);
+            case ThermostatRoomSensorState:
+                id = intent.getIntExtra("id", 0);
+                if (intent.getBooleanExtra("new_sensor", false))
+                    pagerAdapter.fragmentRoomSensors.rebuildUI();
 
-        if ((flags & Utils.FLAG_HAVE_SETTINGS) != 0) {
-            pagerAdapter.fragmentBoiler.rebuildUI();
-            pagerAdapter.fragmentRoomSensors.rebuildUI();
-            pagerAdapter.fragmentHeaterRelays.rebuildUI();
-        } else if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
-            pagerAdapter.fragmentBoiler.drawState();
-            pagerAdapter.fragmentRoomSensors.drawState();
-            pagerAdapter.fragmentHeaterRelays.drawState();
+                pagerAdapter.fragmentRoomSensors.drawState(id);
+                break;
+
+            case ThermostatBoilerSensorState:
+                id = intent.getIntExtra("id", 0);
+
+                pagerAdapter.fragmentBoiler.drawState(id);
+                break;
+
+//            case LightAllStates:
+//                pagerAdapter.fragmentLight.drawState();
+//                break;
         }
     }
 
@@ -286,7 +276,7 @@ public class MainActivity extends ChaActivity {
 
         final private boolean isLandscape;
 
-        LightFragment lightFragment = null;
+        FragmentLight fragmentLight = null;
         FragmentBoiler fragmentBoiler = null;
         FragmentRoomSensors fragmentRoomSensors = null;
         FragmentHeaterRelays fragmentHeaterRelays = null;
@@ -296,7 +286,7 @@ public class MainActivity extends ChaActivity {
 
             this.isLandscape = isLandscape;
 
-            lightFragment = LightFragment.newInstance();
+            fragmentLight = FragmentLight.newInstance();
             fragmentBoiler = FragmentBoiler.newInstance();
             fragmentRoomSensors = FragmentRoomSensors.newInstance();
             fragmentHeaterRelays = FragmentHeaterRelays.newInstance();
@@ -306,7 +296,7 @@ public class MainActivity extends ChaActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return lightFragment;
+                    return fragmentLight;
                 case 1:
                     return fragmentBoiler;
                 case 2:

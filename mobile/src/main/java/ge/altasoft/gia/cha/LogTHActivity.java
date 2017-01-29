@@ -51,7 +51,7 @@ public class LogTHActivity extends ChaActivity {
             case "RoomSensorT": {
                 int id = intent.getIntExtra("id", 0);
 
-                TempSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id);
+                TempSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id, false);
                 logBuffer = sensorData.getLogBuffer();
                 break;
             }
@@ -59,7 +59,7 @@ public class LogTHActivity extends ChaActivity {
                 int id = intent.getIntExtra("id", 0);
 
                 isTemperature = false;
-                RoomSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id);
+                RoomSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id, false);
                 logBuffer = sensorData.getLogBufferH();
                 break;
             }
@@ -103,13 +103,14 @@ public class LogTHActivity extends ChaActivity {
         }
     }
 
-    @Override
-    protected void processThermostatControllerData(int flags, Intent intent) {
-        super.processThermostatControllerData(flags, intent);
-
-        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
-            if (adapter != null)
-                adapter.notifyDataSetChanged();
-        }
-    }
+    // TODO: 1/29/2017
+//    @Override
+//    protected void processThermostatControllerData(int flags, Intent intent) {
+//        super.processThermostatControllerData(flags, intent);
+//
+//        if ((flags & Utils.FLAG_HAVE_STATE) != 0) {
+//            if (adapter != null)
+//                adapter.notifyDataSetChanged();
+//        }
+//    }
 }
