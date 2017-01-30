@@ -133,6 +133,12 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
                     p2.setTitle("Target temperature");
                     screen.addPreference(p2);
 
+                    FriendlyEditTextPreference p3 = new FriendlyEditTextPreference(prefContext);
+                    p3.setKey("t_resp_relay_id_" + Integer.toString(id));
+                    p3.setSummary("%s");
+                    p3.setTitle("Responsible relay id");
+                    screen.addPreference(p3);
+
                     sensorsCat.addPreference(screen);
                 }
 
@@ -189,7 +195,10 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
                         TemperaturePreference targetTPref = (TemperaturePreference) screen.getPreference(2);
 
                         screen.setTitle(namePref.getText() == null ? "Sensor #" + Integer.toString(ThermostatControllerData.Instance.relays(i).getId()) : namePref.getText());
-                        screen.setSummary(String.format(Locale.US, "Set T: %s°", targetTPref.getText() == null ? String.valueOf(Utils.DEFAULT_TARGET_TEMPERATURE) : targetTPref.getText()));
+                        if (targetTPref.getText() == null)
+                            screen.setSummary("");
+                        else
+                            screen.setSummary(String.format(Locale.US, "Set T: %s°", targetTPref.getText()));
                     }
                 }
             }

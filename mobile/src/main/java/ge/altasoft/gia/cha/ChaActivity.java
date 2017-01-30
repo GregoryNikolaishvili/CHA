@@ -1,10 +1,13 @@
 package ge.altasoft.gia.cha;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.os.IBinder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -63,15 +66,55 @@ public abstract class ChaActivity extends AppCompatActivity {
 
         registerReceiver(broadcastStatusReceiver, new IntentFilter(MqttClient.MQTT_STATUS_INTENT));
         registerReceiver(broadcastDataReceiver, new IntentFilter(MqttClient.MQTT_DATA_INTENT));
+
+        //StartServiceIfStopped();
+        bindService(new Intent(this, MqttServiceLocal.class), mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStop() {
+        super.onStop();
+
         unregisterReceiver(broadcastDataReceiver);
         unregisterReceiver(broadcastStatusReceiver);
-        super.onStop();
+
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
     }
 
     void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
     }
+
+    // service
+
+    public MqttClient getMqttClient() {
+        return mService.mqttClient();
+    }
+
+    boolean mBound;
+    MqttServiceLocal mService = null;
+
+
+//    private void StartServiceIfStopped() {
+//        if (!MqttServiceLocal.isRunning()) {
+//            startService(new Intent(this, MqttServiceLocal.class));
+//        }
+//    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            MqttServiceLocal.LocalBinder binder = (MqttServiceLocal.LocalBinder) service;
+            mService = binder.getService();
+
+            mBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been unexpectedly disconnected - process crashed.
+            mService = null;
+            mBound = false;
+        }
+    };
 }

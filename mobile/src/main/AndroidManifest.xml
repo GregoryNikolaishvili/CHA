@@ -8,8 +8,6 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.hardware.wifi" />
-
-
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -31,7 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
@@ -41,18 +38,17 @@
         <activity
             android:name=".thermostat.ThermostatSettingsActivity"
             android:label="@string/title_activity_settings" />
-
         <activity android:name=".GraphActivity" />
         <activity android:name=".LogTHActivity" />
         <activity android:name=".LogBooleanActivity" />
         <activity android:name=".WhoIsOnlineActivity" />
 
-        <service android:name=".thermostat.ThermostatBroadcastService" />
+        <service android:name="org.eclipse.paho.android.service.MqttService" />
 
-        <service android:name="org.eclipse.paho.android.service.MqttService">
-
-        </service>
-
+        <service
+            android:name=".MqttServiceLocal"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

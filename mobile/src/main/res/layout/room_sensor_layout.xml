@@ -15,7 +15,7 @@
         style="@android:style/TextAppearance.Small"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:gravity="right"
+        android:gravity="end"
         android:text="@string/sample_temperature" />
 
     <TextView
@@ -24,15 +24,14 @@
         android:layout_width="16dp"
         android:layout_height="wrap_content"
 
-        android:gravity="left" />
+        android:gravity="end" />
 
     <TextView
         android:id="@+id/humidity_value"
         style="@android:style/TextAppearance.Small"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-
-        android:gravity="right"
+        android:gravity="end"
         android:text="@string/sample_humidity" />
 
     <TextView
@@ -41,7 +40,7 @@
         android:layout_width="40dp"
         android:layout_height="wrap_content"
 
-        android:gravity="right"
+        android:gravity="end"
         android:text="@string/sample_4" />
 
     <TextView
@@ -49,8 +48,14 @@
         style="@android:style/TextAppearance.Small"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-
-        android:gravity="right"
+        android:gravity="end"
         android:text="@string/sample_normal" />
+
+    <TextView
+        android:id="@+id/relay_state"
+        style="@android:style/TextAppearance.Small"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:gravity="end" />
 
 </LinearLayout>

@@ -1,19 +1,19 @@
 package ge.altasoft.gia.cha.thermostat;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.Pair;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.MqttClient;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.CircularArrayList;
 import ge.altasoft.gia.cha.classes.TempSensorData;
-
-import static ge.altasoft.gia.cha.MqttClient.MQTT_DATA_TYPE;
 
 public final class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
 
@@ -21,22 +21,45 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     private int signalLevel;
     private String batteryLevel;
     private String name;
-    private boolean canBeControlled;
+    private boolean isOn;
+    private int responsibleRelayId;
+
+    final private CircularArrayList<Pair<Date, Boolean>> logBufferOnOff = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
     final private CircularArrayList<Pair<Date, Float>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
     RoomSensorData(int id) {
         super(id);
 
         H = Float.NaN;
-        canBeControlled = false;
         setDeltaTargetT(1.0f);
-        name = String.valueOf(id);
+        this.isOn = false;
+        responsibleRelayId = 0; // no responsible
         signalLevel = 0;
         batteryLevel = "unknown";
+        name = String.valueOf(id);
     }
 
     public CircularArrayList<Pair<Date, Float>> getLogBufferH() {
         return logBufferH;
+    }
+
+    public CircularArrayList<Pair<Date, Boolean>> getLogBufferOnOff() {
+        return logBufferOnOff;
+    }
+
+    public boolean isOn() {
+        return this.isOn;
+    }
+
+    public boolean hasRelay() {
+        return this.responsibleRelayId > 0;
+    }
+
+    public void setIsOn(boolean value) {
+        if (this.isOn != value) {
+            this.isOn = value;
+            logBufferOnOff.add(new Pair<>(new Date(), value));
+        }
     }
 
     public String getName() {
@@ -62,12 +85,8 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return batteryLevel;
     }
 
-    public boolean canBeControlled() {
-        return this.canBeControlled;
-    }
-
-    public void setCanBeControlled(boolean canBeControlled) {
-        this.canBeControlled = canBeControlled;
+    public int getResponsibleRelayId() {
+        return this.responsibleRelayId;
     }
 
     void encodeOrderAndName(StringBuilder sb2) {
@@ -78,37 +97,27 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     }
 
     void decodeOrderAndName(String s) {
-        order = Character.digit(s.charAt(2), 16);
-        name = Utils.decodeArduinoString(s.substring(3));
+        order = Character.digit(s.charAt(0), 16);
+        name = Utils.decodeArduinoString(s.substring(1));
     }
 
     public void encodeSettings(StringBuilder sb) {
         super.encodeSettings(sb);
-        sb.append(canBeControlled ? 'C' : 'N');
+        sb.append(String.format(Locale.US, "%02X", responsibleRelayId));
     }
 
     public int decodeSettings(String response, int idx) {
         idx = super.decodeSettings(response, idx);
-        canBeControlled = response.charAt(idx) != 'N';
-        return idx + 1;
+        responsibleRelayId = Integer.parseInt(response.substring(idx, idx + 2), 16);
+        return idx + 2;
     }
-
-//    public void encodeState(StringBuilder sb) {
-//        super.encodeState(sb);
-//        sb.append(String.format(Locale.US, "%04X", ((Float) (H * 10)).intValue()));
-//    }
-//
-//    public int decodeState(String value, int idx) {
-//        idx = super.decodeState(value, idx);
-//        setHumidity(Integer.parseInt(value.substring(idx, idx + 4), 16) / 10.0f);
-//        return idx + 4;
-//    }
 
     void decodeSettings(SharedPreferences prefs) {
         String suffix = Integer.toString(getId());
 
         name = prefs.getString("t_sensor_name_" + suffix, "Sensor #" + suffix);
         setTargetTemperature(Float.parseFloat(prefs.getString("t_target_t_" + suffix, "25")));
+        responsibleRelayId = Integer.parseInt(prefs.getString("t_resp_relay_id_" + suffix, "0"));
     }
 
     void encodeSettings(SharedPreferences.Editor editor) {
@@ -116,6 +125,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
 
         editor.putString("t_sensor_name_" + suffix, getName());
         editor.putString("t_target_t_" + suffix, String.format(Locale.US, "%.1f°", (float) getTargetTemperature()));
+        editor.putString("t_resp_relay_id_" + suffix, String.valueOf(responsibleRelayId));
     }
 
     @Override
@@ -127,33 +137,22 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         }
     }
 
-    public void decodeState(String payload, String type) {
+    @Override
+    public void decodeState(String payload) {
         int value;
 
-        switch (type) {
-            case "temp":
-                super.decodeState(payload);
-                break;
+        JSONObject jMain;
+        try {
+            jMain = new JSONObject(payload);
+            setTemperature(jMain.getInt("T") / 10f);
+            setTemperatureTrend(jMain.getString("TT").charAt(0));
 
-            case "hum":
-                char lastChar = payload.charAt(payload.length() - 1);
-                if ((lastChar == '+') || (lastChar == '-')) {
-                    setTemperatureTrend(lastChar);
-                    payload = payload.substring(0, payload.length() - 1);
-                } else
-                    setTemperatureTrend('=');
-                value = Integer.parseInt(payload);
-                setHumidity(value);
-                break;
-
-            case "rssi":
-                value = Integer.parseInt(payload);
-                signalLevel = value;
-                break;
-
-            case "battery":
-                batteryLevel = payload;
-                break;
+            setHumidity(jMain.getInt("H"));
+            signalLevel = jMain.getInt("S");
+            batteryLevel = jMain.getString("B");
+        } catch (JSONException e) {
+            Log.e("JSON", e.getMessage());
+            return;
         }
     }
 }

@@ -27,7 +27,6 @@ import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class MainActivity extends ChaActivity {
 
-    private MqttClient mqttClient = null;
     private SectionsPagerAdapter pagerAdapter;
     private Menu mainMenu;
 
@@ -82,9 +81,11 @@ public class MainActivity extends ChaActivity {
 
                 if (id == R.id.action_ok) {
                     if (LightControllerData.Instance.relayOrderChanged())
-                        mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
-                    if (ThermostatControllerData.Instance.relayOrderChanged() || ThermostatControllerData.Instance.roomSensorOrderChanged())
-                        mqttClient.publish("chac/thermostat/settings", ThermostatControllerData.Instance.encodeSettings(), false);
+                        getMqttClient().publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
+                    if (ThermostatControllerData.Instance.roomSensorOrderChanged())
+                        getMqttClient().publish("chac/ts/rs/settings/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
+                    if (ThermostatControllerData.Instance.relayOrderChanged())
+                        getMqttClient().publish("chac/ts/hr/settings/names", ThermostatControllerData.Instance.encodeHeaterRelayNamesAndOrder(), false);
                 } else {
                     LightControllerData.Instance.restoreRelayOrders();
                     pagerAdapter.fragmentLight.rebuildUI();
@@ -97,14 +98,13 @@ public class MainActivity extends ChaActivity {
                 return true;
 
             case R.id.action_refresh:
-                //LightUtils.sendCommandToController(this, "?");
-                mqttClient.publish("chac/light/refresh", "1", false);
+                getMqttClient().publish("chac/light/refresh", "1", false);
                 return true;
 
             case R.id.action_show_info:
                 showNetworkInfo();
                 Intent intent = new Intent(this, WhoIsOnlineActivity.class);
-                intent.putStringArrayListExtra("list", mqttClient.getConnectedClientList());
+                intent.putStringArrayListExtra("list", getMqttClient().getConnectedClientList());
                 startActivity(intent);
                 return true;
 
@@ -146,23 +146,6 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        mqttClient = new MqttClient(this);
-        mqttClient.start();
-    }
-
-    @Override
-    protected void onStop() {
-        if (mqttClient != null) {
-            mqttClient.stop();
-        }
-
-        super.onStop();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -190,13 +173,21 @@ public class MainActivity extends ChaActivity {
 //                break;
 
             case Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS:
-                if (resultCode == Activity.RESULT_OK)
-                    mqttClient.publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
+                if (resultCode == Activity.RESULT_OK) {
+                    getMqttClient().publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
+                    getMqttClient().publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
+                }
                 break;
 
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
-                if (resultCode == Activity.RESULT_OK)
-                    mqttClient.publish("chac/thermostat/settings", ThermostatControllerData.Instance.encodeSettings(), false);
+                if (resultCode == Activity.RESULT_OK) {
+                    getMqttClient().publish("chac/ts/rs/settings", ThermostatControllerData.Instance.encodeRoomSensorSettings(), false);
+                    getMqttClient().publish("chac/ts/bs/settings", ThermostatControllerData.Instance.encodeBoilerSettings(), false);
+                    getMqttClient().publish("chac/ts/hr/settings", ThermostatControllerData.Instance.encodeHeaterRelaySettings(), false);
+
+                    getMqttClient().publish("chac/ts/rs/settings/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
+                    getMqttClient().publish("chac/ts/hr/settings/names", ThermostatControllerData.Instance.encodeHeaterRelayNamesAndOrder(), false);
+                }
                 break;
         }
     }
@@ -225,12 +216,19 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentLight.drawState(id);
                 break;
 
-            case ThermostatSettings:
-            case ThermostatNameAndOrders:
-                pagerAdapter.fragmentBoiler.rebuildUI();
+            case ThermostatRoomSensorSettings:
+            case ThermostatRoomSensorNameAndOrders:
                 pagerAdapter.fragmentRoomSensors.rebuildUI();
-                pagerAdapter.fragmentHeaterRelays.rebuildUI();
                 break;
+
+            case ThermostatBoilerSettings:
+                pagerAdapter.fragmentBoiler.rebuildUI();
+                break;
+
+//            case ThermostatHeaterRelaySettings:
+//            case ThermostatHeaterRelayNameAndOrders:
+//                pagerAdapter.fragmentHeaterRelays.rebuildUI();
+//                break;
 
             case ThermostatRoomSensorState:
                 id = intent.getIntExtra("id", 0);
@@ -243,12 +241,14 @@ public class MainActivity extends ChaActivity {
             case ThermostatBoilerSensorState:
                 id = intent.getIntExtra("id", 0);
 
-                pagerAdapter.fragmentBoiler.drawState(id);
+                pagerAdapter.fragmentBoiler.drawSensorState(id);
                 break;
 
-//            case LightAllStates:
-//                pagerAdapter.fragmentLight.drawState();
-//                break;
+            case ThermostatBoilerPumpState:
+                id = intent.getIntExtra("id", 0);
+
+                pagerAdapter.fragmentBoiler.drawPumpState(id);
+                break;
         }
     }
 
@@ -266,10 +266,6 @@ public class MainActivity extends ChaActivity {
         sb.append(url);
 
         Toast.makeText(this, sb.toString(), Toast.LENGTH_SHORT).show();
-    }
-
-    public MqttClient getMqttClient() {
-        return mqttClient;
     }
 
     public static class SectionsPagerAdapter extends FragmentPagerAdapter {

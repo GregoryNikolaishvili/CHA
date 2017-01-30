@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ public class RoomSensorView extends LinearLayout {
     private TextView tvHumidity;
     private TextView tvSignalLevel;
     private TextView tvBatteryLevel;
+    private TextView tvRelayState;
 
     private RoomSensorData sensorData;
 
@@ -108,6 +110,13 @@ public class RoomSensorView extends LinearLayout {
         return tvBatteryLevel;
     }
 
+    private TextView getRelayStateTextView() {
+        if (tvRelayState == null)
+            tvRelayState = (TextView) this.findViewById(R.id.relay_state);
+        return tvRelayState;
+    }
+
+
 //    public void setSensorName(CharSequence value) {
 //        getSensorNameTextView().setText(value);
 //    }
@@ -159,5 +168,18 @@ public class RoomSensorView extends LinearLayout {
         getSignalLevelTextView().setText(String.valueOf(value.getSignalLevel()));
 
         getBatteryLevelTextView().setText(value.getBatteryLevel());
+
+        getRelayStateTextView();
+
+        tvRelayState.setVisibility(value.hasRelay() ? VISIBLE : INVISIBLE);
+        if (value.isOn()) {
+            tvRelayState.setTextColor(Color.RED);
+            tvRelayState.setText("On");
+        }
+        else
+        {
+            tvRelayState.setTextColor(Color.GRAY);
+            tvRelayState.setText("Off");
+        }
     }
 }

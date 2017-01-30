@@ -32,10 +32,10 @@ public class GraphActivity extends ChaActivity {
         super.processMqttData(dataType, intent);
 
         if (dataType == MqttClient.MQTTReceivedDataType.ThermostatBoilerSensorState) {
-            // TODO: 1/29/2017
-            for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-                pointSeries.getItem(i).append(ThermostatControllerData.Instance.boilerSensors(i));
-            }
+            int id = intent.getIntExtra("id", 0);
+            id--;
+
+            pointSeries.getItem(id).append(ThermostatControllerData.Instance.boilerSensors(id));
         }
     }
 }

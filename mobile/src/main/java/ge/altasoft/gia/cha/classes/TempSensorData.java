@@ -109,23 +109,9 @@ public class TempSensorData {
         return idx + 8;
     }
 
-//    public void encodeState(StringBuilder sb) {
-//        if (Utils.DEBUG_THERMOSTAT) {
-//            int trend = Utils.random(0, 2);
-//            char c = NO_CHANGE;
-//            if (trend == 1)
-//                c = GOING_UP;
-//            else if (trend == 2)
-//                c = GOING_DOWN;
-//
-//            sb.append(String.format(Locale.US, "%04X%c", Utils.random(10, 100) * 10, c));
-//        } else
-//            sb.append(String.format(Locale.US, "%04X%c", ((Float) (T * 10)).intValue(), getTemperatureTrend()));
-//    }
-
     public void decodeState(String payload) {
         char lastChar = payload.charAt(payload.length() - 1);
-        if ((lastChar == '+') || (lastChar == '-')) {
+        if ((lastChar == '+') || (lastChar == '-') || (lastChar == '=')) {
             setTemperatureTrend(lastChar);
             payload = payload.substring(0, payload.length() - 1);
         }

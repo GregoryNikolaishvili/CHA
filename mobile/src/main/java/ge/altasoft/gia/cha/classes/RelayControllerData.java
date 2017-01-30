@@ -1,5 +1,7 @@
 package ge.altasoft.gia.cha.classes;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -64,12 +66,11 @@ public abstract class RelayControllerData {
         }
     }
 
-
     protected void setRelay(int index, RelayData relay) {
         relayDatas[index] = relay;
     }
 
-    public void setIsActive(boolean value) {
+    protected void setIsActive(boolean value) {
         this.isActive = value;
     }
 
@@ -121,4 +122,52 @@ public abstract class RelayControllerData {
         sortedByValues.putAll(map);
         return sortedByValues;
     }
+
+    //region Encode/Decode
+    public String encodeSettings() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < relayDatas.length; i++)
+            relays(i).encodeSettings(sb);
+
+        return sb.toString();
+    }
+
+    public String encodeNamesAndOrder() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < relayDatas.length; i++)
+            relays(i).encodeOrderAndName(sb);
+        sb.insert(0, String.format(Locale.US, "%04X", sb.length()));
+
+        return sb.toString();
+    }
+
+    public void decodeSettings(String response) {
+        Log.d("decode relay settings", response);
+
+        setIsActive(response.charAt(0) != 'F');
+
+        int idx = 1;
+        for (int i = 0; i < relayDatas.length; i++)
+            idx = relays(i).decodeSettings(response, idx);
+
+        setHaveSettings();
+    }
+
+    public void decodeNamesAndOrder(String response) {
+        Log.d("decode relay names", response);
+
+        response = response.substring(4); // first 4 digits is length in hex
+
+        String[] arr = response.split(";");
+        if (arr.length != relayDatas.length) {
+            Log.e("LightControllerData", "Invalid number of relays returned");
+            return;
+        }
+
+        for (int i = 0; i < relayDatas.length; i++)
+            relays(i).decodeOrderAndName(arr[i]);
+    }
+    //endregion
 }

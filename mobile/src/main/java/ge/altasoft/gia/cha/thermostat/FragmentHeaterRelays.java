@@ -39,7 +39,7 @@ public class FragmentHeaterRelays extends Fragment {
             public void onSwap(View firstView, int firstPosition,
                                View secondView, int secondPosition) {
 
-                ThermostatControllerData.Instance.reorderRoomSensorMapping(firstPosition, secondPosition);
+                ThermostatControllerData.Instance.reorderRelayMapping(firstPosition, secondPosition);
             }
         });
 
@@ -62,18 +62,20 @@ public class FragmentHeaterRelays extends Fragment {
 
     public void setDraggableViews(boolean on) {
         for (int I = 0; I < dragLinearLayout.getChildCount(); I++) {
-            LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
+            if (dragLinearLayout.getChildAt(I) instanceof LinearLayout) {
+                LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
 
-            if (on)
-                dragLinearLayout.setViewDraggable(lt, lt);
-            else
-                dragLinearLayout.setViewNonDraggable(lt);
+                if (on)
+                    dragLinearLayout.setViewDraggable(lt, lt);
+                else
+                    dragLinearLayout.setViewNonDraggable(lt);
+            }
         }
     }
 
     // rebuild everything and draws new state
     public void rebuildUI() {
-        if (!ThermostatControllerData.Instance.haveSettings() || (rootView == null))
+        if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveSettings())
             return;
 
         View vLoading = dragLinearLayout.findViewById(R.id.roomRelaysLoading);

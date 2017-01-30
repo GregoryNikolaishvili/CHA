@@ -63,6 +63,7 @@ public final class LightRelayData extends RelayData {
         return String.format(Locale.US, "%d:%02d", hours, minutes);
     }
 
+    @Override
     public int decodeSettings(String response, int idx) {
         isActive = response.charAt(idx) != 'F';
         onOffset = Short.parseShort(response.substring(idx + 1, idx + 5), 16);
@@ -71,6 +72,14 @@ public final class LightRelayData extends RelayData {
 
         idx += 10;
         return idx;
+    }
+
+    @Override
+    public void encodeSettings(StringBuilder sb) {
+        sb.append(isActive ? 'T' : 'F');
+        sb.append(Utils.shortToHex4(onOffset));
+        sb.append(offMode);
+        sb.append(Utils.shortToHex4(offValue));
     }
 
     void decodeSettings(SharedPreferences prefs) {
@@ -86,20 +95,6 @@ public final class LightRelayData extends RelayData {
         offValue = value;
 
         setName(prefs.getString("l_relay_name_" + suffix, "Relay #" + suffix));
-    }
-
-    public void encodeSettings(StringBuilder sb) {
-        sb.append(isActive ? 'T' : 'F');
-        sb.append(Utils.shortToHex4(onOffset));
-        sb.append(offMode);
-        sb.append(Utils.shortToHex4(offValue));
-    }
-
-    public static void encodeSettingsDebug(StringBuilder sb) {
-        sb.append('F');
-        sb.append(Utils.shortToHex4((short) 0));
-        sb.append(LightRelayData.OFF_SUNRISE);
-        sb.append(Utils.shortToHex4((short) 0));
     }
 
     void encodeSettings(SharedPreferences.Editor editor) {

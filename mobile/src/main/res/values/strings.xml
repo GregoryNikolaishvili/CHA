@@ -8,12 +8,7 @@
     <string name="action_light_settings">Light settings</string>
     <string name="action_thermostat_settings">Thermostat settings</string>
 
-    <string name="action_automatic_mode">Automatic mode</string>
     <string name="action_show_info">Info</string>
-
-    <string name="action_lights_thermostat">Lights/Thermostat</string>
-    <string name="action_lights">Lights</string>
-    <string name="action_thermostat">Thermostat</string>
 
     <string name="action_refresh">Refresh</string>
     <string name="action_reorder">Reorder</string>
@@ -21,10 +16,6 @@
     <string name="title_activity_settings">Settings</string>
     <string name="set">Set</string>
     <string name="cancel">Cancel</string>
-    <string name="action_save_names">Save relay names to controller</string>
-    <string name="action_load_names">Load relay names from controller</string>
-    <string name="advanced">Advanced</string>
-    <string name="action_reset_names">Reset relay names and order to default</string>
 
     <string name="light">Light</string>
     <string name="auto">Auto</string>

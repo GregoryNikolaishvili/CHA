@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import ge.altasoft.gia.cha.MainActivity;
+import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.Utils;
@@ -51,7 +51,7 @@ public class FragmentLight extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    ((MainActivity) getActivity()).getMqttClient().publish("chac/light/mode", isChecked ? "A" : "M", false);
+                    ((ChaActivity) getActivity()).getMqttClient().publish("chac/light/mode", isChecked ? "A" : "M", false);
                 }
             }
         });
@@ -63,18 +63,20 @@ public class FragmentLight extends Fragment {
 
     public void setDraggableViews(boolean on) {
         for (int I = 0; I < dragLinearLayout.getChildCount(); I++) {
-            LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
+            if (dragLinearLayout.getChildAt(I) instanceof LinearLayout) {
+                LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
 
-            if (on)
-                dragLinearLayout.setViewDraggable(lt, lt);
-            else
-                dragLinearLayout.setViewNonDraggable(lt);
+                if (on)
+                    dragLinearLayout.setViewDraggable(lt, lt);
+                else
+                    dragLinearLayout.setViewNonDraggable(lt);
+            }
         }
     }
 
     // rebuild everything and draw new state
     public void rebuildUI() {
-        if (!LightControllerData.Instance.haveSettings() || (rootView == null))
+        if ((rootView == null) || (LightControllerData.Instance == null) || !LightControllerData.Instance.haveSettings())
             return;
 
         View vLoading = dragLinearLayout.findViewById(R.id.lightLoading);

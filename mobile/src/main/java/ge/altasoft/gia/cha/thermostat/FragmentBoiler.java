@@ -18,8 +18,8 @@ import com.jjoe64.graphview.series.DataPoint;
 
 import java.util.Date;
 
+import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.GraphActivity;
-import ge.altasoft.gia.cha.MainActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.CircularArrayList;
@@ -62,7 +62,7 @@ public class FragmentBoiler extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    ((MainActivity) getActivity()).getMqttClient().publish("chac/light/thermostat", "X", false);
+                    ((ChaActivity) getActivity()).getMqttClient().publish("chac/ts/mode", String.valueOf(ThermostatControllerData.Instance.nextBoilerMode()), false);
                 }
             }
         });
@@ -161,7 +161,7 @@ public class FragmentBoiler extends Fragment {
 
     // rebuild everything and draws new state
     public void rebuildUI() {
-        if (!ThermostatControllerData.Instance.haveSettings() || (rootView == null))
+        if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveBoilerSettings())
             return;
 
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setRelayId(ThermostatControllerData.BOILER_SOLAR_PUMP);
@@ -192,7 +192,7 @@ public class FragmentBoiler extends Fragment {
 //        }
 //    }
 
-    public void drawState(int id) {
+    public void drawSensorState(int id) {
         if (rootView == null)
             return;
 
@@ -215,10 +215,33 @@ public class FragmentBoiler extends Fragment {
                 resId = 0;
         }
 
-        if (resId != 0)
+        if (resId != 0) {
             ((BoilerSensorView) rootView.findViewById(resId)).setSensorData(ThermostatControllerData.Instance.boilerSensors(id));
 
-        pointSeries.getItem(id).append(ThermostatControllerData.Instance.boilerSensors(id));
+            pointSeries.getItem(id).append(ThermostatControllerData.Instance.boilerSensors(id));
+        }
+    }
+
+    public void drawPumpState(int id) {
+        if (rootView == null)
+            return;
+
+        id--;
+        int resId;
+        switch (id) {
+            case ThermostatControllerData.BOILER_SOLAR_PUMP:
+                resId = R.id.boilerPumpSolarPanel;
+                break;
+            case ThermostatControllerData.BOILER_HEATING_PUMP:
+                resId = R.id.boilerPumpHeating;
+                break;
+            default:
+                resId = 0;
+        }
+
+        if (resId != 0)
+            ((BoilerPumpView) rootView.findViewById(resId)).setIsOn(ThermostatControllerData.Instance.boilerPumps(id).isOn());
+
     }
 
     private void drawSensorAndRelayStates() {
