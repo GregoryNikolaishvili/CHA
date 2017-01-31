@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class MqttServiceLocal extends Service {
 
-    private MqttClient mqttClient = null;
+    private MqttClientLocal mqttClientLocal = null;
 
     private final IBinder mBinder = new MqttServiceLocal.LocalBinder();
 
@@ -33,8 +33,8 @@ public class MqttServiceLocal extends Service {
         return super.onUnbind(intent);
     }
 
-    public MqttClient mqttClient() {
-        return this.mqttClient;
+    public MqttClientLocal mqttClient() {
+        return this.mqttClientLocal;
     }
 
     //private static boolean isRunning = false;
@@ -63,12 +63,14 @@ public class MqttServiceLocal extends Service {
 
         //isRunning = true;
 
-        mqttClient = new MqttClient(this);
-        mqttClient.start();
+        mqttClientLocal = new MqttClientLocal(this);
+        mqttClientLocal.start();
     }
 
     @Override
     public void onDestroy() {
+
+        mqttClientLocal.stop();
         super.onDestroy();
     }
 

@@ -18,13 +18,13 @@ public abstract class ChaActivity extends AppCompatActivity {
     final private BroadcastReceiver broadcastStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String statusMessage = intent.getStringExtra(MqttClient.MQTT_MSG);
-            boolean isError = intent.getBooleanExtra(MqttClient.MQTT_MSG_IS_ERROR, false);
+            String statusMessage = intent.getStringExtra(MqttClientLocal.MQTT_MSG);
+            boolean isError = intent.getBooleanExtra(MqttClientLocal.MQTT_MSG_IS_ERROR, false);
 
             if (isError)
                 Toast.makeText(context, statusMessage, Toast.LENGTH_SHORT).show();
 
-            MqttClient.MQTTConnectionStatus status = (MqttClient.MQTTConnectionStatus) intent.getSerializableExtra(MqttClient.MQTT_CONN_STATUS);
+            MqttClientLocal.MQTTConnectionStatus status = (MqttClientLocal.MQTTConnectionStatus) intent.getSerializableExtra(MqttClientLocal.MQTT_CONN_STATUS);
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 if (!isError)
@@ -54,7 +54,7 @@ public abstract class ChaActivity extends AppCompatActivity {
     final private BroadcastReceiver broadcastDataReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MqttClient.MQTTReceivedDataType dataType = (MqttClient.MQTTReceivedDataType) intent.getSerializableExtra(MqttClient.MQTT_DATA_TYPE);
+            MqttClientLocal.MQTTReceivedDataType dataType = (MqttClientLocal.MQTTReceivedDataType) intent.getSerializableExtra(MqttClientLocal.MQTT_DATA_TYPE);
             processMqttData(dataType, intent);
         }
     };
@@ -64,8 +64,8 @@ public abstract class ChaActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        registerReceiver(broadcastStatusReceiver, new IntentFilter(MqttClient.MQTT_STATUS_INTENT));
-        registerReceiver(broadcastDataReceiver, new IntentFilter(MqttClient.MQTT_DATA_INTENT));
+        registerReceiver(broadcastStatusReceiver, new IntentFilter(MqttClientLocal.MQTT_STATUS_INTENT));
+        registerReceiver(broadcastDataReceiver, new IntentFilter(MqttClientLocal.MQTT_DATA_INTENT));
 
         //StartServiceIfStopped();
         bindService(new Intent(this, MqttServiceLocal.class), mConnection, Context.BIND_AUTO_CREATE);
@@ -84,12 +84,12 @@ public abstract class ChaActivity extends AppCompatActivity {
         }
     }
 
-    void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
+    void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
     }
 
     // service
 
-    public MqttClient getMqttClient() {
+    public MqttClientLocal getMqttClient() {
         return mService.mqttClient();
     }
 

@@ -28,10 +28,10 @@ public class GraphActivity extends ChaActivity {
 
 
     @Override
-    void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
+    void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
         super.processMqttData(dataType, intent);
 
-        if (dataType == MqttClient.MQTTReceivedDataType.ThermostatBoilerSensorState) {
+        if (dataType == MqttClientLocal.MQTTReceivedDataType.ThermostatBoilerSensorState) {
             int id = intent.getIntExtra("id", 0);
             id--;
 

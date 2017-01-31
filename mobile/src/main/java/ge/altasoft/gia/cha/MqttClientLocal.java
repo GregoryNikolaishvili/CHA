@@ -9,6 +9,7 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -22,7 +23,7 @@ import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 
-public class MqttClient {
+public class MqttClientLocal {
 
     private static final String TOPIC_CHA_SYS_OLD = "cha/sys";
 
@@ -92,7 +93,7 @@ public class MqttClient {
 
     private MQTTConnectionStatus connectionStatus = MQTTConnectionStatus.INITIAL;
 
-    MqttClient(Context context) {
+    MqttClientLocal(Context context) {
         this.context = context;
         clientId = Utils.getDeviceName().concat("-").concat(Utils.getDeviceUniqueId(context));
     }
@@ -128,9 +129,9 @@ public class MqttClient {
 
         publish(TOPIC_CHA_SYS.concat(clientId), "", true);
         try {
-            mqttClient.unsubscribe("cha/#");
-            mqttClient.disconnect();
-            //mqttClient.unregisterResources();
+            //mqttClient.unsubscribe("cha/#");
+            mqttClient.unregisterResources();
+            mqttClient.close();
 //                IMqttToken disconToken = getMqttClient.disconnect();
 //                disconToken.setActionCallback(new IMqttActionListener() {
 //                    @Override
@@ -148,12 +149,12 @@ public class MqttClient {
 //                        broadcastServiceStatus("Disconnected", false);
 //                    }
 //                });
-        } catch (MqttPersistenceException e) {
-            Log.e("mqtt", "disconnect failed - persistence exception", e);
-            broadcastServiceStatus("disconnect failed - persistence exception: " + e.getMessage(), true);
-        } catch (MqttException e) {
-            Log.e("mqtt", "disconnect failed - MQTT exception", e);
-            broadcastServiceStatus("disconnect failed - MQTT exception: " + e.getMessage(), true);
+//        } catch (MqttPersistenceException e) {
+//            Log.e("mqtt", "disconnect failed - persistence exception", e);
+//            broadcastServiceStatus("disconnect failed - persistence exception: " + e.getMessage(), true);
+//        } catch (MqttException e) {
+//            Log.e("mqtt", "disconnect failed - MQTT exception", e);
+//            broadcastServiceStatus("disconnect failed - MQTT exception: " + e.getMessage(), true);
         } finally {
             mqttClient = null;
         }
@@ -284,9 +285,14 @@ public class MqttClient {
 //                cm.getActiveNetworkInfo().isConnected();
 //    }
 
-    private class MqttCallbackHandler implements MqttCallback {
+    private class MqttCallbackHandler implements MqttCallbackExtended {
 
         MqttCallbackHandler() {
+        }
+
+        @Override
+        public void connectComplete(boolean reconnect, String serverURI) {
+            Log.d("mqtt", "connect complete: " + serverURI);
         }
 
         @Override
@@ -301,7 +307,8 @@ public class MqttClient {
                 mqttClient = null;
             }
 
-            start();
+            if (cause != null)
+                start();
         }
 
         @Override
@@ -411,7 +418,7 @@ public class MqttClient {
                 int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHT_RELAY_STATE.length()), 16);
                 LightControllerData.Instance.relays(id - 1).decodeState(payload);
 
-                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MqttClient.MQTTReceivedDataType.LightRelayState);
+                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MqttClientLocal.MQTTReceivedDataType.LightRelayState);
                 broadcastDataIntent.putExtra("id", id);
                 context.sendBroadcast(broadcastDataIntent);
 

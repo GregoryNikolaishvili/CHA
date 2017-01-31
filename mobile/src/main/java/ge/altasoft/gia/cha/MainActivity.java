@@ -193,7 +193,7 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
-    protected void processMqttData(MqttClient.MQTTReceivedDataType dataType, Intent intent) {
+    protected void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
         super.processMqttData(dataType, intent);
 
         int id;
