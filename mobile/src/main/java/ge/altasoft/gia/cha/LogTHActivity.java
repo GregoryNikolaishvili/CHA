@@ -41,18 +41,18 @@ public class LogTHActivity extends ChaActivity {
         switch (scope) {
             case "BoilerSensor": {
                 int id = intent.getIntExtra("id", 0);
-
-                if (id > 0) {
-                    TempSensorData sensorData = ThermostatControllerData.Instance.boilerSensors(id - 1);
-                    logBuffer = sensorData.getLogBuffer();
-                }
+//
+//                if (id > 0) {
+//                    TempSensorData sensorData = ThermostatControllerData.Instance.boilerSensors(id - 1);
+//                    logBuffer = sensorData.getLogBuffer();
+//                }
                 break;
             }
             case "RoomSensorT": {
                 int id = intent.getIntExtra("id", 0);
-
-                TempSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id, false);
-                logBuffer = sensorData.getLogBuffer();
+//
+//                TempSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id, false);
+//                logBuffer = sensorData.getLogBuffer();
                 break;
             }
             case "RoomSensorH": {

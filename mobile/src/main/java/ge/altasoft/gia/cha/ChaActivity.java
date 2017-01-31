@@ -97,6 +97,10 @@ public abstract class ChaActivity extends AppCompatActivity {
     MqttServiceLocal mService = null;
 
 
+    protected void ServiceConnected() {
+
+    }
+
 //    private void StartServiceIfStopped() {
 //        if (!MqttServiceLocal.isRunning()) {
 //            startService(new Intent(this, MqttServiceLocal.class));
@@ -109,6 +113,12 @@ public abstract class ChaActivity extends AppCompatActivity {
             mService = binder.getService();
 
             mBound = true;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ServiceConnected();
+                }
+            });
         }
 
         public void onServiceDisconnected(ComponentName className) {

@@ -16,13 +16,16 @@ import android.widget.ToggleButton;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.GraphActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.classes.CircularArrayList;
 import ge.altasoft.gia.cha.classes.LineSeriesArray;
 import ge.altasoft.gia.cha.views.BoilerPumpView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
@@ -30,6 +33,7 @@ import ge.altasoft.gia.cha.views.BoilerSensorView;
 public class FragmentBoiler extends Fragment {
 
     private View rootView = null;
+    private boolean haveTemperatureLog = false;
 
     final private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
 
@@ -46,6 +50,9 @@ public class FragmentBoiler extends Fragment {
 
         final GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
         pointSeries.addToGraph(graph);
+
+        graph.getViewport().setXAxisBoundsManual(false);
+        graph.getViewport().setYAxisBoundsManual(false);
 
         graph.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
@@ -167,19 +174,72 @@ public class FragmentBoiler extends Fragment {
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setRelayId(ThermostatControllerData.BOILER_SOLAR_PUMP);
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);
 
+//        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
+//            CircularArrayList<Pair<Date, Float>> points = ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer();
+//
+//            DataPoint[] dataPoints = new DataPoint[points.size()];
+//            int idx = 0;
+//            for (Pair<Date, Float> pt : points)
+//                dataPoints[idx++] = new DataPoint(pt.first.getTime(), pt.second);
+//
+//            pointSeries.getItem(i).resetData(dataPoints);
+//        }
+
+        drawSensorAndRelayStates();
+
+        if (!haveTemperatureLog)
+            ((ChaActivity) getActivity()).getMqttClient().publish("cha/ts/bs/getlog", String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1), false);
+    }
+
+    public void rebuildGraph(String log) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd HHmmss", Locale.US);
+        Date time0 = new Date();
+        long X;
+        long minX = Long.MAX_VALUE, maxX = -Long.MAX_VALUE;
+        double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
+
+        String[] pp = log.split("\\+");
+
         for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-            CircularArrayList<Pair<Date, Float>> points = ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer();
-
-            DataPoint[] dataPoints = new DataPoint[points.size()];
-            int idx = 0;
-            for (Pair<Date, Float> pt : points)
-                dataPoints[idx++] = new DataPoint(pt.first.getTime(), pt.second);
-
+            DataPoint[] dataPoints = new DataPoint[0];
             pointSeries.getItem(i).resetData(dataPoints);
         }
 
-        drawSensorAndRelayStates();
+        for (int i = 0; i < pp.length; i++) {
+            String[] parts = pp[i].split("@");
+
+            try {
+                //time = sdf.parse(parts[0]).getTime() + time0.getTime();
+                X = sdf.parse("170201 " + parts[0]).getTime();// TODO: 2/1/2017
+            } catch (ParseException ignored) {
+                return;
+            }
+
+            int id = Integer.parseInt(parts[1].substring(0, 1)) - 1;
+            double Y = Integer.parseInt(parts[1].substring(2)) / 10.0;
+
+            pointSeries.getItem(id).appendData(new DataPoint(X, Y), false, Utils.LOG_BUFFER_SIZE);
+
+            if (X < minX)
+                minX = X;
+            if (X > maxX)
+                maxX = X;
+
+            if (Y < minY)
+                minY = Y;
+            if (Y > maxY)
+                maxY = Y;
+        }
+
+        final GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
+
+        graph.getViewport().setMinX(minX);
+        graph.getViewport().setMaxX(maxX);
+
+        graph.getViewport().setMinY(minY);
+        graph.getViewport().setMaxY(maxY);
     }
+
 
 //    public void drawState() {
 //        if (rootView == null)

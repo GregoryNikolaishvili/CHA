@@ -21,7 +21,7 @@ public class TempSensorData {
 
     private long lastActivitySec;
 
-    final private CircularArrayList<Pair<Date, Float>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
+    //final private CircularArrayList<Pair<Date, Float>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
 
     protected TempSensorData(int id) {
         this.id = id;
@@ -47,7 +47,7 @@ public class TempSensorData {
 
         if (this.T != value) {
             this.T = value;
-            logBuffer.add(new Pair<>(new Date(), value));
+            //logBuffer.add(new Pair<>(new Date(), value));
         }
     }
 
@@ -59,9 +59,9 @@ public class TempSensorData {
         this.temperatureTrend = value;
     }
 
-    public CircularArrayList<Pair<Date, Float>> getLogBuffer() {
-        return logBuffer;
-    }
+//    public CircularArrayList<Pair<Date, Float>> getLogBuffer() {
+//        return logBuffer;
+//    }
 
 //    public String getInfo() {
 //        return String.format(Locale.US, "Last sync: %d seconds ago", System.currentTimeMillis() / 1000 - lastActivitySec) + "\n\n" + log.toString();

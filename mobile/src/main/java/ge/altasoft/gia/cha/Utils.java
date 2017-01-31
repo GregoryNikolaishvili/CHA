@@ -34,7 +34,7 @@ public class Utils {
     public static final int FLAG_HAVE_STATE = 32; //todo
     public static final int FLAG_HAVE_SETTINGS = 33; //todo
 
-    public static final int LOG_BUFFER_SIZE = 100;
+    public static final int LOG_BUFFER_SIZE = 1000;
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
     static final int ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS = 2;

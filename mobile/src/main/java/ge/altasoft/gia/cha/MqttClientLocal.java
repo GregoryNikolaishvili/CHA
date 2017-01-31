@@ -39,6 +39,8 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_BOILER_RELAY_STATE = "cha/ts/br/"; // last "/" is important
     private static final String TOPIC_CHA_HEATER_RELAY_STATE = "cha/ts/hr/"; // last "/" is important
 
+    private static final String TOPIC_CHA_BOILER_LOG = "cha/ts/bs/log";
+
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS = "cha/ts/rs/settings";
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER = "cha/ts/rs/names";
     private static final String TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS = "cha/ts/bs/settings";
@@ -62,7 +64,8 @@ public class MqttClientLocal {
         ThermostatRoomSensorSettings,
         ThermostatRoomSensorNameAndOrders,
         ThermostatHeaterRelayState,
-        ThermostatBoilerSettings
+        ThermostatBoilerSettings,
+        ThermostatBoilerLog
 //        ThermostatHeaterRelaySettings,
 //        ThermostatHeaterRelayNameAndOrders
     }
@@ -395,6 +398,13 @@ public class MqttClientLocal {
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSettings);
                     context.sendBroadcast(broadcastDataIntent);
                     break;
+
+                case TOPIC_CHA_BOILER_LOG:
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerLog);
+                    broadcastDataIntent.putExtra("log", payload);
+                    context.sendBroadcast(broadcastDataIntent);
+                    break;
+
 
 //                case TOPIC_CHA_THERMOSTAT_HEATER_RELAY_SETTINGS:
 //                    ThermostatControllerData.Instance.decodeHeaterRelaySettings(payload);

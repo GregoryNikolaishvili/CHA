@@ -225,6 +225,10 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentBoiler.rebuildUI();
                 break;
 
+            case ThermostatBoilerLog:
+                pagerAdapter.fragmentBoiler.rebuildGraph(intent.getStringExtra("log"));
+                break;
+
 //            case ThermostatHeaterRelaySettings:
 //            case ThermostatHeaterRelayNameAndOrders:
 //                pagerAdapter.fragmentHeaterRelays.rebuildUI();
