@@ -55,8 +55,9 @@ public class GraphActivity extends ChaActivity {
                 pointSeries.getItem(id).append(ThermostatControllerData.Instance.boilerSensors(id));
                 break;
 
-            case ThermostatBoilerLog:
-                rebuildGraph(intent.getStringExtra("log"));
+            case ThermostatLog:
+                if (intent.getStringExtra("type").startsWith("boiler"))
+                    rebuildGraph(intent.getStringExtra("log"));
                 break;
         }
     }
@@ -65,7 +66,7 @@ public class GraphActivity extends ChaActivity {
     protected void ServiceConnected() {
         super.ServiceConnected();
 
-        getMqttClient().publish("cha/ts/bs/getlog", String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1), false);
+        getMqttClient().publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
     }
 
     public void rebuildGraph(String log) {

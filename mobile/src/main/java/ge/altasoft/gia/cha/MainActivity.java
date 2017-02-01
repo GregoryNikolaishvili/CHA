@@ -83,9 +83,9 @@ public class MainActivity extends ChaActivity {
                     if (LightControllerData.Instance.relayOrderChanged())
                         getMqttClient().publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
                     if (ThermostatControllerData.Instance.roomSensorOrderChanged())
-                        getMqttClient().publish("chac/ts/rs/settings/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
+                        getMqttClient().publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
                     if (ThermostatControllerData.Instance.relayOrderChanged())
-                        getMqttClient().publish("chac/ts/hr/settings/names", ThermostatControllerData.Instance.encodeHeaterRelayNamesAndOrder(), false);
+                        getMqttClient().publish("chac/ts/settings/hr/names", ThermostatControllerData.Instance.encodeHeaterRelayNamesAndOrder(), false);
                 } else {
                     LightControllerData.Instance.restoreRelayOrders();
                     pagerAdapter.fragmentLight.rebuildUI();
@@ -181,12 +181,12 @@ public class MainActivity extends ChaActivity {
 
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
                 if (resultCode == Activity.RESULT_OK) {
-                    getMqttClient().publish("chac/ts/rs/settings", ThermostatControllerData.Instance.encodeRoomSensorSettings(), false);
-                    getMqttClient().publish("chac/ts/bs/settings", ThermostatControllerData.Instance.encodeBoilerSettings(), false);
-                    getMqttClient().publish("chac/ts/hr/settings", ThermostatControllerData.Instance.encodeHeaterRelaySettings(), false);
+                    getMqttClient().publish("chac/ts/settings/rs", ThermostatControllerData.Instance.encodeRoomSensorSettings(), false);
+                    getMqttClient().publish("chac/ts/settings/bs", ThermostatControllerData.Instance.encodeBoilerSettings(), false);
+                    getMqttClient().publish("chac/ts/settings/hr", ThermostatControllerData.Instance.encodeHeaterRelaySettings(), false);
 
-                    getMqttClient().publish("chac/ts/rs/settings/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
-                    getMqttClient().publish("chac/ts/hr/settings/names", ThermostatControllerData.Instance.encodeHeaterRelayNamesAndOrder(), false);
+                    getMqttClient().publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
+                    getMqttClient().publish("chac/ts/settings/hr/names", ThermostatControllerData.Instance.encodeHeaterRelayNamesAndOrder(), false);
                 }
                 break;
         }
@@ -225,8 +225,9 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentBoiler.rebuildUI();
                 break;
 
-            case ThermostatBoilerLog:
-                pagerAdapter.fragmentBoiler.rebuildGraph(intent.getStringExtra("log"));
+            case ThermostatLog:
+                if (intent.getStringExtra("type").startsWith("boiler"))
+                    pagerAdapter.fragmentBoiler.rebuildGraph(intent.getStringExtra("log"));
                 break;
 
 //            case ThermostatHeaterRelaySettings:

@@ -188,7 +188,7 @@ public class FragmentBoiler extends Fragment {
         drawSensorAndRelayStates();
 
         if (!haveTemperatureLog)
-            ((ChaActivity) getActivity()).getMqttClient().publish("cha/ts/bs/getlog", String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1), false);
+            ((ChaActivity) getActivity()).getMqttClient().publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
     }
 
     public void rebuildGraph(String log) {

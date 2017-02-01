@@ -8,12 +8,10 @@ import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -39,11 +37,11 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_BOILER_RELAY_STATE = "cha/ts/br/"; // last "/" is important
     private static final String TOPIC_CHA_HEATER_RELAY_STATE = "cha/ts/hr/"; // last "/" is important
 
-    private static final String TOPIC_CHA_BOILER_LOG = "cha/ts/bs/log";
+    private static final String TOPIC_CHA_BOILER_LOG = "cha/ts/log/"; // last "/" is important
 
-    private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS = "cha/ts/rs/settings";
-    private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER = "cha/ts/rs/names";
-    private static final String TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS = "cha/ts/bs/settings";
+    private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS = "cha/ts/settings/rs";
+    private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER = "cha/ts/names/rs";
+    private static final String TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS = "cha/ts/settings/bs";
 
     //private static final String TOPIC_CHA_THERMOSTAT_HEATER_RELAY_SETTINGS = "cha/ts/hr/settings";
     //private static final String TOPIC_CHA_THERMOSTAT_HEATER_RELAY_NAMES_AND_ORDER = "cha/ts/hr/names";
@@ -65,7 +63,7 @@ public class MqttClientLocal {
         ThermostatRoomSensorNameAndOrders,
         ThermostatHeaterRelayState,
         ThermostatBoilerSettings,
-        ThermostatBoilerLog
+        ThermostatLog
 //        ThermostatHeaterRelaySettings,
 //        ThermostatHeaterRelayNameAndOrders
     }
@@ -399,12 +397,6 @@ public class MqttClientLocal {
                     context.sendBroadcast(broadcastDataIntent);
                     break;
 
-                case TOPIC_CHA_BOILER_LOG:
-                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerLog);
-                    broadcastDataIntent.putExtra("log", payload);
-                    context.sendBroadcast(broadcastDataIntent);
-                    break;
-
 
 //                case TOPIC_CHA_THERMOSTAT_HEATER_RELAY_SETTINGS:
 //                    ThermostatControllerData.Instance.decodeHeaterRelaySettings(payload);
@@ -487,6 +479,16 @@ public class MqttClientLocal {
 
                 return;
             }
+
+            if (topic.startsWith(TOPIC_CHA_BOILER_LOG)) {
+                String type = topic.substring(TOPIC_CHA_BOILER_LOG.length());
+
+                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatLog);
+                broadcastDataIntent.putExtra("type", type);
+                broadcastDataIntent.putExtra("log", payload);
+                context.sendBroadcast(broadcastDataIntent);
+            }
+
 
             // TODO: 1/25/2017
             // აქ დავამატო შუქის და თერმოსტატის კონტროლერიც
