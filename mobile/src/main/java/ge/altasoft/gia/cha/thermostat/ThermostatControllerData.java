@@ -57,7 +57,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         haveBoilerSettings = false;
         roomSensorsReordered = false;
 
-        boilerMode = BOILER_MODE_SUMMER;
+        boilerMode = BOILER_MODE_OFF;
         boilerSensorsData = new BoilerSensorData[BOILER_SENSOR_COUNT];
         boilerPumpsData = new BoilerPumpData[BOILER_PUMP_COUNT];
 
@@ -220,7 +220,7 @@ public final class ThermostatControllerData extends RelayControllerData {
             case BOILER_MODE_WINTER:
                 return "Winter";
             default:
-                return "?";
+                return "Off";
         }
     }
 
@@ -291,10 +291,10 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         int idx = 2;
         for (int i = 0; i < count; i++) {
-            int id = Integer.parseInt(response.substring(idx, idx + 8), 16);
+            int id = Integer.parseInt(response.substring(idx, idx + 4), 16);
 
             RoomSensorData roomSensorData = roomSensors(id, true);
-            idx = roomSensorData.decodeSettings(response, idx + 8);
+            idx = roomSensorData.decodeSettings(response, idx + 4);
         }
 
         haveRoomSensorsSettings = true;
@@ -308,15 +308,17 @@ public final class ThermostatControllerData extends RelayControllerData {
         String[] parts = response.split(";");
 
         for (String s : parts) {
-            int id = Integer.parseInt(s.substring(0, 8), 16);
+            int id = Integer.parseInt(s.substring(0, 4), 16);
 
             RoomSensorData roomSensorData = roomSensors(id, true);
-            roomSensorData.decodeOrderAndName(s.substring(8));
+            roomSensorData.decodeOrderAndName(s.substring(4));
         }
     }
 
     public void decodeBoilerSettings(String response) {
         Log.d("decode boiler settings", response);
+
+        boilerMode = response.charAt(0);
 
         int idx = 0;
         for (int i = 0; i < BOILER_SENSOR_COUNT; i++)

@@ -100,13 +100,12 @@ public class TempSensorData {
 
 
     protected void encodeSettings(StringBuilder sb) {
-        sb.append(String.format(Locale.US, "%04X%04X", ((Float) (targetT * 10)).intValue(), ((Float) (deltaTargetT * 10)).intValue()));
+        sb.append(String.format(Locale.US, "%04X", ((Float) (targetT * 10)).intValue()));
     }
 
     protected int decodeSettings(String response, int idx) {
         setTargetTemperature(Integer.parseInt(response.substring(idx, idx + 4), 16) / 10.0f);
-        setDeltaTargetT(Integer.parseInt(response.substring(idx + 4, idx + 8), 16) / 10.0f);
-        return idx + 8;
+        return idx + 4;
     }
 
     public void decodeState(String payload) {

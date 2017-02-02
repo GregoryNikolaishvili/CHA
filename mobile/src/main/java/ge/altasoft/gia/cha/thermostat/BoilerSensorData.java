@@ -17,7 +17,7 @@ public final class BoilerSensorData extends TempSensorData {
     BoilerSensorData(int id) {
         super(id);
 
-        setDeltaTargetT(5);
+        setDeltaTargetT(5f);
     }
 
     public void encodeSettings(StringBuilder sb) {
