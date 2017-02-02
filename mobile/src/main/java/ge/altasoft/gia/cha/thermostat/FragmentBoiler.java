@@ -3,7 +3,6 @@ package ge.altasoft.gia.cha.thermostat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -192,8 +191,10 @@ public class FragmentBoiler extends Fragment {
     }
 
     public void rebuildGraph(String log) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd HHmmss", Locale.US);
-        Date time0 = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
+        String date0 = sdf.format(new Date());
+        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+
         long X;
         long minX = Long.MAX_VALUE, maxX = -Long.MAX_VALUE;
         double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
@@ -209,8 +210,7 @@ public class FragmentBoiler extends Fragment {
             String[] parts = pp[i].split("@");
 
             try {
-                //time = sdf.parse(parts[0]).getTime() + time0.getTime();
-                X = sdf.parse("170201 " + parts[0]).getTime();// TODO: 2/1/2017
+                X = sdf.parse(date0 + parts[0]).getTime();
             } catch (ParseException ignored) {
                 return;
             }

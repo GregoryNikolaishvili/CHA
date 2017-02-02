@@ -70,8 +70,10 @@ public class GraphActivity extends ChaActivity {
     }
 
     public void rebuildGraph(String log) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd HHmmss", Locale.US);
-        Date time0 = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
+        String date0 = sdf.format(new Date());
+        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+
         long X;
         long minX = Long.MAX_VALUE, maxX = -Long.MAX_VALUE;
         double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
@@ -88,7 +90,7 @@ public class GraphActivity extends ChaActivity {
 
             try {
                 //time = sdf.parse(parts[0]).getTime() + time0.getTime();
-                X = sdf.parse("170201 " + parts[0]).getTime();// TODO: 2/1/2017  
+                X = sdf.parse(date0 + parts[0]).getTime();
             } catch (ParseException ignored) {
                 return;
             }
