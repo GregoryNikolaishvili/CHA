@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -15,12 +14,13 @@ import android.preference.PreferenceScreen;
 import android.view.KeyEvent;
 import android.widget.BaseAdapter;
 
+import ge.altasoft.gia.cha.ChaPreferenceActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.FriendlyEditTextPreference;
 import ge.altasoft.gia.cha.views.TimePreference;
 
-public class LightSettingsActivity extends PreferenceActivity {
+public class LightSettingsActivity extends ChaPreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

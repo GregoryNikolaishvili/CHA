@@ -3,16 +3,13 @@ package ge.altasoft.gia.cha.thermostat;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.Pair;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.classes.CircularArrayList;
 import ge.altasoft.gia.cha.classes.TempSensorData;
 
 public final class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
@@ -23,9 +20,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     private String name;
     private boolean isOn;
     private int responsibleRelayId;
-
-    final private CircularArrayList<Pair<Date, Boolean>> logBufferOnOff = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
-    final private CircularArrayList<Pair<Date, Float>> logBufferH = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
+    private boolean isDeleted;
 
     RoomSensorData(int id) {
         super(id);
@@ -37,14 +32,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         signalLevel = 0;
         batteryLevel = "unknown";
         name = String.valueOf(id);
-    }
-
-    public CircularArrayList<Pair<Date, Float>> getLogBufferH() {
-        return logBufferH;
-    }
-
-    public CircularArrayList<Pair<Date, Boolean>> getLogBufferOnOff() {
-        return logBufferOnOff;
+        isDeleted = false;
     }
 
     public boolean isOn() {
@@ -55,11 +43,12 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return this.responsibleRelayId > 0;
     }
 
+    boolean isDeleted() {
+        return this.isDeleted;
+    }
+
     public void setIsOn(boolean value) {
-        if (this.isOn != value) {
-            this.isOn = value;
-            logBufferOnOff.add(new Pair<>(new Date(), value));
-        }
+        this.isOn = value;
     }
 
     public String getName() {
@@ -70,11 +59,11 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return this.H;
     }
 
-    public void setHumidity(float value) {
-        if (this.H != value) {
+    private void setHumidity(float value) {
+        if (value == Utils.F_UNDEFINED)
+            this.H = Float.NaN;
+        else
             this.H = value;
-            logBufferH.add(new Pair<>(new Date(), value));
-        }
     }
 
     public int getSignalLevel() {
@@ -85,12 +74,12 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return batteryLevel;
     }
 
-    public int getResponsibleRelayId() {
+    int getResponsibleRelayId() {
         return this.responsibleRelayId;
     }
 
     void encodeOrderAndName(StringBuilder sb2) {
-        sb2.append(String.format(Locale.US, "%08X", this.id));
+        sb2.append(String.format(Locale.US, "%04X", this.id));
         sb2.append(String.format(Locale.US, "%01X", this.order));
         sb2.append(Utils.encodeArduinoString(name));
         sb2.append(';');
@@ -115,17 +104,19 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     void decodeSettings(SharedPreferences prefs) {
         String suffix = Integer.toString(getId());
 
-        name = prefs.getString("t_sensor_name_" + suffix, "Sensor #" + suffix);
-        setTargetTemperature(Float.parseFloat(prefs.getString("t_target_t_" + suffix, "25")));
-        responsibleRelayId = Integer.parseInt(prefs.getString("t_resp_relay_id_" + suffix, "0"));
+        name = prefs.getString("t_sensor_name_".concat(suffix), "Sensor #" + suffix);
+        setTargetTemperature(Float.parseFloat(prefs.getString("t_target_t_".concat(suffix), "25")));
+        responsibleRelayId = Integer.parseInt(prefs.getString("t_resp_relay_id_".concat(suffix), "0"));
+        isDeleted = prefs.getBoolean("t_sensor_deleted_Sensor #".concat(suffix), false);
     }
 
     void encodeSettings(SharedPreferences.Editor editor) {
         String suffix = Integer.toString(getId());
 
-        editor.putString("t_sensor_name_" + suffix, getName());
-        editor.putString("t_target_t_" + suffix, String.format(Locale.US, "%.1f°", (float) getTargetTemperature()));
-        editor.putString("t_resp_relay_id_" + suffix, String.valueOf(responsibleRelayId));
+        editor.putString("t_sensor_name_".concat(suffix), getName());
+        editor.putString("t_target_t_".concat(suffix), String.format(Locale.US, "%.1f", (float) getTargetTemperature()));
+        editor.putString("t_resp_relay_id_".concat(suffix), String.valueOf(responsibleRelayId));
+        editor.putBoolean("t_sensor_deleted_Sensor #".concat(suffix), false);
     }
 
     @Override
@@ -139,8 +130,6 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
 
     @Override
     public void decodeState(String payload) {
-        int value;
-
         JSONObject jMain;
         try {
             jMain = new JSONObject(payload);
@@ -152,7 +141,6 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
             batteryLevel = jMain.getString("B");
         } catch (JSONException e) {
             Log.e("JSON", e.getMessage());
-            return;
         }
     }
 }

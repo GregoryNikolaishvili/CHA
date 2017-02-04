@@ -21,13 +21,11 @@ public class TempSensorData {
 
     private long lastActivitySec;
 
-    //final private CircularArrayList<Pair<Date, Float>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
-
     protected TempSensorData(int id) {
         this.id = id;
         //this.enabled = false;
         this.T = Float.NaN;
-        this.targetT = Utils.DEFAULT_TARGET_TEMPERATURE;
+        this.targetT = Float.NaN;
     }
 
     public int getId() {
@@ -44,11 +42,10 @@ public class TempSensorData {
 
     public void setTemperature(float value) {
         this.lastActivitySec = System.currentTimeMillis() / 1000;
-
-        if (this.T != value) {
+        if (value == Utils.F_UNDEFINED)
+            this.T = Float.NaN;
+        else
             this.T = value;
-            //logBuffer.add(new Pair<>(new Date(), value));
-        }
     }
 
     public char getTemperatureTrend() {
@@ -59,20 +56,16 @@ public class TempSensorData {
         this.temperatureTrend = value;
     }
 
-//    public CircularArrayList<Pair<Date, Float>> getLogBuffer() {
-//        return logBuffer;
-//    }
-
-//    public String getInfo() {
-//        return String.format(Locale.US, "Last sync: %d seconds ago", System.currentTimeMillis() / 1000 - lastActivitySec) + "\n\n" + log.toString();
-//    }
-
     public float getTargetTemperature() {
         return this.targetT;
     }
 
     public void setTargetTemperature(float value) {
-        this.targetT = value;
+        this.lastActivitySec = System.currentTimeMillis() / 1000;
+        if (value == Utils.F_UNDEFINED)
+            this.targetT = Float.NaN;
+        else
+            this.targetT = value;
     }
 
     protected void setDeltaTargetT(float value) {
@@ -80,7 +73,7 @@ public class TempSensorData {
     }
 
     public int getTemperatureColor() {
-        if (this.targetT == 0)
+        if (Float.isNaN(this.targetT))
             return Color.BLACK;
 
         float delta = T - this.targetT;
@@ -100,7 +93,7 @@ public class TempSensorData {
 
 
     protected void encodeSettings(StringBuilder sb) {
-        sb.append(String.format(Locale.US, "%04X", ((Float) (targetT * 10)).intValue()));
+        Utils.encodeT(sb, targetT);
     }
 
     protected int decodeSettings(String response, int idx) {

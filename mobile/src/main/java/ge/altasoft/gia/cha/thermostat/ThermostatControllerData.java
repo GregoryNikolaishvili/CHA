@@ -9,11 +9,17 @@ import android.util.SparseIntArray;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 import ge.altasoft.gia.cha.Utils;
+
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_OFF;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER;
 
 public final class ThermostatControllerData extends RelayControllerData {
 
@@ -30,14 +36,10 @@ public final class ThermostatControllerData extends RelayControllerData {
     final public static int BOILER_SENSOR_COUNT = 4;
     final private static int BOILER_PUMP_COUNT = 2;
 
-    final static char BOILER_MODE_OFF = 'N';
-    final private static char BOILER_MODE_SUMMER = 'S';
-    final private static char BOILER_MODE_SUMMER_POOL = 'P';
-    final private static char BOILER_MODE_WINTER = 'W';
-
     final public static ThermostatControllerData Instance = new ThermostatControllerData();
 
-    private char boilerMode;
+    private BoilerSettings boilerSettings = new BoilerSettings();
+
     final private BoilerSensorData[] boilerSensorsData;
     final private BoilerPumpData[] boilerPumpsData;
 
@@ -57,7 +59,6 @@ public final class ThermostatControllerData extends RelayControllerData {
         haveBoilerSettings = false;
         roomSensorsReordered = false;
 
-        boilerMode = BOILER_MODE_OFF;
         boilerSensorsData = new BoilerSensorData[BOILER_SENSOR_COUNT];
         boilerPumpsData = new BoilerPumpData[BOILER_PUMP_COUNT];
 
@@ -76,12 +77,6 @@ public final class ThermostatControllerData extends RelayControllerData {
         for (int i = 0; i < HEATING_RELAY_COUNT; i++) {
             ThermostatRelayData relay = new ThermostatRelayData(i + 1);
             setRelay(i, relay);
-        }
-
-        if (Utils.DEBUG_THERMOSTAT) {
-            boilerSensorsData[BOILER_SENSOR_ROOM].setTargetTemperature(0f);
-            boilerSensorsData[BOILER_SENSOR_TOP].setTargetTemperature(0f);
-            boilerSensorsData[BOILER_SENSOR_SOLAR_PANEL].setTargetTemperature(80f);
         }
     }
 
@@ -197,8 +192,8 @@ public final class ThermostatControllerData extends RelayControllerData {
         for (RoomSensorData ss : roomSensorsMap.values())
             ss.encodeSettings(editor);
 
-        for (BoilerSensorData bs : boilerSensorsData)
-            bs.encodeSettings(editor);
+//        for (BoilerSensorData bs : boilerSensorsData)
+//            bs.encodeSettings(editor);
 
         editor.apply();
     }
@@ -208,11 +203,11 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
     char getBoilerMode() {
-        return boilerMode;
+        return boilerSettings.Mode;
     }
 
     String getBoilerModeText() {
-        switch (boilerMode) {
+        switch (boilerSettings.Mode) {
             case BOILER_MODE_SUMMER:
                 return "Summer";
             case BOILER_MODE_SUMMER_POOL:
@@ -225,7 +220,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
     char nextBoilerMode() {
-        switch (boilerMode) {
+        switch (boilerSettings.Mode) {
             case BOILER_MODE_OFF:
                 return BOILER_MODE_SUMMER;
             case BOILER_MODE_SUMMER:
@@ -245,7 +240,7 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         sb.append(String.format(Locale.US, "%02X", roomSensorsMap.size()));
         for (int id : roomSensorsMap.keySet()) {
-            sb.append(String.format(Locale.US, "%08X", id));
+            sb.append(String.format(Locale.US, "%04X", id));
             roomSensorsMap.get(id).encodeSettings(sb);
         }
 
@@ -253,21 +248,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
     public String encodeBoilerSettings() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(boilerMode);
-
-        for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
-            boilerSensors(i).encodeSettings(sb);
-
-        for (int i = 0; i < BOILER_PUMP_COUNT; i++)
-            boilerPumps(i).encodeSettings(sb);
-
-        return sb.toString();
-    }
-
-    public String encodeHeaterRelaySettings() {
-        return super.encodeSettings();
+        return boilerSettings.encodeSettings();
     }
 
     public String encodeRoomSensorNamesAndOrder() {
@@ -278,10 +259,6 @@ public final class ThermostatControllerData extends RelayControllerData {
         sb.insert(0, String.format(Locale.US, "%04X", sb.length()));
 
         return sb.toString();
-    }
-
-    public String encodeHeaterRelayNamesAndOrder() {
-        return super.encodeNamesAndOrder();
     }
 
     public void decodeRoomSensorSettings(String response) {
@@ -318,30 +295,14 @@ public final class ThermostatControllerData extends RelayControllerData {
     public void decodeBoilerSettings(String response) {
         Log.d("decode boiler settings", response);
 
-        boilerMode = response.charAt(0);
+        boilerSettings.decodeSettings(response);
 
-        int idx = 0;
-        for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
-            idx = boilerSensors(i).decodeSettings(response, idx);
-
-        if (response.charAt(idx++) != '*') {
-            Log.e("ThermControllerData", "Not '*'");
-            return;
-        }
-
-        for (int i = 0; i < BOILER_PUMP_COUNT; i++)
-            idx = boilerPumps(i).decodeSettings(response, idx);
+        boilerSensors(BOILER_SENSOR_SOLAR_PANEL).setTargetTemperature(boilerSettings.CollectorCoolingT);
+        boilerSensors(BOILER_SENSOR_TOP).setTargetTemperature(boilerSettings.BackupHeatingTS1_SwitchOffT); // TODO: 2/5/2017
 
         haveBoilerSettings = true;
     }
 
-//    public void decodeHeaterRelaySettings(String response) {
-//        setHaveSettings();
-//    }
-
-    public void decodeHeaterRelayNamesAndOrder(String response) {
-        super.decodeNamesAndOrder(response);
-    }
 
     void decode(SharedPreferences prefs) {
 
@@ -353,8 +314,18 @@ public final class ThermostatControllerData extends RelayControllerData {
         for (int id : roomSensorsMap.keySet())
             roomSensors(id, false).decodeSettings(prefs);
 
-        for (BoilerSensorData bs : boilerSensorsData)
-            bs.decodeSettings(prefs);
+        for (int id : roomSensorsMap.keySet())
+            roomSensors(id, false).decodeSettings(prefs);
+
+//        for (BoilerSensorData bs : boilerSensorsData)
+//            bs.decodeSettings(prefs);
+
+        Iterator<Integer> it = roomSensorsMap.keySet().iterator();
+        while (it.hasNext()) {
+            int id = it.next();
+            if (roomSensorsMap.get(id).isDeleted())
+                it.remove();
+        }
     }
 
     //endregion

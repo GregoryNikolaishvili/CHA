@@ -81,11 +81,9 @@ public class MainActivity extends ChaActivity {
 
                 if (id == R.id.action_ok) {
                     if (LightControllerData.Instance.relayOrderChanged())
-                        getMqttClient().publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
+                        publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
                     if (ThermostatControllerData.Instance.roomSensorOrderChanged())
-                        getMqttClient().publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
-                    if (ThermostatControllerData.Instance.relayOrderChanged())
-                        getMqttClient().publish("chac/ts/settings/hr/names", ThermostatControllerData.Instance.encodeHeaterRelayNamesAndOrder(), false);
+                        publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
                 } else {
                     LightControllerData.Instance.restoreRelayOrders();
                     pagerAdapter.fragmentLight.rebuildUI();
@@ -98,7 +96,7 @@ public class MainActivity extends ChaActivity {
                 return true;
 
             case R.id.action_refresh:
-                getMqttClient().publish("chac/light/refresh", "1", false);
+                publish("chac/light/refresh", "1", false);
                 return true;
 
             case R.id.action_show_info:
@@ -174,19 +172,17 @@ public class MainActivity extends ChaActivity {
 
             case Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
-                    getMqttClient().publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
-                    getMqttClient().publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
+                    publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
+                    publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
                 }
                 break;
 
             case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
                 if (resultCode == Activity.RESULT_OK) {
-                    getMqttClient().publish("chac/ts/settings/rs", ThermostatControllerData.Instance.encodeRoomSensorSettings(), false);
-                    getMqttClient().publish("chac/ts/settings/bs", ThermostatControllerData.Instance.encodeBoilerSettings(), false);
-                    getMqttClient().publish("chac/ts/settings/hr", ThermostatControllerData.Instance.encodeHeaterRelaySettings(), false);
+                    publish("chac/ts/settings/rs", ThermostatControllerData.Instance.encodeRoomSensorSettings(), false);
+                    publish("chac/ts/settings/bl", ThermostatControllerData.Instance.encodeBoilerSettings(), false);
 
-                    getMqttClient().publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
-                    getMqttClient().publish("chac/ts/settings/hr/names", ThermostatControllerData.Instance.encodeHeaterRelayNamesAndOrder(), false);
+                    publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
                 }
                 break;
         }
@@ -199,11 +195,24 @@ public class MainActivity extends ChaActivity {
         int id;
 
         switch (dataType) {
-            case LightControllerConnected:
-                ImageView image = (ImageView) findViewById(R.id.lightsIsOnline);
-                boolean value = intent.getBooleanExtra("value", false);
-                if (image != null)
-                    image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+            case ClientConnected:
+                String clientId = intent.getStringExtra("id");
+                ImageView image;
+                boolean value;
+                switch (clientId) {
+                    case "Lights controller":
+                        image = (ImageView) findViewById(R.id.lightControllerIsOnline);
+                        value = intent.getBooleanExtra("value", false);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        break;
+                    case "TS controller":
+                        image = (ImageView) findViewById(R.id.tsControllerIsOnline);
+                        value = intent.getBooleanExtra("value", false);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        break;
+                }
                 break;
 
             case LightSettings:

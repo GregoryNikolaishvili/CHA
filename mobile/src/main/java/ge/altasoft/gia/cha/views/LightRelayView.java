@@ -52,7 +52,7 @@ public class LightRelayView extends LinearLayout {
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
 
-                    ((ChaActivity) getContext()).getMqttClient().publish(String.format(Locale.US, "chac/light/state/%01X", relayData.getId()), isChecked ? "1" : "0", false);
+                    ((ChaActivity) getContext()).publish(String.format(Locale.US, "chac/light/state/%01X", relayData.getId()), isChecked ? "1" : "0", false);
                     //LightUtils.sendCommandToController(getContext(), String.format(Locale.US, "#%01X%s", relayData.getId(), isChecked ? "1" : "0"));
                 }
             }

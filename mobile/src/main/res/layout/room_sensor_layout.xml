@@ -27,6 +27,14 @@
         android:gravity="end" />
 
     <TextView
+        android:id="@+id/target_temperature_value"
+        style="@android:style/TextAppearance.Small"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:text="@string/sample_temperature" />
+
+    <TextView
         android:id="@+id/humidity_value"
         style="@android:style/TextAppearance.Small"
         android:layout_width="80dp"

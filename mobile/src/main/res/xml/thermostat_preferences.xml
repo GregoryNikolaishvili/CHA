@@ -18,7 +18,7 @@
             android:title="Sensors" />
     </PreferenceScreen>
 
-    <PreferenceScreen android:title="Solar">
-    </PreferenceScreen>
+    <PreferenceScreen android:title="Solar"></PreferenceScreen>
+
 </PreferenceScreen>
 

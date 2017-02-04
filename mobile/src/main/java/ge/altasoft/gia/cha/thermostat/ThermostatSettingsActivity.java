@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -16,12 +15,13 @@ import android.widget.BaseAdapter;
 import java.util.Locale;
 import java.util.Map;
 
+import ge.altasoft.gia.cha.ChaPreferenceActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.FriendlyEditTextPreference;
 import ge.altasoft.gia.cha.views.TemperaturePreference;
 
-public class ThermostatSettingsActivity extends PreferenceActivity {
+public class ThermostatSettingsActivity extends ChaPreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +119,7 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
                     p0.setPersistent(false);
                     p0.setSelectable(false);
                     p0.setTitle("Sensor #" + Integer.toString(id));
+                    p0.setKey("t_sensor_deleted_" + Integer.toString(id));
                     screen.addPreference(p0);
 
                     FriendlyEditTextPreference p1 = new FriendlyEditTextPreference(prefContext);
@@ -135,9 +136,60 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
 
                     FriendlyEditTextPreference p3 = new FriendlyEditTextPreference(prefContext);
                     p3.setKey("t_resp_relay_id_" + Integer.toString(id));
-                    p3.setSummary("%s");
+                    p3.setSummary("# %s");
                     p3.setTitle("Responsible relay id");
                     screen.addPreference(p3);
+
+                    Preference p4 = new Preference(prefContext);
+                    p4.setKey(p0.getTitle().toString());
+                    p4.setTitle("Delete");
+                    p4.setSummary("Press to delete this sensor");
+                    screen.addPreference(p4);
+
+                    p4.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+
+                            final Preference _preference = preference;
+                            Utils.ConfirmDialog(_preference.getContext(), "Delete", "Are you sure you want to delete this sensor?",
+                                    new Runnable() {
+                                        public void run() {
+                                            String key = _preference.getKey();
+
+                                            PreferenceScreen root = getPreferenceScreen();
+                                            PreferenceCategory sensors = (PreferenceCategory) root.findPreference("Sensors");
+                                            if (sensors != null) {
+                                                for (int i = 0; i < sensors.getPreferenceCount(); i++) {
+                                                    if (sensors.getPreference(i) instanceof PreferenceScreen) {
+                                                        PreferenceScreen screen = (PreferenceScreen) sensors.getPreference(i);
+                                                        Preference pref0 = screen.getPreference(0);
+
+                                                        if (pref0.getTitle().toString().equals(key)) {
+                                                            SharedPreferences prefs = _preference.getSharedPreferences();
+                                                            SharedPreferences.Editor editor = prefs.edit();
+                                                            editor.putBoolean("t_sensor_deleted_".concat(key), true);
+                                                            editor.apply();
+
+                                                            pref0.setTitle(pref0.getTitle().toString().concat(" - deleted"));
+                                                            screen.setSummary("Deleted");
+                                                            screen.setEnabled(false);
+
+                                                            //sensors.removePreference(screen);
+                                                            setSensorNamesAndSummary();
+
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    null
+                            );
+
+                            return true;
+                        }
+                    });
 
                     sensorsCat.addPreference(screen);
                 }
@@ -193,12 +245,22 @@ public class ThermostatSettingsActivity extends PreferenceActivity {
                         PreferenceScreen screen = (PreferenceScreen) sensors.getPreference(i);
                         FriendlyEditTextPreference namePref = (FriendlyEditTextPreference) screen.getPreference(1);
                         TemperaturePreference targetTPref = (TemperaturePreference) screen.getPreference(2);
+                        FriendlyEditTextPreference relayPref = (FriendlyEditTextPreference) screen.getPreference(3);
 
                         screen.setTitle(namePref.getText() == null ? "Sensor #" + Integer.toString(ThermostatControllerData.Instance.relays(i).getId()) : namePref.getText());
-                        if (targetTPref.getText() == null)
-                            screen.setSummary("");
-                        else
-                            screen.setSummary(String.format(Locale.US, "Set T: %s°", targetTPref.getText()));
+
+                        String summary = "";
+                        if (screen.isEnabled()) {
+                            if (targetTPref.getText() != null)
+                                summary = String.format(Locale.US, "Set T: %s°", targetTPref.getText());
+                            if ((relayPref.getText() != null) && (!relayPref.getText().equals("0"))) {
+                                if (summary.length() > 0)
+                                    summary = summary.concat(", ");
+                                summary = summary.concat(String.format(Locale.US, "Heater Relay #%s", relayPref.getText()));
+                            }
+                        } else
+                            summary = "Deleted";
+                        screen.setSummary(summary);
                     }
                 }
             }

@@ -66,7 +66,7 @@ public class GraphActivity extends ChaActivity {
     protected void ServiceConnected() {
         super.ServiceConnected();
 
-        getMqttClient().publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+        publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
     }
 
     public void rebuildGraph(String log) {
@@ -85,8 +85,8 @@ public class GraphActivity extends ChaActivity {
             pointSeries.getItem(i).resetData(dataPoints);
         }
 
-        for (int i = 0; i < pp.length; i++) {
-            String[] parts = pp[i].split("@");
+        for (String p : pp) {
+            String[] parts = p.split("@");
 
             try {
                 //time = sdf.parse(parts[0]).getTime() + time0.getTime();

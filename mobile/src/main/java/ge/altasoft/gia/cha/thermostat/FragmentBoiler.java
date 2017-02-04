@@ -68,7 +68,7 @@ public class FragmentBoiler extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    ((ChaActivity) getActivity()).getMqttClient().publish("chac/ts/mode", String.valueOf(ThermostatControllerData.Instance.nextBoilerMode()), false);
+                    ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(ThermostatControllerData.Instance.nextBoilerMode()), false);
                 }
             }
         });
@@ -187,10 +187,11 @@ public class FragmentBoiler extends Fragment {
         drawSensorAndRelayStates();
 
         if (!haveTemperatureLog)
-            ((ChaActivity) getActivity()).getMqttClient().publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+            ((ChaActivity) getActivity()).publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
     }
 
     public void rebuildGraph(String log) {
+        haveTemperatureLog = true;
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
@@ -206,8 +207,8 @@ public class FragmentBoiler extends Fragment {
             pointSeries.getItem(i).resetData(dataPoints);
         }
 
-        for (int i = 0; i < pp.length; i++) {
-            String[] parts = pp[i].split("@");
+        for (String p : pp) {
+            String[] parts = p.split("@");
 
             try {
                 X = sdf.parse(date0 + parts[0]).getTime();
@@ -323,7 +324,7 @@ public class FragmentBoiler extends Fragment {
         try {
             tvAuto.setTextOn(ThermostatControllerData.Instance.getBoilerModeText());
             tvAuto.setTextOff(getResources().getString(R.string.off));
-            tvAuto.setChecked(ThermostatControllerData.Instance.getBoilerMode() != ThermostatControllerData.BOILER_MODE_OFF);
+            tvAuto.setChecked(ThermostatControllerData.Instance.getBoilerMode() != BoilerSettings.BOILER_MODE_OFF);
             tvAuto.setEnabled(true);
         } finally {
             Utils.disableOnCheckedListener = false;

@@ -13,7 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
-public abstract class ChaActivity extends AppCompatActivity {
+public abstract class ChaPreferenceActivity extends AppCompatActivity {
 
     final private BroadcastReceiver broadcastStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -89,9 +89,7 @@ public abstract class ChaActivity extends AppCompatActivity {
 
     // service
 
-    protected MqttClientLocal getMqttClient() {
-        if (mService == null)
-            return null;
+    private MqttClientLocal getMqttClient() {
         return mService.mqttClient();
     }
 
@@ -102,7 +100,6 @@ public abstract class ChaActivity extends AppCompatActivity {
 
         client.publish(topic, message, retained);
     }
-
     boolean mBound;
     MqttServiceLocal mService = null;
 

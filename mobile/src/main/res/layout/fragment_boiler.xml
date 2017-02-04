@@ -29,6 +29,15 @@
         android:paddingTop="4dp"
         android:weightSum="1">
 
+        <ImageView
+            android:id="@+id/tsControllerIsOnline"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:paddingRight="4dp"
+            android:paddingEnd="4dp"
+            android:src="@drawable/circle_red" />
+
+
         <ToggleButton
             android:id="@+id/boilerMode"
             android:layout_width="120dp"

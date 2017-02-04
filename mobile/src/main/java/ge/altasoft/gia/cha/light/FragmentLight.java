@@ -51,7 +51,7 @@ public class FragmentLight extends Fragment {
                     ((ToggleButton) button).setTextOn("");
                     ((ToggleButton) button).setTextOff("");
                     button.setEnabled(false);
-                    ((ChaActivity) getActivity()).getMqttClient().publish("chac/light/mode", isChecked ? "A" : "M", false);
+                    ((ChaActivity) getActivity()).publish("chac/light/mode", isChecked ? "A" : "M", false);
                 }
             }
         });

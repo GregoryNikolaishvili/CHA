@@ -21,6 +21,7 @@ public class RoomSensorView extends LinearLayout {
     private TextView tvSensorName;
     private TextView tvTemperature;
     private TextView tvTemperatureTrend;
+    private TextView tvTargetTemperature;
     private TextView tvHumidity;
     private TextView tvSignalLevel;
     private TextView tvBatteryLevel;
@@ -92,6 +93,12 @@ public class RoomSensorView extends LinearLayout {
         return tvTemperatureTrend;
     }
 
+    private TextView getTargetTemperatureTextView() {
+        if (tvTargetTemperature == null)
+            tvTargetTemperature = (TextView) this.findViewById(R.id.target_temperature_value);
+        return tvTargetTemperature;
+    }
+
     private TextView getHumidityTextView() {
         if (tvHumidity == null)
             tvHumidity = (TextView) this.findViewById(R.id.humidity_value);
@@ -143,7 +150,6 @@ public class RoomSensorView extends LinearLayout {
             tvTemperature.setText("--");
         else
             tvTemperature.setText(String.format(Locale.US, "%.1f°", v));
-
         tvTemperature.setTextColor(value.getTemperatureColor());
 
         switch (value.getTemperatureTrend()) {
@@ -159,6 +165,13 @@ public class RoomSensorView extends LinearLayout {
                 getTemperatureTrendTextView().setTextColor(Color.BLUE);
                 break;
         }
+
+        v = value.getTargetTemperature();
+        if (Float.isNaN(v))
+            getTargetTemperatureTextView().setText("--");
+        else
+            getTargetTemperatureTextView().setText(String.format(Locale.US, "%.1f°", v));
+
         v = value.getHumidity();
         if (Float.isNaN(v))
             getHumidityTextView().setText("--");
@@ -175,9 +188,7 @@ public class RoomSensorView extends LinearLayout {
         if (value.isOn()) {
             tvRelayState.setTextColor(Color.RED);
             tvRelayState.setText("On");
-        }
-        else
-        {
+        } else {
             tvRelayState.setTextColor(Color.GRAY);
             tvRelayState.setText("Off");
         }

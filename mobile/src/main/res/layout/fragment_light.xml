@@ -35,7 +35,7 @@
         android:paddingTop="4dp">
 
         <ImageView
-            android:id="@+id/lightsIsOnline"
+            android:id="@+id/lightControllerIsOnline"
             android:layout_width="20dp"
             android:layout_height="match_parent"
             android:paddingRight="4dp"

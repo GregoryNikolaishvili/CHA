@@ -106,11 +106,13 @@ public class BoilerSensorView extends LinearLayout {
                 break;
         }
 
-        if (value.getTargetTemperature() != 0f) {
+        v = value.getTargetTemperature();
+        if (Float.isNaN(v))
+            llTargetTemperature.setVisibility(View.GONE);
+        else {
             getTargetTemperatureTextView();
             tvTargetTemperature.setText(String.format(Locale.US, "%.1f°", value.getTargetTemperature()));
             llTargetTemperature.setVisibility(View.VISIBLE);
-        } else
-            llTargetTemperature.setVisibility(View.GONE);
+        }
     }
 }

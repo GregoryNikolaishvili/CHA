@@ -18,31 +18,19 @@ import android.support.annotation.NonNull;
 
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.light.LightControllerData;
-
 public class Utils {
 
-    public static String mqttBrokerLocalUrl = "192.168.2.99:1883";
-    public static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
+    static String mqttBrokerLocalUrl = "192.168.2.99:1883";
+    static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
 
-    public final static boolean DEBUG_LIGHT = true;
-    public final static boolean DEBUG_THERMOSTAT = true;
-
-    public static final int FLAG_HAVE_THERMOSTAT_FULL_STATE = 100;
-
-    public static final int FLAG_HAVE_NOTHING = 0; //todo
-    public static final int FLAG_HAVE_STATE = 32; //todo
-    public static final int FLAG_HAVE_SETTINGS = 33; //todo
+    public final static float F_UNDEFINED = 999.9f;
 
     public static final int LOG_BUFFER_SIZE = 1000;
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
     static final int ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS = 2;
 
-    public static final float DEFAULT_TARGET_TEMPERATURE = 25.0f;
-
     public static boolean disableOnCheckedListener = false;
-
 
     public static String shortToHex4(short value) {
         return String.format(Locale.US, "%04X", value);
@@ -54,7 +42,19 @@ public class Utils {
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
-    public static void readUrlSettings(Context context) {
+    public static void encodeT(StringBuilder sb, float T) {
+        if (Float.isNaN(T))
+            T = Utils.F_UNDEFINED * 10f;
+        else
+            T = T * 10f;
+        sb.append(String.format(Locale.US, "%04X", ((Float) T).intValue()));
+    }
+
+    public static void encodeTime(StringBuilder sb, int t) {
+        sb.append(String.format(Locale.US, "%04X", t));
+    }
+
+    static void readUrlSettings(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         mqttBrokerLocalUrl = prefs.getString("mtqq_url_local", mqttBrokerLocalUrl);
@@ -164,11 +164,11 @@ public class Utils {
         return wifiInfo.getSSID().trim().equals("\"GIA\"") || wifiInfo.getSSID().trim().equals("\"GIA2\"");
     }
 
-    public static int random(int min, int max) {
-        return min + (int) Math.round(Math.random() * (max - min));
-    }
+//    public static int random(int min, int max) {
+//        return min + (int) Math.round(Math.random() * (max - min));
+//    }
 
-    public static String getDeviceName() {
+    static String getDeviceName() {
         String manufacturer = Build.MANUFACTURER;
         String model = Build.MODEL;
         if (model.startsWith(manufacturer)) {
@@ -190,7 +190,7 @@ public class Utils {
         }
     }
 
-    public static String getDeviceUniqueId(Context context) {
+    static String getDeviceUniqueId(Context context) {
         return Build.SERIAL.concat(".").concat(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
     }
 

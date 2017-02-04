@@ -33,7 +33,7 @@ public class LogTHActivity extends ChaActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_th);
 
-        CircularArrayList<Pair<Date, Float>> logBuffer = null;
+        //CircularArrayList<Pair<Date, Float>> logBuffer = null;
 
         Intent intent = getIntent();
         String scope = intent.getStringExtra("scope");
@@ -59,18 +59,18 @@ public class LogTHActivity extends ChaActivity {
                 int id = intent.getIntExtra("id", 0);
 
                 isTemperature = false;
-                RoomSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id, false);
-                logBuffer = sensorData.getLogBufferH();
+                //RoomSensorData sensorData = ThermostatControllerData.Instance.roomSensors(id, false);
+                //logBuffer = sensorData.getLogBufferH();
                 break;
             }
         }
 
-        if (logBuffer != null) {
-            adapter = new THLogAdapter(this, logBuffer, isTemperature);
-
-            ListView listView = (ListView) findViewById(R.id.lvLogTemperature);
-            listView.setAdapter(adapter);
-        }
+//        if (logBuffer != null) {
+//            adapter = new THLogAdapter(this, logBuffer, isTemperature);
+//
+//            ListView listView = (ListView) findViewById(R.id.lvLogTemperature);
+//            listView.setAdapter(adapter);
+//        }
     }
 
     public class THLogAdapter extends ArrayAdapter<Pair<Date, Float>> {

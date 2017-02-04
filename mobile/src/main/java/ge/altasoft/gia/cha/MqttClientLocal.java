@@ -21,14 +21,11 @@ import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 
-public class MqttClientLocal {
-
-    private static final String TOPIC_CHA_SYS_OLD = "cha/sys";
+class MqttClientLocal {
 
     private static final String TOPIC_CHA_SYS = "cha/sys/";
     private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/light/state/"; // last "/" is important
 
-    private static final String TOPIC_CHA_LIGHTS_SYS = "cha/light/sys";
     private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
     private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
 
@@ -41,17 +38,16 @@ public class MqttClientLocal {
 
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS = "cha/ts/settings/rs";
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER = "cha/ts/names/rs";
-    private static final String TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS = "cha/ts/settings/bs";
+    private static final String TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS = "cha/ts/settings/bl";
 
     //private static final String TOPIC_CHA_THERMOSTAT_HEATER_RELAY_SETTINGS = "cha/ts/hr/settings";
     //private static final String TOPIC_CHA_THERMOSTAT_HEATER_RELAY_NAMES_AND_ORDER = "cha/ts/hr/names";
 
 
-    public static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
+    static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
 
-    public enum MQTTReceivedDataType {
-        HaveNothing,
-        LightControllerConnected,
+    enum MQTTReceivedDataType {
+        ClientConnected,
         LightRelayState,
         LightSettings,
         LightNameAndOrders,
@@ -64,11 +60,9 @@ public class MqttClientLocal {
         ThermostatHeaterRelayState,
         ThermostatBoilerSettings,
         ThermostatLog
-//        ThermostatHeaterRelaySettings,
-//        ThermostatHeaterRelayNameAndOrders
     }
 
-    public enum MQTTConnectionStatus {
+    enum MQTTConnectionStatus {
         INITIAL,                            // initial status
         CONNECTING,                         // attempting to connect
         CONNECTED,                          // connected
@@ -77,11 +71,11 @@ public class MqttClientLocal {
     }
 
     // constants used to tell the Activity UI the connection status
-    public static final String MQTT_STATUS_INTENT = "ge.altasoft.gia.cha.STATUS";
-    public static final String MQTT_DATA_INTENT = "ge.altasoft.gia.cha.DATA";
-    public static final String MQTT_CONN_STATUS = "ge.altasoft.gia.cha.MSG.STATUS";
-    public static final String MQTT_MSG = "ge.altasoft.gia.cha.MSG";
-    public static final String MQTT_MSG_IS_ERROR = "ge.altasoft.gia.cha.MSG.IS_ERROR";
+    static final String MQTT_STATUS_INTENT = "ge.altasoft.gia.cha.STATUS";
+    static final String MQTT_DATA_INTENT = "ge.altasoft.gia.cha.DATA";
+    static final String MQTT_CONN_STATUS = "ge.altasoft.gia.cha.MSG.STATUS";
+    static final String MQTT_MSG = "ge.altasoft.gia.cha.MSG";
+    static final String MQTT_MSG_IS_ERROR = "ge.altasoft.gia.cha.MSG.IS_ERROR";
 
     final private Context context;
 
@@ -99,7 +93,7 @@ public class MqttClientLocal {
         clientId = Utils.getDeviceName().concat("-").concat(Utils.getDeviceUniqueId(context));
     }
 
-    public ArrayList<String> getConnectedClientList() {
+    ArrayList<String> getConnectedClientList() {
         return connectedClients;
     }
 
@@ -324,39 +318,21 @@ public class MqttClientLocal {
             switch (topic) {
 
                 //region SYS
-                case TOPIC_CHA_SYS_OLD: // TODO: 1/24/2017  obsolete
-                    switch (payload) {
-                        case "light controller connected":
-                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
-                            broadcastDataIntent.putExtra("value", true);
-                            context.sendBroadcast(broadcastDataIntent);
-                            break;
-
-                        case "light controller disconnected":
-                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
-                            broadcastDataIntent.putExtra("value", false);
-                            context.sendBroadcast(broadcastDataIntent);
-                            break;
-                    }
-                    break;
-
-                // TODO: 1/25/2017
-                // აქ აღარ მინდა ეს. ქვემოთ იყოს
-                case TOPIC_CHA_LIGHTS_SYS:
-                    switch (payload) {
-                        case "connected":
-                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
-                            broadcastDataIntent.putExtra("value", true);
-                            context.sendBroadcast(broadcastDataIntent);
-                            break;
-
-                        case "disconnected":
-                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
-                            broadcastDataIntent.putExtra("value", false);
-                            context.sendBroadcast(broadcastDataIntent);
-                            break;
-                    }
-                    break;
+//                case TOPIC_CHA_SYS_OLD: // TODO: 1/24/2017  obsolete
+//                    switch (payload) {
+//                        case "light controller connected":
+//                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
+//                            broadcastDataIntent.putExtra("value", true);
+//                            context.sendBroadcast(broadcastDataIntent);
+//                            break;
+//
+//                        case "light controller disconnected":
+//                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
+//                            broadcastDataIntent.putExtra("value", false);
+//                            context.sendBroadcast(broadcastDataIntent);
+//                            break;
+//                    }
+//                    break;
                 //endregion
 
                 //region Lights
@@ -428,7 +404,7 @@ public class MqttClientLocal {
             }
 
             if (topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE)) {
-                int id = Integer.parseInt(topic.substring(TOPIC_CHA_ROOM_SENSOR_STATE.length()));
+                int id = Integer.parseInt(topic.substring(TOPIC_CHA_ROOM_SENSOR_STATE.length()), 16);
                 RoomSensorData rs = ThermostatControllerData.Instance.roomSensors(id, false);
                 if (rs == null)
                     broadcastDataIntent.putExtra("new_sensor", true);
@@ -490,20 +466,28 @@ public class MqttClientLocal {
             }
 
 
-            // TODO: 1/25/2017
-            // აქ დავამატო შუქის და თერმოსტატის კონტროლერიც
             if (topic.startsWith(TOPIC_CHA_SYS)) {
                 String clientId = topic.substring(TOPIC_CHA_SYS.length());
                 switch (payload) {
                     case "connected":
                         if (!connectedClients.contains(clientId))
                             connectedClients.add(clientId);
+
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ClientConnected);
+                        broadcastDataIntent.putExtra("id", clientId);
+                        broadcastDataIntent.putExtra("value", true);
+                        context.sendBroadcast(broadcastDataIntent);
                         break;
 
                     case "disconnected":
                     case "":
                         if (connectedClients.contains(clientId))
                             connectedClients.remove(clientId);
+
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ClientConnected);
+                        broadcastDataIntent.putExtra("id", clientId);
+                        broadcastDataIntent.putExtra("value", false);
+                        context.sendBroadcast(broadcastDataIntent);
                         break;
                 }
             }
