@@ -15,4 +15,15 @@ public final class BoilerSensorData extends TempSensorData {
 
         setDeltaTargetT(5f);
     }
+
+    public void decodeState(String payload) {
+        char lastChar = payload.charAt(payload.length() - 1);
+        if ((lastChar == '+') || (lastChar == '-') || (lastChar == '=')) {
+            setTemperatureTrend(lastChar);
+            payload = payload.substring(0, payload.length() - 1);
+        }
+        int value = Integer.parseInt(payload, 16);
+        setTemperature(value / 10f);
+    }
+
 }

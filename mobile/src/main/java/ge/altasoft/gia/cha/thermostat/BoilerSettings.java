@@ -18,6 +18,7 @@ public class BoilerSettings {
     float EmergencyCollectorSwitchOffT;
     float EmergencyCollectorSwitchOnT;
     float CollectorCoolingT;
+    float MaxTankT;
 
     float PoolSwitchOnT;
     float PoolSwitchOffT;
@@ -51,6 +52,7 @@ public class BoilerSettings {
         Utils.encodeT(sb, EmergencyCollectorSwitchOffT);
         Utils.encodeT(sb, EmergencyCollectorSwitchOnT);
         Utils.encodeT(sb, CollectorCoolingT);
+        Utils.encodeT(sb, MaxTankT);
 
         Utils.encodeT(sb, PoolSwitchOnT);
         Utils.encodeT(sb, PoolSwitchOffT);
@@ -87,6 +89,8 @@ public class BoilerSettings {
         EmergencyCollectorSwitchOnT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
         idx += 4;
         CollectorCoolingT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        idx += 4;
+        MaxTankT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
         idx += 4;
 
         PoolSwitchOnT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
