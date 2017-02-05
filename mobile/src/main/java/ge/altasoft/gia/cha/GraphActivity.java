@@ -96,7 +96,7 @@ public class GraphActivity extends ChaActivity {
             }
 
             int id = Integer.parseInt(parts[1].substring(0, 1)) - 1;
-            double Y = Integer.parseInt(parts[1].substring(2)) / 10.0;
+            double Y = Integer.parseInt(parts[1].substring(2), 16) / 10.0;
 
             pointSeries.getItem(id).appendData(new DataPoint(X, Y), false, Utils.LOG_BUFFER_SIZE);
 
