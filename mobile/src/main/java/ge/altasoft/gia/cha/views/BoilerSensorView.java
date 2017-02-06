@@ -104,6 +104,9 @@ public class BoilerSensorView extends LinearLayout {
                 tvTemperatureTrend.setText("↓");
                 tvTemperatureTrend.setTextColor(Color.BLUE);
                 break;
+            case '=':
+                tvTemperatureTrend.setText("");
+                break;
         }
 
         v = value.getTargetTemperature();

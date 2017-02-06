@@ -97,7 +97,7 @@ public class TempSensorData {
     }
 
     protected int decodeSettings(String response, int idx) {
-        setTargetTemperature(Integer.parseInt(response.substring(idx, idx + 4), 16) / 10.0f);
+        setTargetTemperature(Utils.decodeT(response.substring(idx, idx + 4)));
         return idx + 4;
     }
 
@@ -107,7 +107,6 @@ public class TempSensorData {
             setTemperatureTrend(lastChar);
             payload = payload.substring(0, payload.length() - 1);
         }
-        int value = Integer.parseInt(payload);
-        setTemperature(value / 10f);
+        setTemperature(Utils.decodeT(payload));
     }
 }

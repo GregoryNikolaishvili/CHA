@@ -16,6 +16,8 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class Utils {
@@ -42,12 +44,17 @@ public class Utils {
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
+    public static float decodeT(String s) {
+        int value = Integer.parseInt(s, 16);
+        return (value - 1000) / 10f;
+    }
+
     public static void encodeT(StringBuilder sb, float T) {
         if (Float.isNaN(T))
             T = Utils.F_UNDEFINED * 10f;
         else
             T = T * 10f;
-        sb.append(String.format(Locale.US, "%04X", ((Float) T).intValue()));
+        sb.append(String.format(Locale.US, "%04X", ((Float) (T + 1000)).intValue()));
     }
 
     public static void encodeTime(StringBuilder sb, int t) {
@@ -60,6 +67,16 @@ public class Utils {
         mqttBrokerLocalUrl = prefs.getString("mtqq_url_local", mqttBrokerLocalUrl);
         mqttBrokerLocalUrl = prefs.getString("mtqq_url_global", mqttBrokerLocalUrl);
     }
+
+    public static String millisToTimeString(String format, double x) {
+        if (format == null)
+            format = "HH:mm";
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis((long) x);
+        return sdf.format(calendar.getTimeInMillis());
+    }
+
 
     @NonNull
     public static String decodeArduinoString(String encodedName) {

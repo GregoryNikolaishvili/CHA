@@ -2,6 +2,7 @@ package ge.altasoft.gia.cha;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -70,45 +71,57 @@ public class GraphActivity extends ChaActivity {
     }
 
     public void rebuildGraph(String log) {
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
+        int id;
         long X;
-        long minX = Long.MAX_VALUE, maxX = -Long.MAX_VALUE;
-        double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
-
-        String[] pp = log.split("\\+");
+        double Y;
+        //long minX = Long.MAX_VALUE, maxX = -Long.MAX_VALUE;
+        //double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
 
         for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
             DataPoint[] dataPoints = new DataPoint[0];
             pointSeries.getItem(i).resetData(dataPoints);
         }
 
-        for (String p : pp) {
-            String[] parts = p.split("@");
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == 11) {
+                try {
+                    X = sdf.parse(date0 + logEntry.substring(0, 6)).getTime();
+                } catch (ParseException ex) {
+                    Log.e("Graph", "Invalid X", ex);
+                    return;
+                }
 
-            try {
-                //time = sdf.parse(parts[0]).getTime() + time0.getTime();
-                X = sdf.parse(date0 + parts[0]).getTime();
-            } catch (ParseException ignored) {
-                return;
+                try {
+                    id = Integer.parseInt(logEntry.substring(6, 7), 16) - 1;
+                } catch (NumberFormatException ex) {
+                    Log.e("Graph", "Invalid id", ex);
+                    return;
+                }
+                try {
+                    Y = Utils.decodeT(logEntry.substring(7, 11));
+                } catch (NumberFormatException ex) {
+                    Log.e("Graph", "Invalid Y", ex);
+                    return;
+                }
+
+                pointSeries.getItem(id).appendData(new DataPoint(X, Y), false, Utils.LOG_BUFFER_SIZE);
+//
+//                if (X < minX)
+//                    minX = X;
+//                if (X > maxX)
+//                    maxX = X;
+//
+//                if (Y < minY)
+//                    minY = Y;
+//                if (Y > maxY)
+//                    maxY = Y;
             }
-
-            int id = Integer.parseInt(parts[1].substring(0, 1)) - 1;
-            double Y = Integer.parseInt(parts[1].substring(2), 16) / 10.0;
-
-            pointSeries.getItem(id).appendData(new DataPoint(X, Y), false, Utils.LOG_BUFFER_SIZE);
-
-            if (X < minX)
-                minX = X;
-            if (X > maxX)
-                maxX = X;
-
-            if (Y < minY)
-                minY = Y;
-            if (Y > maxY)
-                maxY = Y;
         }
 //
 //        final GraphView graph = (GraphView) findViewById(R.id.graphBig);

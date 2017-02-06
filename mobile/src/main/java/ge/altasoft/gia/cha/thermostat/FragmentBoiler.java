@@ -3,6 +3,7 @@ package ge.altasoft.gia.cha.thermostat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +33,10 @@ import ge.altasoft.gia.cha.views.BoilerSensorView;
 public class FragmentBoiler extends Fragment {
 
     private View rootView = null;
-    private boolean haveTemperatureLog = false;
 
     final private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
+
+    private boolean haveLogData = false;
 
     public FragmentBoiler() {
     }
@@ -160,13 +162,13 @@ public class FragmentBoiler extends Fragment {
                 );
         //endregion
 
-        rebuildUI();
+        rebuildUI(false);
 
         return rootView;
     }
 
     // rebuild everything and draws new state
-    public void rebuildUI() {
+    public void rebuildUI(boolean requestGraphLog) {
         if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveBoilerSettings())
             return;
 
@@ -186,53 +188,73 @@ public class FragmentBoiler extends Fragment {
 
         drawSensorAndRelayStates();
 
-        if (!haveTemperatureLog)
+        if (requestGraphLog || !haveLogData) {
+            haveLogData = false;
             ((ChaActivity) getActivity()).publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+        }
     }
 
     public void rebuildGraph(String log) {
-        haveTemperatureLog = true;
+
+        haveLogData = true;
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
+        int id;
         long X;
+        double Y;
         long minX = Long.MAX_VALUE, maxX = -Long.MAX_VALUE;
         double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
-
-        String[] pp = log.split("\\+");
 
         for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
             DataPoint[] dataPoints = new DataPoint[0];
             pointSeries.getItem(i).resetData(dataPoints);
         }
 
-        for (String p : pp) {
-            String[] parts = p.split("@");
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == 11) {
+                try {
+                    X = sdf.parse(date0 + logEntry.substring(0, 6)).getTime();
+                } catch (ParseException ex) {
+                    Log.e("Graph", "Invalid X", ex);
+                    return;
+                }
 
-            try {
-                X = sdf.parse(date0 + parts[0]).getTime();
-            } catch (ParseException ignored) {
-                return;
+                try {
+                    id = Integer.parseInt(logEntry.substring(6, 7), 16) - 1;
+                } catch (NumberFormatException ex) {
+                    Log.e("Graph", "Invalid id", ex);
+                    return;
+                }
+                try {
+                    Y = Utils.decodeT(logEntry.substring(7, 11));
+                } catch (NumberFormatException ex) {
+                    Log.e("Graph", "Invalid Y", ex);
+                    return;
+                }
+
+                pointSeries.getItem(id).appendData(new DataPoint(X, Y), false, Utils.LOG_BUFFER_SIZE);
+
+                if (X < minX)
+                    minX = X;
+                if (X > maxX)
+                    maxX = X;
+
+                if (Y < minY)
+                    minY = Y;
+                if (Y > maxY)
+                    maxY = Y;
             }
-
-            int id = Integer.parseInt(parts[1].substring(0, 1)) - 1;
-            double Y = Integer.parseInt(parts[1].substring(2), 16) / 10.0;
-
-            pointSeries.getItem(id).appendData(new DataPoint(X, Y), false, Utils.LOG_BUFFER_SIZE);
-
-            if (X < minX)
-                minX = X;
-            if (X > maxX)
-                maxX = X;
-
-            if (Y < minY)
-                minY = Y;
-            if (Y > maxY)
-                maxY = Y;
         }
 
         final GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
+
+        if (minY == Double.MAX_VALUE)
+            minY = 0;
+        if ( maxY == -Double.MAX_VALUE)
+            maxY = 100;
 
         graph.getViewport().setMinX(minX);
         graph.getViewport().setMaxX(maxX);

@@ -22,8 +22,8 @@ public final class BoilerSensorData extends TempSensorData {
             setTemperatureTrend(lastChar);
             payload = payload.substring(0, payload.length() - 1);
         }
-        int value = Integer.parseInt(payload, 16);
-        setTemperature(value / 10f);
+
+        setTemperature(Utils.decodeT(payload));
     }
 
 }

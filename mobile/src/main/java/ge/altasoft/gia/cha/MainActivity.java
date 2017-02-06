@@ -151,7 +151,7 @@ public class MainActivity extends ChaActivity {
             pagerAdapter.fragmentLight.rebuildUI();
 
         if (pagerAdapter.fragmentBoiler != null)
-            pagerAdapter.fragmentBoiler.rebuildUI();
+            pagerAdapter.fragmentBoiler.rebuildUI(true);
         if (pagerAdapter.fragmentRoomSensors != null)
             pagerAdapter.fragmentRoomSensors.rebuildUI();
         if (pagerAdapter.fragmentHeaterRelays != null)
@@ -231,7 +231,7 @@ public class MainActivity extends ChaActivity {
                 break;
 
             case ThermostatBoilerSettings:
-                pagerAdapter.fragmentBoiler.rebuildUI();
+                pagerAdapter.fragmentBoiler.rebuildUI(false);
                 break;
 
             case ThermostatLog:

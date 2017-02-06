@@ -80,49 +80,49 @@ public class BoilerSettings {
 
         int idx = 1;
 
-        CollectorSwitchOnTempDiff = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        CollectorSwitchOnTempDiff = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        CollectorSwitchOffTempDiff = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        CollectorSwitchOffTempDiff = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        EmergencyCollectorSwitchOffT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        EmergencyCollectorSwitchOffT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        EmergencyCollectorSwitchOnT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        EmergencyCollectorSwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        CollectorCoolingT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        CollectorCoolingT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        MaxTankT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        MaxTankT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
 
-        PoolSwitchOnT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        PoolSwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        PoolSwitchOffT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        PoolSwitchOffT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
 
         BackupHeatingTS1_Start = Integer.parseInt(response.substring(idx, idx + 4), 16);
         idx += 4;
         BackupHeatingTS1_End = Integer.parseInt(response.substring(idx, idx + 4), 16);
         idx += 4;
-        BackupHeatingTS1_SwitchOnT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        BackupHeatingTS1_SwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        BackupHeatingTS1_SwitchOffT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        BackupHeatingTS1_SwitchOffT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
 
         BackupHeatingTS2_Start = Integer.parseInt(response.substring(idx, idx + 4), 16);
         idx += 4;
         BackupHeatingTS2_End = Integer.parseInt(response.substring(idx, idx + 4), 16);
         idx += 4;
-        BackupHeatingTS2_SwitchOnT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        BackupHeatingTS2_SwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        BackupHeatingTS2_SwitchOffT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        BackupHeatingTS2_SwitchOffT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
 
         BackupHeatingTS3_Start = Integer.parseInt(response.substring(idx, idx + 4), 16);
         idx += 4;
         BackupHeatingTS3_End = Integer.parseInt(response.substring(idx, idx + 4), 16);
         idx += 4;
-        BackupHeatingTS3_SwitchOnT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        BackupHeatingTS3_SwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        BackupHeatingTS3_SwitchOffT = Integer.parseInt(response.substring(idx, idx + 4), 16) / 10f;
+        BackupHeatingTS3_SwitchOffT = Utils.decodeT(response.substring(idx, idx + 4));
         //idx += 4;
     }
 }
