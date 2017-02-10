@@ -241,7 +241,7 @@ public class Utils {
         alert.show();
     }
 
-//    public static void InputDialog(Context context, String title, String value, int type, final RunnableWithParams positiveAction) {
+    //    public static void InputDialog(Context context, String title, String value, int type, final RunnableWithParams positiveAction) {
 //
 //        AlertDialog.Builder builder = new AlertDialog.Builder(context);
 //        builder.setTitle(title);

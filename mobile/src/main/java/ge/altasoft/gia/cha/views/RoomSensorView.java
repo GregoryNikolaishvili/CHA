@@ -54,7 +54,7 @@ public class RoomSensorView extends LinearLayout {
                 if (sensorData != null) {
                     Intent intent = new Intent(getContext(), LogTHActivity.class);
                     intent.putExtra("id", sensorData.getId());
-                    intent.putExtra("scope", "RoomSensorT");
+                    intent.putExtra("scope", "RoomSensor");
                     getContext().startActivity(intent);
                 }
                 return true;
@@ -67,7 +67,7 @@ public class RoomSensorView extends LinearLayout {
                 if (sensorData != null) {
                     Intent intent = new Intent(getContext(), LogTHActivity.class);
                     intent.putExtra("id", sensorData.getId());
-                    intent.putExtra("scope", "RoomSensorH");
+                    intent.putExtra("scope", "RoomSensor");
                     getContext().startActivity(intent);
                 }
                 return true;

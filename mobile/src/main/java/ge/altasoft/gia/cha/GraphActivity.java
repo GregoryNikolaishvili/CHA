@@ -2,47 +2,56 @@ package ge.altasoft.gia.cha;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.model.XYSeries;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
-import ge.altasoft.gia.cha.classes.LineSeriesArray;
+import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
+import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class GraphActivity extends ChaActivity {
 
-    final private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
+    private Menu mainMenu;
+
+    private GraphicalView mChartView;
+    private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
+    private XYMultipleSeriesRenderer mRenderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
-//        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++)
-//            pointSeries.getItem(i).fill(ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer());
+        LinearLayout chartLayout = (LinearLayout) findViewById(R.id.chartBig);
+        XYSeries series1 = new XYSeries("T1");
+        XYSeries series2 = new XYSeries("T2");
+        XYSeries series3 = new XYSeries("T3");
 
-        final GraphView graph = (GraphView) findViewById(R.id.graphBig);
-        pointSeries.addToGraph(graph);
+        mRenderer = ThermostatUtils.getBoilerSensorChartRenderer();
+        mRenderer.setZoomEnabled(true, true);
+        mRenderer.setPanEnabled(true, true);
+        mRenderer.setZoomButtonsVisible(true);
+        //mRenderer.setPanLimits(new double[] { -10, 20, -10, 40 });
+        //mRenderer.setZoomLimits(new double[] { -10, 20, -10, 40 });
 
-        //graph.getGridLabelRenderer().setNumHorizontalLabels(4); // only 4 because of the space
-        //graph.getGridLabelRenderer().setNumVerticalLabels(8); // only 4 because of the space
+        xyDataSet.addSeries(series1);
+        xyDataSet.addSeries(series2);
+        xyDataSet.addSeries(series3);
 
-        //graph.getViewport().setXAxisBoundsManual(false);
-        //graph.getViewport().setYAxisBoundsManual(false);
-        //graph.getViewport().setMinY(0.0);
-        //graph.getViewport().setMaxY(100.0);
-        //graph.getGridLabelRenderer().setHumanRounding(true);
-
-        //graph.getViewport().scrollToEnd();
+        mChartView = ChartFactory.getCubeLineChartView(this, xyDataSet, mRenderer, 0.1f);
+        chartLayout.addView(mChartView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
-
 
     @Override
     void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
@@ -53,7 +62,12 @@ public class GraphActivity extends ChaActivity {
                 int id = intent.getIntExtra("id", 0);
                 id--;
 
-                pointSeries.getItem(id).append(ThermostatControllerData.Instance.boilerSensors(id));
+                BoilerSensorData data = ThermostatControllerData.Instance.boilerSensors(id);
+                float v = data.getTemperature();
+                if (!Float.isNaN(v)) {
+                    xyDataSet.getSeriesAt(id).add(data.getLastReadingTime(), v);
+                    mChartView.repaint();
+                }
                 break;
 
             case ThermostatLog:
@@ -70,67 +84,91 @@ public class GraphActivity extends ChaActivity {
         publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
     }
 
-    public void rebuildGraph(String log) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_graph, menu);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
-        String date0 = sdf.format(new Date());
-        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+        this.mainMenu = menu;
 
-        int id;
-        long X;
-        double Y;
-        //long minX = Long.MAX_VALUE, maxX = -Long.MAX_VALUE;
-        //double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
-
-        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-            DataPoint[] dataPoints = new DataPoint[0];
-            pointSeries.getItem(i).resetData(dataPoints);
+        int id = 0;
+        int logSuffix = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+        switch (logSuffix) {
+            case 0:
+                id = R.id.action_sunday;
+                break;
+            case 1:
+                id = R.id.action_monday;
+                break;
+            case 2:
+                id = R.id.action_tuesday;
+                break;
+            case 3:
+                id = R.id.action_wednesday;
+                break;
+            case 4:
+                id = R.id.action_thursday;
+                break;
+            case 5:
+                id = R.id.action_friday;
+                break;
+            case 6:
+                id = R.id.action_saturday;
+                break;
         }
-
-        String[] logEntries = log.split(":");
-        for (String logEntry : logEntries) {
-            if (logEntry.length() == 11) {
-                try {
-                    X = sdf.parse(date0 + logEntry.substring(0, 6)).getTime();
-                } catch (ParseException ex) {
-                    Log.e("Graph", "Invalid X", ex);
-                    return;
-                }
-
-                try {
-                    id = Integer.parseInt(logEntry.substring(6, 7), 16) - 1;
-                } catch (NumberFormatException ex) {
-                    Log.e("Graph", "Invalid id", ex);
-                    return;
-                }
-                try {
-                    Y = Utils.decodeT(logEntry.substring(7, 11));
-                } catch (NumberFormatException ex) {
-                    Log.e("Graph", "Invalid Y", ex);
-                    return;
-                }
-
-                pointSeries.getItem(id).appendData(new DataPoint(X, Y), false, Utils.LOG_BUFFER_SIZE);
-//
-//                if (X < minX)
-//                    minX = X;
-//                if (X > maxX)
-//                    maxX = X;
-//
-//                if (Y < minY)
-//                    minY = Y;
-//                if (Y > maxY)
-//                    maxY = Y;
-            }
-        }
-//
-//        final GraphView graph = (GraphView) findViewById(R.id.graphBig);
-//
-//        graph.getViewport().setMinX(minX);
-//        graph.getViewport().setMaxX(maxX);
-//
-//        graph.getViewport().setMinY(minY);
-//        graph.getViewport().setMaxY(maxY);
+        if (id > 0)
+            menu.findItem(id).setChecked(true);
+        return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        item.setChecked(!item.isChecked());
+
+        int wd = -1;
+        switch (id) {
+            case R.id.action_sunday:
+                wd = 0;
+                break;
+            case R.id.action_monday:
+                wd = 1;
+                break;
+            case R.id.action_tuesday:
+                wd = 2;
+                break;
+            case R.id.action_wednesday:
+                wd = 3;
+                break;
+            case R.id.action_thursday:
+                wd = 4;
+                break;
+            case R.id.action_friday:
+                wd = 5;
+                break;
+            case R.id.action_saturday:
+                wd = 6;
+                break;
+        }
+
+        if (wd > 0) {
+            publish("cha/hub/getlog", "boiler_".concat(String.valueOf(wd)), false);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    public void rebuildGraph(String log) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date startDt = calendar.getTime();
+
+        ThermostatUtils.DrawBoilerSensorChart(log, mChartView, mRenderer, xyDataSet, startDt, 60);
+    }
 }

@@ -10,9 +10,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ge.altasoft.gia.cha.GraphActivity">
 
-    <com.jjoe64.graphview.GraphView
-        android:id="@+id/graphBig"
+    <LinearLayout
+        android:id="@+id/chartBig"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:orientation="horizontal" />
 
 </RelativeLayout>

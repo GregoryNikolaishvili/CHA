@@ -14,7 +14,7 @@
     tools:context="ge.altasoft.gia.cha.LogTHActivity">
 
     <ListView
-        android:id="@+id/lvLogTemperature"
+        android:id="@+id/lvLogTemperatureAndHumidity"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

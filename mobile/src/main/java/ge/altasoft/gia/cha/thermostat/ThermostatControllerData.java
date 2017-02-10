@@ -66,7 +66,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         savedRoomSensorOrders = new SparseIntArray();
 
         for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
-            boilerSensorsData[i] = new BoilerSensorData(i + 1);
+            boilerSensorsData[i] = new BoilerSensorData(i);
 
         for (int i = 0; i < BOILER_PUMP_COUNT; i++)
             boilerPumpsData[i] = new BoilerPumpData(i + 1);

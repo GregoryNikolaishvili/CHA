@@ -34,7 +34,7 @@ class MqttClientLocal {
     private static final String TOPIC_CHA_BOILER_RELAY_STATE = "cha/ts/br/"; // last "/" is important
     private static final String TOPIC_CHA_HEATER_RELAY_STATE = "cha/ts/hr/"; // last "/" is important
 
-    private static final String TOPIC_CHA_BOILER_LOG = "cha/ts/log/"; // last "/" is important
+    private static final String TOPIC_CHA_THERMOSTAT_LOG = "cha/ts/log/"; // last "/" is important
 
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS = "cha/ts/settings/rs";
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER = "cha/ts/names/rs";
@@ -456,8 +456,8 @@ class MqttClientLocal {
                 return;
             }
 
-            if (topic.startsWith(TOPIC_CHA_BOILER_LOG)) {
-                String type = topic.substring(TOPIC_CHA_BOILER_LOG.length());
+            if (topic.startsWith(TOPIC_CHA_THERMOSTAT_LOG)) {
+                String type = topic.substring(TOPIC_CHA_THERMOSTAT_LOG.length());
 
                 broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatLog);
                 broadcastDataIntent.putExtra("type", type);

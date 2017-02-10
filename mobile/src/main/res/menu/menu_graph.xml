@@ -1,0 +1,43 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ge.altasoft.gia.cha.MainActivity">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/action_monday"
+
+            android:title="Monday" />
+
+        <item
+            android:id="@+id/action_tuesday"
+
+            android:title="Tuesday" />
+
+        <item
+            android:id="@+id/action_wednesday"
+
+            android:title="Wednesday" />
+
+        <item
+            android:id="@+id/action_thursday"
+
+            android:title="Thursday" />
+
+        <item
+            android:id="@+id/action_friday"
+
+            android:title="Friday" />
+
+        <item
+            android:id="@+id/action_saturday"
+
+            android:title="Saturday" />
+
+        <item
+            android:id="@+id/action_sunday"
+
+            android:title="Sunday" />
+    </group>
+</menu>

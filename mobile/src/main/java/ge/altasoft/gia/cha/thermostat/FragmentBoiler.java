@@ -3,20 +3,22 @@ package ge.altasoft.gia.cha.thermostat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.model.XYSeries;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,7 +28,6 @@ import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.GraphActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.classes.LineSeriesArray;
 import ge.altasoft.gia.cha.views.BoilerPumpView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
 
@@ -34,9 +35,13 @@ public class FragmentBoiler extends Fragment {
 
     private View rootView = null;
 
-    final private LineSeriesArray pointSeries = new LineSeriesArray(ThermostatControllerData.BOILER_SENSOR_COUNT);
-
     private boolean haveLogData = false;
+
+    private GraphicalView mChartView;
+    private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
+    private XYMultipleSeriesRenderer mRenderer;
+    private double mMinXX;
+    private Date mMaxXX;
 
     public FragmentBoiler() {
     }
@@ -48,20 +53,6 @@ public class FragmentBoiler extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_boiler, container, false);
-
-        final GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
-        pointSeries.addToGraph(graph);
-
-        graph.getViewport().setXAxisBoundsManual(false);
-        graph.getViewport().setYAxisBoundsManual(false);
-
-        graph.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View arg0) {
-                Intent intent = new Intent(getActivity(), GraphActivity.class);
-                startActivity(intent);
-            }
-        });
-
 
         ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.boilerMode));
         tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -162,9 +153,39 @@ public class FragmentBoiler extends Fragment {
                 );
         //endregion
 
+        LinearLayout chartLayout = (LinearLayout) rootView.findViewById(R.id.chart);
+        XYSeries series1 = new XYSeries("T1");
+        XYSeries series2 = new XYSeries("T2");
+        XYSeries series3 = new XYSeries("T3");
+
+        mRenderer = ThermostatUtils.getBoilerSensorChartRenderer();
+        mRenderer.setPanEnabled(false, false);
+
+        xyDataSet.addSeries(series1);
+        xyDataSet.addSeries(series2);
+        xyDataSet.addSeries(series3);
+
+        mChartView = ChartFactory.getLineChartView(getActivity(), xyDataSet, mRenderer);
+        chartLayout.addView(mChartView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        mChartView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
+                Intent intent = new Intent(getActivity(), GraphActivity.class);
+                startActivity(intent);
+            }
+        });
+
         rebuildUI(false);
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mChartView != null)
+            mChartView.repaint();
     }
 
     // rebuild everything and draws new state
@@ -174,17 +195,6 @@ public class FragmentBoiler extends Fragment {
 
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setRelayId(ThermostatControllerData.BOILER_SOLAR_PUMP);
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);
-
-//        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-//            CircularArrayList<Pair<Date, Float>> points = ThermostatControllerData.Instance.boilerSensors(i).getLogBuffer();
-//
-//            DataPoint[] dataPoints = new DataPoint[points.size()];
-//            int idx = 0;
-//            for (Pair<Date, Float> pt : points)
-//                dataPoints[idx++] = new DataPoint(pt.first.getTime(), pt.second);
-//
-//            pointSeries.getItem(i).resetData(dataPoints);
-//        }
 
         drawSensorAndRelayStates();
 
@@ -197,72 +207,23 @@ public class FragmentBoiler extends Fragment {
     public void rebuildGraph(String log) {
 
         haveLogData = true;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
-        String date0 = sdf.format(new Date());
-        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        int id;
-        long X;
-        double Y;
-        long minX = Long.MAX_VALUE, maxX = -Long.MAX_VALUE;
-        double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
-
-        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-            DataPoint[] dataPoints = new DataPoint[0];
-            pointSeries.getItem(i).resetData(dataPoints);
-        }
-
-        String[] logEntries = log.split(":");
-        for (String logEntry : logEntries) {
-            if (logEntry.length() == 11) {
-                try {
-                    X = sdf.parse(date0 + logEntry.substring(0, 6)).getTime();
-                } catch (ParseException ex) {
-                    Log.e("Graph", "Invalid X", ex);
-                    return;
-                }
-
-                try {
-                    id = Integer.parseInt(logEntry.substring(6, 7), 16) - 1;
-                } catch (NumberFormatException ex) {
-                    Log.e("Graph", "Invalid id", ex);
-                    return;
-                }
-                try {
-                    Y = Utils.decodeT(logEntry.substring(7, 11));
-                } catch (NumberFormatException ex) {
-                    Log.e("Graph", "Invalid Y", ex);
-                    return;
-                }
-
-                pointSeries.getItem(id).appendData(new DataPoint(X, Y), false, Utils.LOG_BUFFER_SIZE);
-
-                if (X < minX)
-                    minX = X;
-                if (X > maxX)
-                    maxX = X;
-
-                if (Y < minY)
-                    minY = Y;
-                if (Y > maxY)
-                    maxY = Y;
-            }
-        }
-
-        final GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
-
-        if (minY == Double.MAX_VALUE)
-            minY = 0;
-        if ( maxY == -Double.MAX_VALUE)
-            maxY = 100;
-
-        graph.getViewport().setMinX(minX);
-        graph.getViewport().setMaxX(maxX);
-
-        graph.getViewport().setMinY(minY);
-        graph.getViewport().setMaxY(maxY);
+        Date[] dates = ThermostatUtils.DrawBoilerSensorChart(log, mChartView, mRenderer, xyDataSet, getNowMinus4Hour(), 30);
+        mMinXX = dates[0].getTime();
+        mMaxXX = dates[1];
     }
 
+    private Date getNowMinus4Hour() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY, -4);
+        if (calendar.get(Calendar.MINUTE) >= 30)
+            calendar.set(Calendar.MINUTE, 30);
+        else
+            calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
 
 //    public void drawState() {
 //        if (rootView == null)
@@ -301,7 +262,28 @@ public class FragmentBoiler extends Fragment {
         if (resId != 0) {
             ((BoilerSensorView) rootView.findViewById(resId)).setSensorData(ThermostatControllerData.Instance.boilerSensors(id));
 
-            pointSeries.getItem(id).append(ThermostatControllerData.Instance.boilerSensors(id));
+            BoilerSensorData data = ThermostatControllerData.Instance.boilerSensors(id);
+            XYSeries series = xyDataSet.getSeriesAt(id);
+
+            long tm = getNowMinus4Hour().getTime();
+            while ((series.getItemCount() > 0) && (series.getX(0) < tm))
+                series.remove(0);
+
+            float v = data.getTemperature();
+            if (!Float.isNaN(v)) {
+                series.add(data.getLastReadingTime(), v);
+
+                if (data.getLastReadingTime() >= mMaxXX.getTime()) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(mMaxXX);
+                    calendar.add(Calendar.MINUTE, 30);
+                    mMaxXX = calendar.getTime();
+                    mRenderer.setXAxisMax(mMaxXX.getTime());
+                    mRenderer.addXTextLabel(mMaxXX.getTime(), new SimpleDateFormat("HH:mm", Locale.US).format(mMaxXX));
+                }
+            }
+
+            mChartView.repaint();
         }
     }
 

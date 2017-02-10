@@ -12,7 +12,15 @@
         android:maxLines="1" />
 
     <TextView
-        android:id="@+id/tvListViewItemValue"
+        android:id="@+id/tvListViewItemValue1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:maxLines="1"
+        android:paddingLeft="4dp" />
+
+    <TextView
+        android:id="@+id/tvListViewItemValue2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

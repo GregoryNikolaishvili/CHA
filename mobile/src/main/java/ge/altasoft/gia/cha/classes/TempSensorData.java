@@ -19,7 +19,7 @@ public class TempSensorData {
     private float targetT;
     private float deltaTargetT;
 
-    private long lastActivitySec;
+    private long lastReadingTime;
 
     protected TempSensorData(int id) {
         this.id = id;
@@ -32,8 +32,8 @@ public class TempSensorData {
         return this.id;
     }
 
-    long getLastActivitySec() {
-        return this.lastActivitySec;
+    public long getLastReadingTime() {
+        return this.lastReadingTime;
     }
 
     public float getTemperature() {
@@ -41,7 +41,7 @@ public class TempSensorData {
     }
 
     public void setTemperature(float value) {
-        this.lastActivitySec = System.currentTimeMillis() / 1000;
+        this.lastReadingTime = new Date().getTime();
         if (value == Utils.F_UNDEFINED)
             this.T = Float.NaN;
         else
@@ -61,7 +61,6 @@ public class TempSensorData {
     }
 
     public void setTargetTemperature(float value) {
-        this.lastActivitySec = System.currentTimeMillis() / 1000;
         if (value == Utils.F_UNDEFINED)
             this.targetT = Float.NaN;
         else
