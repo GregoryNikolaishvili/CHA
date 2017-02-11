@@ -3,6 +3,7 @@ package ge.altasoft.gia.cha.thermostat;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
+import android.util.SparseArray;
 
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
@@ -22,12 +23,59 @@ import ge.altasoft.gia.cha.Utils;
 
 public final class ThermostatUtils {
 
-    public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 3; // $ + 12 switches + autoatic_mode + datetime  + sunrise/sunset 123456789012TYYMMDDHHmmssxxxxxxxx. 34 chars
+    public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 3;
 
-    public static Date[] DrawBoilerSensorChart(String log, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet, Date startDt, int dateLabelIntervalMinutes) {
+    public static XYMultipleSeriesRenderer getChartRenderer(int rendererCount, int[] colors) {
+
+        XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
+
+        // We want to avoid black border
+        // transparent margins
+        renderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
+        //renderer.setMargins(new int[] { 60, 60, 60, 60 });
+
+        renderer.setClickEnabled(true);
+        renderer.setShowGrid(true); // we show the grid
+        renderer.setShowLegend(false);
+        renderer.setShowLabels(true, true);
+        renderer.setShowTickMarks(true);
+        renderer.setShowCustomTextGrid(true);
+
+        renderer.setPointSize(5f);
+        renderer.setAxesColor(Color.DKGRAY);
+        renderer.setLabelsColor(Color.BLACK);
+
+        renderer.setXLabelsAlign(Paint.Align.CENTER);
+        renderer.setYLabelsAlign(Paint.Align.RIGHT);
+        renderer.setXLabels(0);
+
+        renderer.setXLabelsPadding(5);
+        renderer.setYLabelsPadding(5);
+
+        for (int i = 0; i < rendererCount; i++) {
+            XYSeriesRenderer r = new XYSeriesRenderer();
+            r.setPointStyle(PointStyle.POINT);
+            if (i < colors.length)
+                r.setColor(colors[i]);
+            //r.setFillPoints(true);
+            //r.setLineWidth(2);
+            // Include low and max value
+            r.setDisplayBoundingPoints(true);
+            r.setPointStrokeWidth(1);
+            renderer.addSeriesRenderer(r);
+        }
+
+        return renderer;
+    }
+
+    public static Date[] DrawSensorChart(int sensorId, String scope, String log, Date startDt, int dateLabelIntervalMinutes, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+
+        boolean isRoomSensorLog = !scope.equals("BoilerSensor");
+        int logEntryLen = isRoomSensorLog ? 18 : 11;
 
         for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
             xyDataSet.getSeriesAt(i).clear();
@@ -35,39 +83,62 @@ public final class ThermostatUtils {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, 1);
         Date minXX = calendar.getTime();
-        Date maxXX = startDt;
+        Date maxXX;
+        if (startDt != null)
+            maxXX = startDt;
+        else {
+            calendar.add(Calendar.YEAR, -2);
+            maxXX = calendar.getTime();
+        }
 
         int id;
         Date XX;
-        double Y;
+        double T;
+        SparseArray<Double> startValues = new SparseArray<>();
 
         String[] logEntries = log.split(":");
         for (String logEntry : logEntries) {
-            if (logEntry.length() == 11) {
+            if (logEntry.length() == logEntryLen) {
                 try {
                     XX = sdf.parse(date0 + logEntry.substring(0, 6));
                 } catch (ParseException ex) {
-                    Log.e("Graph", "Invalid X", ex);
+                    Log.e("Chart", "Invalid X", ex);
                     continue;
                 }
 
-                if (XX.before(startDt))
+                try {
+                    if (isRoomSensorLog)
+                        id = Integer.parseInt(logEntry.substring(6, 10), 16);
+                    else
+                        id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Chart", "Invalid id", ex);
+                    continue;
+                }
+
+                if ((sensorId >= 0) && (sensorId != id))
                     continue;
 
                 try {
-                    id = Integer.parseInt(logEntry.substring(6, 7), 16) - 1;
+                    if (isRoomSensorLog) {
+                        T = Utils.decodeT(logEntry.substring(10, 14));
+                    } else {
+                        T = Utils.decodeT(logEntry.substring(7, 11));
+                    }
                 } catch (NumberFormatException ex) {
-                    Log.e("Graph", "Invalid id", ex);
-                    continue;
-                }
-                try {
-                    Y = Utils.decodeT(logEntry.substring(7, 11));
-                } catch (NumberFormatException ex) {
-                    Log.e("Graph", "Invalid Y", ex);
+                    Log.e("Chart", "Invalid Y", ex);
                     continue;
                 }
 
-                xyDataSet.getSeriesAt(id).add(XX.getTime(), Y);
+                if ((startDt != null) && XX.before(startDt)) {
+                    startValues.put(id, T);
+                    continue;
+                }
+
+                XYSeries series = xyDataSet.getSeriesAt(sensorId < 0 ? id : 0);
+                if ((startDt != null) && (series.getItemCount() == 0) && (startValues.get(id) != null))
+                    series.add(startDt.getTime(), startValues.get(id));
+                series.add(XX.getTime(), T);
 
                 if (XX.before(minXX))
                     minXX = XX;
@@ -106,66 +177,7 @@ public final class ThermostatUtils {
         return new Date[]{minXX, maxXX};
     }
 
-    public static XYMultipleSeriesRenderer getBoilerSensorChartRenderer() {
-
-        XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
-
-        // We want to avoid black border
-        // transparent margins
-        renderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-        //renderer.setMargins(new int[] { 60, 60, 60, 60 });
-
-        renderer.setClickEnabled(true);
-        renderer.setShowGrid(true); // we show the grid
-        renderer.setShowLegend(false);
-        renderer.setShowLabels(true, true);
-        renderer.setShowTickMarks(true);
-        renderer.setShowCustomTextGrid(true);
-
-        renderer.setPointSize(5f);
-        renderer.setAxesColor(Color.DKGRAY);
-        renderer.setLabelsColor(Color.BLACK);
-
-        renderer.setXLabelsAlign(Paint.Align.CENTER);
-        renderer.setYLabelsAlign(Paint.Align.RIGHT);
-        renderer.setXLabels(0);
-
-        renderer.setXLabelsPadding(5);
-        renderer.setYLabelsPadding(5);
-
-        XYSeriesRenderer r = new XYSeriesRenderer();
-        r.setPointStyle(PointStyle.POINT);
-        r.setColor(Color.RED);
-        //r.setFillPoints(true);
-        //r.setLineWidth(2);
-        // Include low and max value
-        r.setDisplayBoundingPoints(true);
-        r.setPointStrokeWidth(1);
-        renderer.addSeriesRenderer(r);
-
-        r = new XYSeriesRenderer();
-        r.setPointStyle(PointStyle.POINT);
-        r.setColor(Color.GREEN);
-        //r.setFillPoints(true);
-        //r.setLineWidth(2);
-        // Include low and max value
-        r.setDisplayBoundingPoints(true);
-        r.setPointStrokeWidth(1);
-        renderer.addSeriesRenderer(r);
-
-        r = new XYSeriesRenderer();
-        r.setPointStyle(PointStyle.POINT);
-        //r.setFillPoints(true);
-        //r.setLineWidth(2);
-        // Include low and max value
-        r.setDisplayBoundingPoints(true);
-        r.setPointStrokeWidth(1);
-        renderer.addSeriesRenderer(r);
-
-        return renderer;
-    }
-
-    public static void FillSensorLog(String log, ArrayList<LogItem> logBuffer, int sensorId, String scope) {
+    public static void FillSensorLog(int sensorId, String scope, String log, ArrayList<LogItem> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
@@ -194,7 +206,7 @@ public final class ThermostatUtils {
                     if (isRoomSensorLog)
                         id = Integer.parseInt(logEntry.substring(6, 10), 16);
                     else
-                        id = Integer.parseInt(logEntry.substring(6, 7), 16) - 1;
+                        id = Integer.parseInt(logEntry.substring(6, 7), 16);
                 } catch (NumberFormatException ex) {
                     Log.e("Log", "Invalid id", ex);
                     continue;

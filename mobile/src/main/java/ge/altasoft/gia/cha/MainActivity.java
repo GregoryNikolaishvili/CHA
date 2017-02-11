@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -52,6 +53,18 @@ public class MainActivity extends ChaActivity {
         viewPager.setAdapter(pagerAdapter);
     }
 
+    Handler timerHandler = new Handler();
+
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            if (pagerAdapter.fragmentBoiler != null)
+                pagerAdapter.fragmentBoiler.checkSensors();
+            timerHandler.postDelayed(this, 60000);
+        }
+    };
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -97,10 +110,14 @@ public class MainActivity extends ChaActivity {
 
             case R.id.action_refresh:
                 publish("chac/light/refresh", "1", false);
+                publish("chac/ts/refresh", "1", false);
                 return true;
 
             case R.id.action_show_info:
                 showNetworkInfo();
+                return true;
+
+            case R.id.who_is_online:
                 Intent intent = new Intent(this, WhoIsOnlineActivity.class);
                 intent.putStringArrayListExtra("list", getMqttClient().getConnectedClientList());
                 startActivity(intent);
@@ -156,8 +173,16 @@ public class MainActivity extends ChaActivity {
             pagerAdapter.fragmentRoomSensors.rebuildUI();
         if (pagerAdapter.fragmentHeaterRelays != null)
             pagerAdapter.fragmentHeaterRelays.rebuildUI();
+
+        timerHandler.postDelayed(timerRunnable, 60000);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        timerHandler.removeCallbacks(timerRunnable);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -189,7 +214,7 @@ public class MainActivity extends ChaActivity {
     }
 
     @Override
-    protected void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
+    public void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
         super.processMqttData(dataType, intent);
 
         int id;

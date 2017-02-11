@@ -6,9 +6,12 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.R;
@@ -117,5 +120,12 @@ public class BoilerSensorView extends LinearLayout {
             tvTargetTemperature.setText(String.format(Locale.US, "%.1f°", value.getTargetTemperature()));
             llTargetTemperature.setVisibility(View.VISIBLE);
         }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, -2);
+        if (value.getLastReadingTime() < calendar.getTime().getTime())
+            this.getChildAt(0).setBackgroundResource(R.drawable.rounded_border_red);
+        else
+            this.getChildAt(0).setBackgroundResource(R.drawable.rounded_border);
     }
 }

@@ -14,7 +14,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import ge.altasoft.gia.cha.classes.RelayControllerData;
-import ge.altasoft.gia.cha.Utils;
 
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_OFF;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;

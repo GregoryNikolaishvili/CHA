@@ -1,10 +1,8 @@
 package ge.altasoft.gia.cha.classes;
 
 import android.graphics.Color;
-import android.util.Pair;
 
 import java.util.Date;
-import java.util.Locale;
 
 import ge.altasoft.gia.cha.Utils;
 
@@ -19,7 +17,7 @@ public class TempSensorData {
     private float targetT;
     private float deltaTargetT;
 
-    private long lastReadingTime;
+    private long lastReadingTime = 0;
 
     protected TempSensorData(int id) {
         this.id = id;
@@ -40,7 +38,7 @@ public class TempSensorData {
         return this.T;
     }
 
-    public void setTemperature(float value) {
+    protected void setTemperature(float value) {
         this.lastReadingTime = new Date().getTime();
         if (value == Utils.F_UNDEFINED)
             this.T = Float.NaN;

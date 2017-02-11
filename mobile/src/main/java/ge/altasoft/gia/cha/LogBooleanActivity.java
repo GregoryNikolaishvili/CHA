@@ -51,7 +51,7 @@ public class LogBooleanActivity extends ChaActivity {
                 int id = intent.getIntExtra("id", 0);
 
                 if (id > 0) {
-                    RelayData sensorData = ThermostatControllerData.Instance.relays(id - 1);
+                    RelayData sensorData = ThermostatControllerData.Instance.relays(id);
                     logBuffer = sensorData.getLogBuffer();
                 }
                 break;
@@ -60,7 +60,7 @@ public class LogBooleanActivity extends ChaActivity {
                 int id = intent.getIntExtra("id", 0);
 
                 if (id > 0) {
-                    RelayData sensorData = LightControllerData.Instance.relays(id - 1);
+                    RelayData sensorData = LightControllerData.Instance.relays(id);
                     logBuffer = sensorData.getLogBuffer();
                 }
                 break;

@@ -21,7 +21,7 @@ import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 
-class MqttClientLocal {
+public class MqttClientLocal {
 
     private static final String TOPIC_CHA_SYS = "cha/sys/";
     private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/light/state/"; // last "/" is important
@@ -30,7 +30,10 @@ class MqttClientLocal {
     private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
 
     private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/ts/rs/"; // last "/" is important
+    private static final String TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH = "cha/ts/RS/"; // last "/" is important
+
     private static final String TOPIC_CHA_BOILER_SENSOR_STATE = "cha/ts/bs/"; // last "/" is important
+    private static final String TOPIC_CHA_BOILER_SENSOR_STATE_REFRESH = "cha/ts/BS/"; // last "/" is important
     private static final String TOPIC_CHA_BOILER_RELAY_STATE = "cha/ts/br/"; // last "/" is important
     private static final String TOPIC_CHA_HEATER_RELAY_STATE = "cha/ts/hr/"; // last "/" is important
 
@@ -46,7 +49,7 @@ class MqttClientLocal {
 
     static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
 
-    enum MQTTReceivedDataType {
+    public enum MQTTReceivedDataType {
         ClientConnected,
         LightRelayState,
         LightSettings,
@@ -394,7 +397,7 @@ class MqttClientLocal {
 
             if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE)) {
                 int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHT_RELAY_STATE.length()), 16);
-                LightControllerData.Instance.relays(id - 1).decodeState(payload);
+                LightControllerData.Instance.relays(id - 1).decodeState(payload);// TODO: 2/11/2017 id should start from 0
 
                 broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MqttClientLocal.MQTTReceivedDataType.LightRelayState);
                 broadcastDataIntent.putExtra("id", id);
@@ -403,12 +406,12 @@ class MqttClientLocal {
                 return;
             }
 
-            if (topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE)) {
+            if (topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH)) {
                 int id = Integer.parseInt(topic.substring(TOPIC_CHA_ROOM_SENSOR_STATE.length()), 16);
                 RoomSensorData rs = ThermostatControllerData.Instance.roomSensors(id, false);
                 if (rs == null)
                     broadcastDataIntent.putExtra("new_sensor", true);
-                ThermostatControllerData.Instance.roomSensors(id, true).decodeState(payload);
+                ThermostatControllerData.Instance.roomSensors(id, true).decodeState(payload, topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE));
 
                 broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorState);
                 broadcastDataIntent.putExtra("id", id);
@@ -435,9 +438,9 @@ class MqttClientLocal {
                 return;
             }
 
-            if (topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE)) {
+            if (topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE_REFRESH)) {
                 int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_SENSOR_STATE.length()), 16);
-                ThermostatControllerData.Instance.boilerSensors(id - 1).decodeState(payload);
+                ThermostatControllerData.Instance.boilerSensors(id).decodeState(payload);
 
                 broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSensorState);
                 broadcastDataIntent.putExtra("id", id);
@@ -447,7 +450,7 @@ class MqttClientLocal {
 
             if (topic.startsWith(TOPIC_CHA_BOILER_RELAY_STATE)) {
                 int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_RELAY_STATE.length()), 16);
-                ThermostatControllerData.Instance.boilerPumps(id - 1).decodeState(payload);
+                ThermostatControllerData.Instance.boilerPumps(id).decodeState(payload);
 
                 broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerPumpState);
                 broadcastDataIntent.putExtra("id", id);

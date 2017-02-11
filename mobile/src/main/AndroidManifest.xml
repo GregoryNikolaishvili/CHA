@@ -38,7 +38,7 @@
         <activity
             android:name=".thermostat.ThermostatSettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity android:name=".GraphActivity" />
+        <activity android:name=".thermostat.BoilerChartActivity" />
         <activity android:name=".LogTHActivity" />
         <activity android:name=".LogBooleanActivity" />
         <activity android:name=".WhoIsOnlineActivity" />

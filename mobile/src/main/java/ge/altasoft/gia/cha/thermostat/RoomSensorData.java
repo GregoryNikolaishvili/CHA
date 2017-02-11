@@ -128,19 +128,24 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         }
     }
 
-    @Override
-    public void decodeState(String payload) {
-        JSONObject jMain;
-        try {
-            jMain = new JSONObject(payload);
-            setTemperature(jMain.getInt("T") / 10f);
-            setTemperatureTrend(jMain.getString("TT").charAt(0));
+    public void decodeState(String payload, boolean isJson) {
 
-            setHumidity(jMain.getInt("H"));
-            signalLevel = jMain.getInt("S");
-            batteryLevel = jMain.getString("B");
-        } catch (JSONException e) {
-            Log.e("JSON", e.getMessage());
+        if (isJson) {
+            JSONObject jMain;
+            try {
+                jMain = new JSONObject(payload);
+                setTemperature(jMain.getInt("T") / 10f);
+                setTemperatureTrend(jMain.getString("TT").charAt(0));
+
+                setHumidity(jMain.getInt("H"));
+                signalLevel = jMain.getInt("S");
+                batteryLevel = jMain.getString("B");
+            } catch (JSONException e) {
+                Log.e("JSON", e.getMessage());
+            }
+        } else {
+            setTemperatureTrend('=');
+            setTemperature(Utils.decodeT(payload));
         }
     }
 }

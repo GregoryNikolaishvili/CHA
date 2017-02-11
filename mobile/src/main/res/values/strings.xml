@@ -33,6 +33,7 @@
     <string name="loading">Loading&#8230;</string>
     <string name="sample_normal">normal</string>
     <string name="sample_4">4</string>
+    <string name="who_is_online">Who is online</string>
 
     <string-array name="listArray">
         <item>Sunrise</item>

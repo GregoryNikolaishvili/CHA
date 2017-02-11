@@ -79,7 +79,7 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
 
                 // Create the Preferences Manually - so that the key can be refresh programatically.
 
-                for (int id = 1; id <= ThermostatControllerData.HEATING_RELAY_COUNT; id++) {
+                for (int id = 0; id < ThermostatControllerData.HEATING_RELAY_COUNT; id++) {
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 
                     screen.setTitle(Integer.toString(id));

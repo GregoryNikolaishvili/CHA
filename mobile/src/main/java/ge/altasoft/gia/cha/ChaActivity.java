@@ -84,7 +84,7 @@ public abstract class ChaActivity extends AppCompatActivity {
         }
     }
 
-    void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
+    public void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
     }
 
     // service
