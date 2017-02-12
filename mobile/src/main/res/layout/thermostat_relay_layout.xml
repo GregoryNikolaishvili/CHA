@@ -23,7 +23,7 @@
         android:paddingRight="8dp" />
 
     <ToggleButton
-        android:id="@+id/onOffButton"
+        android:id="@+id/on_off_button"
         style="@android:style/TextAppearance.Small"
         android:layout_width="100dp"
         android:layout_height="match_parent"

@@ -5,17 +5,13 @@ import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.util.Locale;
-
 import ge.altasoft.gia.cha.LogBooleanActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 import ge.altasoft.gia.cha.thermostat.ThermostatRelayData;
 
 public class ThermostatRelayView extends LinearLayout {
@@ -86,7 +82,7 @@ public class ThermostatRelayView extends LinearLayout {
 
     private ToggleButton getOnOffButton() {
         if (tbButton == null)
-            tbButton = (ToggleButton) this.findViewById(R.id.onOffButton);
+            tbButton = (ToggleButton) this.findViewById(R.id.on_off_button);
         return tbButton;
     }
 

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.LogTHActivity;
@@ -48,20 +49,7 @@ public class RoomSensorView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.room_sensor_layout, this);
 
-        getTemperatureTextView().setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (sensorData != null) {
-                    Intent intent = new Intent(getContext(), LogTHActivity.class);
-                    intent.putExtra("id", sensorData.getId());
-                    intent.putExtra("scope", "RoomSensor");
-                    getContext().startActivity(intent);
-                }
-                return true;
-            }
-        });
-
-        getHumidityTextView().setOnLongClickListener(new View.OnLongClickListener() {
+        setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (sensorData != null) {
@@ -192,5 +180,12 @@ public class RoomSensorView extends LinearLayout {
             tvRelayState.setTextColor(Color.GRAY);
             tvRelayState.setText("Off");
         }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, -2);
+        if (value.getLastReadingTime() < calendar.getTime().getTime())
+            this.getChildAt(0).setBackgroundResource(R.drawable.rounded_border_red);
+        else
+            this.getChildAt(0).setBackgroundResource(R.drawable.rounded_border);
     }
 }

@@ -11,9 +11,12 @@ import android.os.IBinder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
 
 public abstract class ChaActivity extends AppCompatActivity {
+
+    private String lastStatusMessage = "";
+    private String lastErrorMessage = "";
+    private long lastErrorMessageTime = 0;
 
     final private BroadcastReceiver broadcastStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -21,14 +24,22 @@ public abstract class ChaActivity extends AppCompatActivity {
             String statusMessage = intent.getStringExtra(MqttClientLocal.MQTT_MSG);
             boolean isError = intent.getBooleanExtra(MqttClientLocal.MQTT_MSG_IS_ERROR, false);
 
-            if (isError)
-                Toast.makeText(context, statusMessage, Toast.LENGTH_SHORT).show();
-
             MqttClientLocal.MQTTConnectionStatus status = (MqttClientLocal.MQTTConnectionStatus) intent.getSerializableExtra(MqttClientLocal.MQTT_CONN_STATUS);
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
-                if (!isError)
-                    actionBar.setSubtitle(statusMessage);
+                if (isError) {
+                    status = MqttClientLocal.MQTTConnectionStatus.ERROR;
+                    lastErrorMessage = statusMessage;
+                    lastErrorMessageTime = System.currentTimeMillis();
+                    actionBar.setSubtitle(lastStatusMessage.concat(", ").concat(statusMessage));
+                } else {
+                    lastStatusMessage = statusMessage;
+
+                    if ((status == MqttClientLocal.MQTTConnectionStatus.CONNECTED) || ((System.currentTimeMillis() - lastErrorMessageTime) > 120000))
+                        actionBar.setSubtitle(statusMessage);
+                    else
+                        actionBar.setSubtitle(statusMessage.concat(", ").concat(lastErrorMessage));
+                }
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 if (toolbar != null) {
                     switch (status) {
@@ -41,6 +52,7 @@ public abstract class ChaActivity extends AppCompatActivity {
                         case CONNECTED:
                             toolbar.setSubtitleTextColor(Color.WHITE);
                             break;
+                        case ERROR:
                         case NOTCONNECTED_UNKNOWNREASON:
                         case NOTCONNECTED_USERDISCONNECT:
                             toolbar.setSubtitleTextColor(Color.RED);

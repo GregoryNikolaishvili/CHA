@@ -58,13 +58,13 @@ public abstract class RelayControllerData {
         return this.controllerCurrentTime;
     }
 
-    protected void setControllerCurrentTime(String dateAndTime) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-        try {
-            this.controllerCurrentTime = sdf.parse(dateAndTime);
-        } catch (ParseException ignored) {
-        }
-    }
+//    protected void setControllerCurrentTime(String dateAndTime) {
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+//        try {
+//            this.controllerCurrentTime = sdf.parse(dateAndTime);
+//        } catch (ParseException ignored) {
+//        }
+//    }
 
     protected void setRelay(int index, RelayData relay) {
         relayDatas[index] = relay;
@@ -90,7 +90,7 @@ public abstract class RelayControllerData {
         relaysReordered = false;
     }
 
-    private RelayData getRelayFromUIIndex(int index) {
+    public RelayData getRelayFromUIIndex(int index) {
         RelayData[] r = Arrays.copyOf(relayDatas, relayDatas.length);
         Arrays.sort(r);
 

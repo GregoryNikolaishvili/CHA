@@ -65,7 +65,7 @@ public class Utils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         mqttBrokerLocalUrl = prefs.getString("mtqq_url_local", mqttBrokerLocalUrl);
-        mqttBrokerLocalUrl = prefs.getString("mtqq_url_global", mqttBrokerLocalUrl);
+        mqttBrokerGlobalUrl = prefs.getString("mtqq_url_global", mqttBrokerGlobalUrl);
     }
 
     public static String millisToTimeString(String format, double x) {

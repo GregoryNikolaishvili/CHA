@@ -58,6 +58,11 @@ public class FragmentRoomSensors extends Fragment {
         }
     }
 
+    public void checkSensors() {
+        if (rootView != null)
+            drawStates();
+    }
+
     // rebuild everything and draws new state
     public void rebuildUI() {
         if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveRoomSensorsSettings())
@@ -84,18 +89,18 @@ public class FragmentRoomSensors extends Fragment {
         }
     }
 
-//    public void drawState() {
-//        if (rootView == null)
-//            return;
-//
-//        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
-//            if (dragLinearLayout.getChildAt(i) instanceof RoomSensorView) {
-//                RoomSensorView rv = (RoomSensorView) dragLinearLayout.getChildAt(i);
-//                RoomSensorData data = rv.getSensorData();
-//                rv.setSensorData(data);
-//            }
-//        }
-//    }
+    public void drawStates() {
+        if (rootView == null)
+            return;
+
+        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
+            if (dragLinearLayout.getChildAt(i) instanceof RoomSensorView) {
+                RoomSensorView rv = (RoomSensorView) dragLinearLayout.getChildAt(i);
+                RoomSensorData data = rv.getSensorData();
+                rv.setSensorData(data);
+            }
+        }
+    }
 
     public void drawState(int id) {
         if (rootView == null)

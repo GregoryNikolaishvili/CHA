@@ -61,6 +61,9 @@ public class MainActivity extends ChaActivity {
         public void run() {
             if (pagerAdapter.fragmentBoiler != null)
                 pagerAdapter.fragmentBoiler.checkSensors();
+            if (pagerAdapter.fragmentRoomSensors != null)
+                pagerAdapter.fragmentRoomSensors.checkSensors();
+
             timerHandler.postDelayed(this, 60000);
         }
     };

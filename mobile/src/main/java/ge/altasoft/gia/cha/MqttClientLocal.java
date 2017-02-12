@@ -66,6 +66,7 @@ public class MqttClientLocal {
     }
 
     enum MQTTConnectionStatus {
+        ERROR,
         INITIAL,                            // initial status
         CONNECTING,                         // attempting to connect
         CONNECTED,                          // connected
@@ -107,7 +108,7 @@ public class MqttClientLocal {
         Utils.readUrlSettings(context);
         brokerUrl = "tcp://" + Utils.getMtqqBrokerUrl(context);
 
-        mqttClient = new MqttAndroidClient(context, brokerUrl, "acha." + String.valueOf(System.currentTimeMillis()));
+        mqttClient = new MqttAndroidClient(context, brokerUrl, "android." + String.valueOf(System.currentTimeMillis()));
         //mqttClient.registerResources(context);
         mqttClient.setCallback(new MqttCallbackHandler());
 

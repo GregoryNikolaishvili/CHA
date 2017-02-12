@@ -3,14 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingEnd="4dp"
+    android:paddingRight="4dp">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lightRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="100">
+
+    </android.support.v7.widget.RecyclerView>
 
     <ge.altasoft.gia.cha.views.DragLinearLayout
         android:id="@+id/lightDragLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_margin="8dp"
-        android:layout_weight="1"
+        android:layout_weight="0"
         android:orientation="vertical">
 
         <TextView
@@ -19,6 +29,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/loading" />
+
 
     </ge.altasoft.gia.cha.views.DragLinearLayout>
 
@@ -38,8 +49,8 @@
             android:id="@+id/lightControllerIsOnline"
             android:layout_width="20dp"
             android:layout_height="match_parent"
-            android:paddingRight="4dp"
             android:paddingEnd="4dp"
+            android:paddingRight="4dp"
             android:src="@drawable/circle_red" />
 
         <ToggleButton

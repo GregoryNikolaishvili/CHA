@@ -3,7 +3,7 @@
     android:title="Settings">
 
     <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
-        android:defaultValue="192.168.2.99:1883"
+        android:defaultValue="192.168.3.1:1883"
         android:key="mtqq_url_local"
         android:summary="%s"
         android:title="MTQQ Broker local Url" />
