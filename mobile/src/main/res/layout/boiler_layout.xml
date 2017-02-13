@@ -33,21 +33,21 @@
         android:id="@+id/boilerSensorRoom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
-        android:gravity="right" />
+        android:gravity="end" />
 
     <ge.altasoft.gia.cha.views.BoilerPumpView
         android:id="@+id/boilerPumpSolarPanel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp" />
+        android:layout_marginTop="150dp" />
 
     <ge.altasoft.gia.cha.views.BoilerPumpView
         android:id="@+id/boilerPumpHeating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="300dp" />
+        android:layout_marginTop="200dp" />
 
 </RelativeLayout>

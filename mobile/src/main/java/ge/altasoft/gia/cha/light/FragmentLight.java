@@ -18,8 +18,8 @@ import android.widget.ToggleButton;
 
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.classes.ItemTouchHelperAdapter;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
-import ge.altasoft.gia.cha.classes.RecyclerListAdapter;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.SimpleItemTouchHelperCallback;
@@ -27,10 +27,10 @@ import ge.altasoft.gia.cha.views.LightRelayView;
 
 public class FragmentLight extends Fragment implements OnStartDragListener {
 
-    //private DragLinearLayout dragLinearLayout = null;
     private ViewGroup rootView = null;
     private boolean dragMode = false;
     private TextView tvLoading;
+    private ItemTouchHelper mItemTouchHelper;
 
     public FragmentLight() {
     }
@@ -51,16 +51,6 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
         tvLoading.setText(getResources().getString(R.string.loading));
         rootView.addView(tvLoading, 0);
 
-//        dragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.lightDragLinearLayout);
-//        dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
-//            @Override
-//            public void onSwap(View firstView, int firstPosition,
-//                               View secondView, int secondPosition) {
-//
-//                LightControllerData.Instance.reorderRelayMapping(firstPosition, secondPosition);
-//            }
-//        });
-
         ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.lightsAutoMode));
         tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
@@ -78,23 +68,31 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
         return rootView;
     }
 
-    private ItemTouchHelper mItemTouchHelper;
+    private class MySimpleItemTouchHelperCallback extends SimpleItemTouchHelperCallback {
+        public MySimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
+            super(adapter);
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return dragMode;
+        }
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final RecyclerListAdapter adapter = new RecyclerListAdapter(this);
+        final LightRecyclerListAdapter adapter = new LightRecyclerListAdapter(this);
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.lightRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
-        //recyclerView.addItemDecoration(new SpacesItemDecoration(8));
 
         final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 3);
         recyclerView.setLayoutManager(layoutManager);
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        ItemTouchHelper.Callback callback = new MySimpleItemTouchHelperCallback(adapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
     }
@@ -109,20 +107,9 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
         dragMode = on;
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.lightRecyclerView);
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            LightRelayView relayView = (LightRelayView) recyclerView.getChildAt(i);
-            relayView.setDragMode(on);
+            LightRelayView view = (LightRelayView) recyclerView.getChildAt(i);
+            view.setDragMode(on);
         }
-
-//        for (int I = 0; I < dragLinearLayout.getChildCount(); I++) {
-//            if (dragLinearLayout.getChildAt(I) instanceof LinearLayout) {
-//                LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
-//
-//                if (on)
-//                    dragLinearLayout.setViewDraggable(lt, lt);
-//                else
-//                    dragLinearLayout.setViewNonDraggable(lt);
-//            }
-//        }
     }
 
     // rebuild everything and draw new state
@@ -130,14 +117,10 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
         if ((rootView == null) || (LightControllerData.Instance == null) || !LightControllerData.Instance.haveSettings())
             return;
 
-        if (tvLoading != null)
+        if (tvLoading != null) {
             rootView.removeView(tvLoading);
-
-//        View vLoading = dragLinearLayout.findViewById(R.id.lightLoading);
-//        if (vLoading != null)
-//            dragLinearLayout.removeView(vLoading);
-//
-//        dragLinearLayout.removeAllViews();
+            tvLoading = null;
+        }
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.lightRecyclerView);
 
@@ -164,7 +147,6 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
 //                rv.setIsOn(data.isOn());
 //            }
 //        }
-//
 //        drawFooter();
 //    }
 
@@ -175,10 +157,12 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.lightRecyclerView);
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
             LightRelayView rv = (LightRelayView) recyclerView.getChildAt(i);
-            LightRelayData data = rv.getRelayData();
-            if (data.getId() == id) {
-                rv.setIsOn(data.isOn());
-                break;
+            if (rv != null) {
+                LightRelayData data = rv.getRelayData();
+                if (data.getId() == id) {
+                    rv.setIsOn(data.isOn());
+                    break;
+                }
             }
         }
     }
@@ -198,34 +182,34 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
         ((TextView) rootView.findViewById(R.id.lightsTimeTextView)).setText(LightControllerData.Instance.GetStatusText());
     }
 
-    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
-        private int space;
-
-        public SpacesItemDecoration(int space) {
-            this.space = space;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            outRect.left = space;
-            outRect.right = space;
-            outRect.bottom = space;
-
-            outRect.left = space;
-            outRect.top = space;
-
-//            // Add top margin only for the left item to avoid double space between items
-//            if (parent.getChildLayoutPosition(view) % 4 == 0) {
-//                outRect.left = space;
-//            } else {
-//                outRect.left = 0;
-//            }
-//            // Add top margin only for the first item to avoid double space between items
-//            if (parent.getChildLayoutPosition(view) < 4) {
-//                outRect.top = space;
-//            } else {
-//                outRect.top = 0;
-//            }
-        }
-    }
+//    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+//        private int space;
+//
+//        public SpacesItemDecoration(int space) {
+//            this.space = space;
+//        }
+//
+//        @Override
+//        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+//            outRect.left = space;
+//            outRect.right = space;
+//            outRect.bottom = space;
+//
+//            outRect.left = space;
+//            outRect.top = space;
+//
+////            // Add top margin only for the left item to avoid double space between items
+////            if (parent.getChildLayoutPosition(view) % 4 == 0) {
+////                outRect.left = space;
+////            } else {
+////                outRect.left = 0;
+////            }
+////            // Add top margin only for the first item to avoid double space between items
+////            if (parent.getChildLayoutPosition(view) < 4) {
+////                outRect.top = space;
+////            } else {
+////                outRect.top = 0;
+////            }
+//        }
+//    }
 }

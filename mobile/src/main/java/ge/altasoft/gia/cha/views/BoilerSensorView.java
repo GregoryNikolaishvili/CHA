@@ -6,12 +6,10 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.R;

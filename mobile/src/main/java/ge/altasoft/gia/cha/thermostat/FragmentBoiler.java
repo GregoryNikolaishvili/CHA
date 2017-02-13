@@ -3,7 +3,9 @@ package ge.altasoft.gia.cha.thermostat;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,14 +35,14 @@ import ge.altasoft.gia.cha.views.BoilerSensorView;
 
 public class FragmentBoiler extends Fragment {
 
-    private View rootView = null;
-
     private boolean haveLogData = false;
 
+    private ViewGroup rootView = null;
     private GraphicalView mChartView;
     private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
     private XYMultipleSeriesRenderer mRenderer;
     private Date mMaxXX;
+    private TextView tvLoading;
 
     public FragmentBoiler() {
     }
@@ -51,7 +53,15 @@ public class FragmentBoiler extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_boiler, container, false);
+        rootView = (ViewGroup) inflater.inflate(R.layout.fragment_boiler, container, false);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        tvLoading = new TextView(getContext());
+
+        tvLoading.setLayoutParams(lp);
+        tvLoading.setGravity(Gravity.CENTER);
+        tvLoading.setText(getResources().getString(R.string.loading));
+        rootView.addView(tvLoading, 0);
 
         ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.boilerMode));
         tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -182,11 +192,26 @@ public class FragmentBoiler extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
         if (mChartView != null)
             mChartView.repaint();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     public void checkSensors() {
@@ -198,6 +223,11 @@ public class FragmentBoiler extends Fragment {
     public void rebuildUI(boolean requestGraphLog) {
         if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveBoilerSettings())
             return;
+
+        if (tvLoading != null) {
+            rootView.removeView(tvLoading);
+            tvLoading = null;
+        }
 
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setRelayId(ThermostatControllerData.BOILER_SOLAR_PUMP);
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);

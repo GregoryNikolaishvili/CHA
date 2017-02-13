@@ -3,8 +3,11 @@ package ge.altasoft.gia.cha.views;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,6 +32,7 @@ public class RoomSensorView extends LinearLayout {
     private TextView tvRelayState;
 
     private RoomSensorData sensorData;
+    private boolean dragMode = false;
 
     public RoomSensorView(Context context) {
         super(context);
@@ -49,6 +53,27 @@ public class RoomSensorView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.room_sensor_layout, this);
 
+        findViewById(R.id.btn_click).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popupMenu = new PopupMenu(getContext(), view);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if (sensorData != null) {
+                            Intent intent = new Intent(getContext(), LogTHActivity.class);
+                            intent.putExtra("id", sensorData.getId());
+                            intent.putExtra("scope", "RoomSensor");
+                            getContext().startActivity(intent);
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.inflate(R.menu.room_sensor_popup_menu);
+                popupMenu.show();
+            }
+        });
+
         setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -61,6 +86,10 @@ public class RoomSensorView extends LinearLayout {
                 return true;
             }
         });
+    }
+
+    public void setDragMode(boolean dragMode) {
+        this.dragMode = dragMode;
     }
 
     private TextView getSensorNameTextView() {
@@ -112,17 +141,6 @@ public class RoomSensorView extends LinearLayout {
     }
 
 
-//    public void setSensorName(CharSequence value) {
-//        getSensorNameTextView().setText(value);
-//    }
-//
-//    public void setTemperature(double value) {
-//    }
-//
-//    public void setHumidity(double value) {
-//        getHumidityTextView().setText(String.format(Locale.US, "%.0f%%", value));
-//    }
-
     public RoomSensorData getSensorData() {
         return this.sensorData;
     }
@@ -130,7 +148,7 @@ public class RoomSensorView extends LinearLayout {
     public void setSensorData(RoomSensorData value) {
         this.sensorData = value;
 
-        getSensorNameTextView().setText(value.getName() + ", order=" + String.valueOf(value.getOrder()));
+        getSensorNameTextView().setText(value.getName() + ", order=" + String.valueOf(value.getOrder()) + " bla bla bla bla bla bla blabla bla bla bla bla bla bla");
 
         getTemperatureTextView();
         float v = value.getTemperature();
@@ -184,8 +202,8 @@ public class RoomSensorView extends LinearLayout {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
         if (value.getLastReadingTime() < calendar.getTime().getTime())
-            this.getChildAt(0).setBackgroundResource(R.drawable.rounded_border_red);
+            ((CardView) getChildAt(0)).setCardBackgroundColor(Color.RED);
         else
-            this.getChildAt(0).setBackgroundResource(R.drawable.rounded_border);
+            ((CardView) getChildAt(0)).setCardBackgroundColor(Color.WHITE);
     }
 }

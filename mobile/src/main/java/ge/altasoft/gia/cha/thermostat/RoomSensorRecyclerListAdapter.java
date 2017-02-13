@@ -1,4 +1,4 @@
-package ge.altasoft.gia.cha.classes;
+package ge.altasoft.gia.cha.thermostat;
 
 import android.graphics.Color;
 import android.support.v4.view.MotionEventCompat;
@@ -7,25 +7,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.light.LightControllerData;
-import ge.altasoft.gia.cha.light.LightRelayData;
-import ge.altasoft.gia.cha.views.LightRelayView;
+import ge.altasoft.gia.cha.classes.ItemTouchHelperAdapter;
+import ge.altasoft.gia.cha.classes.ItemTouchHelperViewHolder;
+import ge.altasoft.gia.cha.classes.OnStartDragListener;
+import ge.altasoft.gia.cha.classes.RelayData;
+import ge.altasoft.gia.cha.views.RoomSensorView;
 
-public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapter.ItemViewHolder>
-        implements ItemTouchHelperAdapter {
+public class RoomSensorRecyclerListAdapter extends RecyclerView.Adapter<RoomSensorRecyclerListAdapter.ItemViewHolder> implements ItemTouchHelperAdapter {
 
     private final OnStartDragListener mDragStartListener;
 
-    public RecyclerListAdapter(OnStartDragListener dragStartListener) {
+    public RoomSensorRecyclerListAdapter(OnStartDragListener dragStartListener) {
         mDragStartListener = dragStartListener;
     }
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = new LightRelayView(parent.getContext());
+        View itemView = new RoomSensorView(parent.getContext());
 
         //int height = parent.getMeasuredWidth() / 4;
         int height = parent.getMeasuredHeight() / 4;
@@ -37,10 +37,10 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, int position) {
 
-        RelayData data = LightControllerData.Instance.getRelayFromUIIndex(position);
-        ((LightRelayView) holder.itemView).setRelayData((LightRelayData) data);
+        RoomSensorData data = ThermostatControllerData.Instance.getRoomSensorFromUIIndex(position);
+        ((RoomSensorView) holder.itemView).setSensorData((RoomSensorData) data);
 
-        // Start a drag whenever the handle view it touched
+        //Start a drag whenever the handle view it touched
         holder.handleView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -60,14 +60,14 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        LightControllerData.Instance.reorderRelayMapping(fromPosition, toPosition);
+        ThermostatControllerData.Instance.reorderRoomSensorMapping(fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }
 
     @Override
     public int getItemCount() {
-        return LightControllerData.Instance.relayCount();
+        return ThermostatControllerData.Instance.roomSensorCount();
     }
 
     static class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -76,7 +76,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter<RecyclerListAdapte
 
         ItemViewHolder(View itemView) {
             super(itemView);
-            handleView = itemView.findViewById(R.id.relay_layout);
+            handleView = itemView.findViewById(R.id.sensor_layout);
         }
 
         @Override

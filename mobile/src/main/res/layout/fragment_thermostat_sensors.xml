@@ -2,25 +2,16 @@
     android:id="@+id/thermostatSensorsContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_weight="1"
     android:orientation="vertical">
 
-    <ge.altasoft.gia.cha.views.DragLinearLayout
-        android:id="@+id/thermostatSensorDragLinearLayout"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/thermostatRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_margin="8dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_weight="100" />
 
-        <TextView
-            android:id="@+id/thermostatsLoading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/loading" />
-
-    </ge.altasoft.gia.cha.views.DragLinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

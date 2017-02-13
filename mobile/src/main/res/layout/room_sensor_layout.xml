@@ -1,76 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/rounded_border">
+    android:layout_height="match_parent"
+    android:layout_marginLeft="4dp"
+    android:layout_marginTop="4dp"
+    card_view:cardBackgroundColor="@color/cardview_light_background"
+    card_view:cardCornerRadius="4dp"
+    card_view:cardPreventCornerOverlap="true"
+    card_view:cardUseCompatPadding="true">
 
-    <TextView
-        android:id="@+id/sensor_name"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:paddingLeft="10dp"
-        android:paddingStart="10dp" />
+    <LinearLayout
+        android:id="@+id/sensor_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/temperature_value"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:text="@string/sample_temperature" />
+        <TextView
+            android:id="@+id/sensor_name"
+            style="@android:style/TextAppearance.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="none"
+            android:gravity="center"
+            android:maxLines="2"
+            android:minLines="2"
+            android:scrollHorizontally="false"
+            android:text="Sensor name" />
 
-    <TextView
-        android:id="@+id/temperature_trend"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="16dp"
-        android:layout_height="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="100"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        android:gravity="end" />
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
 
-    <TextView
-        android:id="@+id/target_temperature_value"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:text="@string/sample_temperature" />
+            <TextView
+                android:id="@+id/temperature_value"
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--" />
 
-    <TextView
-        android:id="@+id/humidity_value"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:text="@string/sample_humidity" />
+            <TextView
+                android:id="@+id/temperature_trend"
+                style="@android:style/TextAppearance.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="↑" />
 
-    <TextView
-        android:id="@+id/signal_level"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="100" />
 
-        android:gravity="end"
-        android:text="@string/sample_4" />
+            <TextView
+                android:id="@+id/humidity_value"
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--" />
 
-    <TextView
-        android:id="@+id/battery_value"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:text="@string/sample_normal" />
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/relay_state"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:gravity="end"
-        android:paddingRight="10dp"
-        android:paddingEnd="10dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/target_temperature_value"
+                style="@android:style/TextAppearance.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sample_temperature" />
+
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+
+            <TextView
+                android:id="@+id/signal_level"
+                style="@android:style/TextAppearance.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sample_4" />
+
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+
+            <TextView
+                android:id="@+id/battery_value"
+                style="@android:style/TextAppearance.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sample_normal" />
+
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+
+            <TextView
+                android:id="@+id/relay_state"
+                style="@android:style/TextAppearance.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+
+            <ImageView
+                android:id="@+id/btn_click"
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_reorder"
+                android:layout_weight="20" />
+
+            <View
+                style="@android:style/TextAppearance.Large"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="20" />
+
+        </LinearLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

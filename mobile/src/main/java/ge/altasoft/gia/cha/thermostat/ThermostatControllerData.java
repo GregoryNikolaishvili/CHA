@@ -84,6 +84,10 @@ public final class ThermostatControllerData extends RelayControllerData {
         return HEATING_RELAY_COUNT;
     }
 
+    int roomSensorCount() {
+        return roomSensorsMap.size();
+    }
+
     boolean haveRoomSensorsSettings() {
         return this.haveRoomSensorsSettings;
     }
@@ -152,7 +156,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         return roomSensorsReordered;
     }
 
-    private RoomSensorData getRoomSensorFromUIIndex(int index) {
+    RoomSensorData getRoomSensorFromUIIndex(int index) {
 
         Map<Integer, RoomSensorData> ss = sortByOrder(roomSensorsMap);
 

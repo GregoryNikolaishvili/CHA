@@ -24,6 +24,7 @@ public class TempSensorData {
         //this.enabled = false;
         this.T = Float.NaN;
         this.targetT = Float.NaN;
+        this.temperatureTrend = '=';
     }
 
     public int getId() {
