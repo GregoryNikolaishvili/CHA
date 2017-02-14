@@ -22,7 +22,7 @@ import java.util.Locale;
 
 public class Utils {
 
-    static String mqttBrokerLocalUrl = "192.168.2.99:1883";
+    static String mqttBrokerLocalUrl = "192.168.3.1:1883";
     static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
 
     public final static float F_UNDEFINED = 999.9f;

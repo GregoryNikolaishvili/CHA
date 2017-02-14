@@ -48,7 +48,8 @@ public final class LightControllerData extends RelayControllerData {
 
     String GetStatusText() {
         String now = DateFormat.getDateTimeInstance().format(this.getControllerCurrentTime());
-        return String.format(Locale.US, "%s, Sunrise: %d:%02d, Sunset: %d:%02d", now, sunriseMin / 60, sunriseMin % 60, sunsetMin / 60, sunsetMin % 60);
+        //return String.format(Locale.US, "%s, Sunrise: %d:%02d, Sunset: %d:%02d", now, sunriseMin / 60, sunriseMin % 60, sunsetMin / 60, sunsetMin % 60);
+        return now;
     }
 
     //region Encode/Decode

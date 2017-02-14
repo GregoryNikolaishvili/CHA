@@ -14,13 +14,11 @@ import android.widget.ToggleButton;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.views.DragLinearLayout;
 import ge.altasoft.gia.cha.views.ThermostatRelayView;
 
 public class FragmentHeaterRelays extends Fragment {
 
     private View rootView = null;
-    private DragLinearLayout dragLinearLayout = null;
 
     public FragmentHeaterRelays() {
     }
@@ -32,16 +30,6 @@ public class FragmentHeaterRelays extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_thermostat_relays, container, false);
-
-        dragLinearLayout = (DragLinearLayout) rootView.findViewById(R.id.thermostatRelayDragLinearLayout);
-        dragLinearLayout.setOnViewSwapListener(new DragLinearLayout.OnViewSwapListener() {
-            @Override
-            public void onSwap(View firstView, int firstPosition,
-                               View secondView, int secondPosition) {
-
-                ThermostatControllerData.Instance.reorderRelayMapping(firstPosition, secondPosition);
-            }
-        });
 
 //        ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.thermostatAutoMode));
 //        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -61,28 +49,12 @@ public class FragmentHeaterRelays extends Fragment {
     }
 
     public void setDraggableViews(boolean on) {
-        for (int I = 0; I < dragLinearLayout.getChildCount(); I++) {
-            if (dragLinearLayout.getChildAt(I) instanceof LinearLayout) {
-                LinearLayout lt = (LinearLayout) dragLinearLayout.getChildAt(I);
-
-                if (on)
-                    dragLinearLayout.setViewDraggable(lt, lt);
-                else
-                    dragLinearLayout.setViewNonDraggable(lt);
-            }
-        }
     }
 
     // rebuild everything and draws new state
     public void rebuildUI() {
         if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveSettings())
             return;
-
-        View vLoading = dragLinearLayout.findViewById(R.id.roomRelaysLoading);
-        if (vLoading != null)
-            dragLinearLayout.removeView(vLoading);
-
-        dragLinearLayout.removeAllViews();
 
         Context context = getContext();
         LinearLayout.LayoutParams lpRelay = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
@@ -92,8 +64,6 @@ public class FragmentHeaterRelays extends Fragment {
             ThermostatRelayView relayView = new ThermostatRelayView(context);
             relayView.setRelayData((ThermostatRelayData) data);
             relayView.setLayoutParams(lpRelay);
-
-            dragLinearLayout.addView(relayView);
         }
 
         drawFooter();
@@ -102,14 +72,6 @@ public class FragmentHeaterRelays extends Fragment {
     public void drawState() {
         if (rootView == null)
             return;
-
-        for (int i = 0; i < dragLinearLayout.getChildCount(); i++) {
-            if (dragLinearLayout.getChildAt(i) instanceof ThermostatRelayView) {
-                ThermostatRelayView rv = (ThermostatRelayView) dragLinearLayout.getChildAt(i);
-                ThermostatRelayData data = rv.getRelayData();
-                rv.setIsOn(data.isOn());
-            }
-        }
 
         drawFooter();
     }

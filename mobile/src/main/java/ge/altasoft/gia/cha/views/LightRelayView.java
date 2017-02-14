@@ -3,14 +3,15 @@ package ge.altasoft.gia.cha.views;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,9 +27,9 @@ public class LightRelayView extends LinearLayout {
 
     private enum ButtonState {UNKNOWN, ON, OFF, WAIT}
 
+    private boolean isPressed = false;
     private boolean dragMode = false;
     private ButtonState buttonState = ButtonState.UNKNOWN;
-    private ButtonState prevButtonState = ButtonState.UNKNOWN;
 
     private LightRelayData relayData;
 
@@ -90,45 +91,81 @@ public class LightRelayView extends LinearLayout {
     private void initializeViews(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.light_relay_layout, this);
+        setTag(false);
 
         setOnTouchListener(new OnTouchListener() {
+                               @Override
+                               public boolean onTouch(View v, MotionEvent event) {
+                                   if (!dragMode) {
+                                       switch (event.getAction()) {
+                                           case MotionEvent.ACTION_DOWN:
+                                               setIsPressed(true);
+                                               longPressHandle.postDelayed(longPressCall, ViewConfiguration.getLongPressTimeout());
+                                               break;
+
+                                           case MotionEvent.ACTION_CANCEL:
+                                               longPressHandle.removeCallbacks(longPressCall);
+                                               setIsPressed(false);
+                                               break;
+
+                                           case MotionEvent.ACTION_UP:
+                                               longPressHandle.removeCallbacks(longPressCall);
+                                               if (!(boolean) getTag()) {
+                                                   setIsPressed(false);
+                                                   onClick();
+                                               }
+                                       }
+                                       //Log.d("Touch", actionToString(event.getAction()));
+                                       return true;
+                                   }
+                                   return false;
+                               }
+                           }
+        );
+    }
+
+    final Handler longPressHandle = new Handler();
+    final Runnable longPressCall = new Runnable() {
+        @Override
+        public void run() {
+            if (isPressed)
+                onLongPress();
+        }
+    };
+
+    private void onClick() {
+        ((ChaActivity) getContext()).publish(String.format(Locale.US, "chac/light/state/%01X", relayData.getId()), buttonState == ButtonState.OFF ? "1" : "0", false);
+        setState(ButtonState.WAIT);
+    }
+
+    private void onLongPress() {
+        final CardView card = ((CardView) getChildAt(0));
+
+        card.setCardBackgroundColor(Color.GRAY);
+        PopupMenu popupMenu = new PopupMenu(getContext(), card);
+        setTag(true);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (!dragMode) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            prevButtonState = buttonState;
-                            setIsPressed(true);
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            setIsPressed(false);
-                            ((ChaActivity) getContext()).publish(String.format(Locale.US, "chac/light/state/%01X", relayData.getId()), buttonState == ButtonState.OFF ? "1" : "0", false);
-                            setState(ButtonState.WAIT);
-                            break;
-                        case MotionEvent.ACTION_CANCEL:
-                            setIsPressed(false);
-                            setState(prevButtonState);
-                            break;
-                    }
-                    //Log.d("Touch", actionToString(event.getAction()));
-                    return true;
+            public boolean onMenuItemClick(MenuItem item) {
+                setTag(false);
+                if (relayData != null) {
+                    Intent intent = new Intent(getContext(), LogBooleanActivity.class);
+                    intent.putExtra("id", relayData.getId());
+                    intent.putExtra("scope", "LightRelay");
+                    getContext().startActivity(intent);
                 }
                 return false;
             }
         });
-
-//        this.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                if (relayData != null) {
-//                    Intent intent = new Intent(getContext(), LogBooleanActivity.class);
-//                    intent.putExtra("id", relayData.getId());
-//                    intent.putExtra("scope", "LightRelay");
-//                    getContext().startActivity(intent);
-//                }
-//                return true;
-//            }
-//        });
+        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+            @Override
+            public void onDismiss(PopupMenu menu) {
+                setTag(false);
+                card.setCardBackgroundColor(Color.WHITE);
+            }
+        });
+        popupMenu.inflate(R.menu.light_relay_popup_menu);
+        popupMenu.show();
     }
 
     private void setRelayName(CharSequence value) {
@@ -139,9 +176,9 @@ public class LightRelayView extends LinearLayout {
         setState(value ? ButtonState.ON : ButtonState.OFF);
     }
 
-    private void setIsPressed(Boolean value) {
-
-        ((CardView) getChildAt(0)).setCardBackgroundColor(value ? Color.LTGRAY : Color.WHITE);
+    public void setIsPressed(boolean pressed) {
+        this.isPressed = pressed;
+        ((CardView) getChildAt(0)).setCardBackgroundColor(pressed ? Color.LTGRAY : Color.WHITE);
     }
 
     private void setState(ButtonState value) {

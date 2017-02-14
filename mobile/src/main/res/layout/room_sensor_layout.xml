@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="4dp"
+    android:layout_marginStart="4dp"
     android:layout_marginTop="4dp"
     card_view:cardBackgroundColor="@color/cardview_light_background"
     card_view:cardCornerRadius="4dp"
@@ -18,7 +19,6 @@
 
         <TextView
             android:id="@+id/sensor_name"
-            style="@android:style/TextAppearance.Small"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="none"
@@ -26,7 +26,8 @@
             android:maxLines="2"
             android:minLines="2"
             android:scrollHorizontally="false"
-            android:text="Sensor name" />
+            android:text="Sensor name"
+            android:textSize="@dimen/sensor_name_size" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,40 +37,37 @@
             android:orientation="horizontal">
 
             <View
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="20" />
 
             <TextView
                 android:id="@+id/temperature_value"
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="--" />
+                android:text="--"
+                android:textSize="@dimen/sensor_t_size" />
 
             <TextView
                 android:id="@+id/temperature_trend"
-                style="@android:style/TextAppearance.Medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="↑" />
+                android:text="↑"
+                android:textSize="@dimen/sensor_trend_size" />
 
             <View
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="100" />
 
             <TextView
                 android:id="@+id/humidity_value"
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="--" />
+                android:text="--"
+                android:textSize="@dimen/sensor_h_size" />
 
             <View
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="20" />
@@ -81,75 +79,56 @@
             android:orientation="horizontal">
 
             <View
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="20" />
+                android:layout_weight="10" />
 
             <TextView
                 android:id="@+id/target_temperature_value"
-                style="@android:style/TextAppearance.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sample_temperature" />
+                android:text="@string/sample_temperature"
+                android:textSize="@dimen/sensor_footer_size" />
 
             <View
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="20" />
 
             <TextView
                 android:id="@+id/signal_level"
-                style="@android:style/TextAppearance.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sample_4" />
+                android:text="@string/sample_4"
+                android:textSize="@dimen/sensor_footer_size" />
 
             <View
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="20" />
 
             <TextView
                 android:id="@+id/battery_value"
-                style="@android:style/TextAppearance.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sample_normal" />
+                android:text="@string/sample_normal"
+                android:textSize="@dimen/sensor_footer_size" />
 
             <View
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="20" />
 
             <TextView
                 android:id="@+id/relay_state"
-                style="@android:style/TextAppearance.Small"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/sensor_footer_size" />
 
             <View
-                style="@android:style/TextAppearance.Large"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="20" />
-
-            <ImageView
-                android:id="@+id/btn_click"
-                style="@android:style/TextAppearance.Large"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_reorder"
-                android:layout_weight="20" />
-
-            <View
-                style="@android:style/TextAppearance.Large"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="20" />
+                android:layout_weight="10" />
 
         </LinearLayout>
     </LinearLayout>

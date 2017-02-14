@@ -18,12 +18,12 @@
 
         <TextView
             android:id="@+id/relay_name"
-            style="@android:style/TextAppearance.Small"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="75"
             android:gravity="center"
-            android:text="House Front" />
+            android:textSize="@dimen/relay_name_size"
+            android:text="Sensor name" />
 
 
         <LinearLayout

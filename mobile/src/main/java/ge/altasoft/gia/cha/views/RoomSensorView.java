@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -53,10 +53,14 @@ public class RoomSensorView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.room_sensor_layout, this);
 
-        findViewById(R.id.btn_click).setOnClickListener(new OnClickListener() {
+        setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
-                PopupMenu popupMenu = new PopupMenu(getContext(), view);
+            public boolean onLongClick(View v) {
+
+                final CardView card = ((CardView) ((ViewGroup) v).getChildAt(0));
+
+                card.setCardBackgroundColor(Color.GRAY);
+                PopupMenu popupMenu = new PopupMenu(getContext(), v);
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -69,20 +73,15 @@ public class RoomSensorView extends LinearLayout {
                         return false;
                     }
                 });
+                popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+                    @Override
+                    public void onDismiss(PopupMenu menu) {
+                        card.setCardBackgroundColor(Color.WHITE);
+                    }
+                });
                 popupMenu.inflate(R.menu.room_sensor_popup_menu);
                 popupMenu.show();
-            }
-        });
 
-        setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (sensorData != null) {
-                    Intent intent = new Intent(getContext(), LogTHActivity.class);
-                    intent.putExtra("id", sensorData.getId());
-                    intent.putExtra("scope", "RoomSensor");
-                    getContext().startActivity(intent);
-                }
                 return true;
             }
         });
