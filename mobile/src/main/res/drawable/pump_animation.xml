@@ -2,12 +2,15 @@
 <animation-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:oneshot="false">
     <item
-        android:drawable="@drawable/pump1"
+        android:drawable="@drawable/pump_0"
         android:duration="500" />
     <item
-        android:drawable="@drawable/pump2"
+        android:drawable="@drawable/pump_45"
         android:duration="500" />
     <item
-        android:drawable="@drawable/pump3"
+        android:drawable="@drawable/pump_90"
+        android:duration="500" />
+    <item
+        android:drawable="@drawable/pump_135"
         android:duration="500" />
 </animation-list>

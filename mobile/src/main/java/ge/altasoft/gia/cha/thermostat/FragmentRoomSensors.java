@@ -113,10 +113,12 @@ public class FragmentRoomSensors extends Fragment implements OnStartDragListener
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.thermostatRecyclerView);
 
+        int prevOrder = -1;
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
             RoomSensorView sensor = (RoomSensorView) recyclerView.getChildAt(i);
             if (sensor != null) {
                 RoomSensorData data = ThermostatControllerData.Instance.getRoomSensorFromUIIndex(i);
+                data.setOrder(i + 1);
                 sensor.setSensorData(data);
             }
         }

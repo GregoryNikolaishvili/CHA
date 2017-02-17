@@ -92,8 +92,8 @@ public class FragmentBoiler extends Fragment {
                                                   final int heaterPipePositionX = 420;
                                                   final int heaterPipePositionY = 190;
 
-                                                  final int topSensorPositionY = 140;
-                                                  final int bottomSensorPositionY = 240;
+                                                  final int topSensorPositionY = 130;
+                                                  final int bottomSensorPositionY = 235;
 
                                                   final int solarPanelTopRightX = 130;
                                                   final int solarPanelTopRightY = 28;
@@ -168,7 +168,7 @@ public class FragmentBoiler extends Fragment {
         XYSeries series3 = new XYSeries("T3");
         XYSeries series4 = new XYSeries("T4");
 
-        mRenderer = ThermostatUtils.getChartRenderer(4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
+        mRenderer = ThermostatUtils.getChartRenderer(this.getContext(), 4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
         mRenderer.setPanEnabled(false, false);
 
         xyDataSet.addSeries(series1);

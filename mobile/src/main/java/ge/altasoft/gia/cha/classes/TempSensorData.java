@@ -21,6 +21,7 @@ public class TempSensorData {
 
     protected TempSensorData(int id) {
         this.id = id;
+        this.order = 99;
         //this.enabled = false;
         this.T = Float.NaN;
         this.targetT = Float.NaN;

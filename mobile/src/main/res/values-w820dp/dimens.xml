@@ -5,10 +5,18 @@
     <dimen name="activity_horizontal_margin">64dp</dimen>
 
     <dimen name="relay_name_size">18sp</dimen>
+
     <dimen name="sensor_name_size">18sp</dimen>
     <dimen name="sensor_t_size">30sp</dimen>
-    <dimen name="sensor_trend_size">24sp</dimen>
+    <dimen name="sensor_trend_size">20sp</dimen>
     <dimen name="sensor_h_size">24sp</dimen>
     <dimen name="sensor_footer_size">13sp</dimen>
+    <dimen name="sensor_margin_size">4dp</dimen>
+
+    <dimen name="boiler_sensor_t_size">30sp</dimen>
+    <dimen name="boiler_sensor_trend_size">20sp</dimen>
+    <dimen name="boiler_sensor_target_size">20sp</dimen>
+
+    <dimen name="chart_label_size">14sp</dimen>
 
 </resources>

@@ -1,6 +1,7 @@
 package ge.altasoft.gia.cha.light;
 
 import android.content.SharedPreferences;
+import android.widget.ToggleButton;
 
 import java.text.DateFormat;
 import java.util.Locale;
@@ -50,6 +51,7 @@ public final class LightControllerData extends RelayControllerData {
         String now = DateFormat.getDateTimeInstance().format(this.getControllerCurrentTime());
         //return String.format(Locale.US, "%s, Sunrise: %d:%02d, Sunset: %d:%02d", now, sunriseMin / 60, sunriseMin % 60, sunsetMin / 60, sunsetMin % 60);
         return now;
+        
     }
 
     //region Encode/Decode

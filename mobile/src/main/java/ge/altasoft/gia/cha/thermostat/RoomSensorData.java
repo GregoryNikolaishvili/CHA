@@ -80,14 +80,14 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
 
     void encodeOrderAndName(StringBuilder sb2) {
         sb2.append(String.format(Locale.US, "%04X", this.id));
-        sb2.append(String.format(Locale.US, "%01X", this.order));
+        sb2.append(String.format(Locale.US, "%02X", this.order));
         sb2.append(Utils.encodeArduinoString(name));
         sb2.append(';');
     }
 
     void decodeOrderAndName(String s) {
-        order = Character.digit(s.charAt(0), 16);
-        name = Utils.decodeArduinoString(s.substring(1));
+        order = Integer.parseInt(s.substring(0, 2), 16);
+        name = Utils.decodeArduinoString(s.substring(2));
     }
 
     public void encodeSettings(StringBuilder sb) {

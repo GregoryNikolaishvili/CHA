@@ -91,7 +91,7 @@ public class BoilerSensorView extends LinearLayout {
 
         float v = value.getTemperature();
         if (Float.isNaN(v))
-            tvTemperature.setText("--");
+            tvTemperature.setText("- - - -");
         else
             tvTemperature.setText(String.format(Locale.US, "%.1f°", value.getTemperature()));
         tvTemperature.setTextColor(value.getTemperatureColor());

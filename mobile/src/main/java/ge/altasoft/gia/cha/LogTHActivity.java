@@ -63,7 +63,7 @@ public class LogTHActivity extends ChaActivity {
         LinearLayout chartLayout = (LinearLayout) findViewById(R.id.chartLogBig);
         XYSeries seriesT = new XYSeries("T");
 
-        mRenderer = ThermostatUtils.getChartRenderer(1, new int[]{Color.RED});
+        mRenderer = ThermostatUtils.getChartRenderer(this, 1, new int[]{Color.RED});
         mRenderer.setZoomEnabled(true, true);
         mRenderer.setPanEnabled(true, true);
         mRenderer.setZoomButtonsVisible(true);
@@ -125,7 +125,7 @@ public class LogTHActivity extends ChaActivity {
                             String log = intent.getStringExtra("log");
                             ThermostatUtils.FillSensorLog(sensorId, scope, log, logBuffer);
                             adapter.notifyDataSetChanged();
-                            ThermostatUtils.DrawSensorChart(sensorId, scope, log, null, 60, mChartView, mRenderer, xyDataSet);
+                            ThermostatUtils.DrawSensorChart(sensorId, scope, log, null, 120, mChartView, mRenderer, xyDataSet);
                         }
                         break;
                     case "RoomSensor":
@@ -133,7 +133,7 @@ public class LogTHActivity extends ChaActivity {
                             String log = intent.getStringExtra("log");
                             ThermostatUtils.FillSensorLog(sensorId, scope, log, logBuffer);
                             adapter.notifyDataSetChanged();
-                            ThermostatUtils.DrawSensorChart(sensorId, scope, log, null, 60, mChartView, mRenderer, xyDataSet);
+                            ThermostatUtils.DrawSensorChart(sensorId, scope, log, null, 120, mChartView, mRenderer, xyDataSet);
                         }
                         break;
                 }

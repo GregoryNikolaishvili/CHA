@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -189,19 +190,19 @@ public class LightRelayView extends LinearLayout {
         try {
             switch (value) {
                 case UNKNOWN:
-                    ((CardView) findViewById(R.id.relay_light)).setCardBackgroundColor(0);
+                    ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_unknown);
                     setEnabled(false);
                     break;
                 case ON:
-                    ((CardView) findViewById(R.id.relay_light)).setCardBackgroundColor(Color.GREEN);
+                    ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_on);
                     setEnabled(true);
                     break;
                 case OFF:
-                    ((CardView) findViewById(R.id.relay_light)).setCardBackgroundColor(Color.GRAY);
+                    ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_off);
                     setEnabled(true);
                     break;
                 case WAIT:
-                    ((CardView) findViewById(R.id.relay_light)).setCardBackgroundColor(Color.YELLOW);
+                    ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_wait);
                     setEnabled(false);
                     setEnabled(true);//// TODO: 2/12/2017
                     break;

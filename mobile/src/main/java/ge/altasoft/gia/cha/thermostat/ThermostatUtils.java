@@ -1,9 +1,12 @@
 package ge.altasoft.gia.cha.thermostat;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.TypedValue;
 
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
@@ -19,13 +22,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 
 public final class ThermostatUtils {
 
     public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 3;
 
-    public static XYMultipleSeriesRenderer getChartRenderer(int rendererCount, int[] colors) {
+    public static XYMultipleSeriesRenderer getChartRenderer(Context context, int rendererCount, int[] colors) {
 
         XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 
@@ -33,6 +37,7 @@ public final class ThermostatUtils {
         // transparent margins
         renderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
         //renderer.setMargins(new int[] { 60, 60, 60, 60 });
+        renderer.setMargins(new int[] {30, 70, 10, 0});
 
         renderer.setClickEnabled(true);
         renderer.setShowGrid(true); // we show the grid
@@ -49,8 +54,17 @@ public final class ThermostatUtils {
         renderer.setYLabelsAlign(Paint.Align.RIGHT);
         renderer.setXLabels(0);
 
+        renderer.setShowGridY(true);
+        //renderer.setYLabelsVerticalPadding(30);
         renderer.setXLabelsPadding(5);
         renderer.setYLabelsPadding(5);
+
+        renderer.setYLabelsAngle(-90);
+        renderer.setLabelsTextSize(context.getResources().getDimension(R.dimen.chart_label_size));
+
+        //DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        //float sz = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, metrics);
+        //renderer.setLabelsTextSize(sz);
 
         for (int i = 0; i < rendererCount; i++) {
             XYSeriesRenderer r = new XYSeriesRenderer();
@@ -58,7 +72,7 @@ public final class ThermostatUtils {
             if (i < colors.length)
                 r.setColor(colors[i]);
             //r.setFillPoints(true);
-            //r.setLineWidth(2);
+            r.setLineWidth(2);
             // Include low and max value
             r.setDisplayBoundingPoints(true);
             r.setPointStrokeWidth(1);

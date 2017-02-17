@@ -147,12 +147,12 @@ public class RoomSensorView extends LinearLayout {
     public void setSensorData(RoomSensorData value) {
         this.sensorData = value;
 
-        getSensorNameTextView().setText(value.getName() + ", order=" + String.valueOf(value.getOrder()) + " bla bla bla bla bla bla blabla bla bla bla bla bla bla");
+        getSensorNameTextView().setText(value.getName() + ", order=" + String.valueOf(value.getOrder()));
 
         getTemperatureTextView();
         float v = value.getTemperature();
         if (Float.isNaN(v))
-            tvTemperature.setText("--");
+            tvTemperature.setText("- - - -");
         else
             tvTemperature.setText(String.format(Locale.US, "%.1f°", v));
         tvTemperature.setTextColor(value.getTemperatureColor());
@@ -173,13 +173,13 @@ public class RoomSensorView extends LinearLayout {
 
         v = value.getTargetTemperature();
         if (Float.isNaN(v))
-            getTargetTemperatureTextView().setText("--");
+            getTargetTemperatureTextView().setText("- - - -");
         else
             getTargetTemperatureTextView().setText(String.format(Locale.US, "%.1f°", v));
 
         v = value.getHumidity();
         if (Float.isNaN(v))
-            getHumidityTextView().setText("--");
+            getHumidityTextView().setText("- - - -");
         else
             getHumidityTextView().setText(String.format(Locale.US, "%.0f%%", v));
 
@@ -201,7 +201,7 @@ public class RoomSensorView extends LinearLayout {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
         if (value.getLastReadingTime() < calendar.getTime().getTime())
-            ((CardView) getChildAt(0)).setCardBackgroundColor(Color.RED);
+            ((CardView) getChildAt(0)).setCardBackgroundColor(Color.LTGRAY);
         else
             ((CardView) getChildAt(0)).setCardBackgroundColor(Color.WHITE);
     }
