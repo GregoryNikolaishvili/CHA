@@ -48,25 +48,6 @@ public class LogBooleanActivity extends ChaActivity {
         Intent intent = getIntent();
         String scope = intent.getStringExtra("scope");
         sensorId = intent.getIntExtra("id", -1);
-
-        switch (scope) {
-            case "LightRelay": {
-                int id = intent.getIntExtra("id", 0);
-
-                if (id > 0) {
-                    RelayData sensorData = LightControllerData.Instance.relays(id);
-                    //logBuffer = sensorData.getLogBuffer();
-                }
-                break;
-            }
-        }
-
-//        if (logBuffer != null) {
-//            adapter = new StateLogAdapter(this, logBuffer);
-//
-//            ListView listView = (ListView) findViewById(R.id.lvLogBoolean);
-//            listView.setAdapter(adapter);
-//        }
     }
 
     @Override
