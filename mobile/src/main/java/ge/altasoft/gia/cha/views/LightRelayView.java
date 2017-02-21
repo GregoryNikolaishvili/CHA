@@ -19,7 +19,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.ChaActivity;
-import ge.altasoft.gia.cha.LogBooleanActivity;
+import ge.altasoft.gia.cha.LogStateActivity;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.light.LightRelayData;
 import ge.altasoft.gia.cha.R;
@@ -150,7 +150,7 @@ public class LightRelayView extends LinearLayout {
             public boolean onMenuItemClick(MenuItem item) {
                 setTag(false);
                 if (relayData != null) {
-                    Intent intent = new Intent(getContext(), LogBooleanActivity.class);
+                    Intent intent = new Intent(getContext(), LogStateActivity.class);
                     intent.putExtra("id", relayData.getId());
                     intent.putExtra("scope", "LightRelay");
                     getContext().startActivity(intent);
@@ -221,6 +221,6 @@ public class LightRelayView extends LinearLayout {
 
         setRelayName(value.getName()); // + ", order=" + String.valueOf(value.getOrder()));
         //setComment(value.getComment());
-        setIsOn(value.isOn());
+        setIsOn(value.getState() != 0);
     }
 }

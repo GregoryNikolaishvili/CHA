@@ -3,10 +3,8 @@ package ge.altasoft.gia.cha.thermostat;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
-import android.util.TypedValue;
 
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
@@ -24,6 +22,8 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
+import ge.altasoft.gia.cha.classes.LogRelayItem;
+import ge.altasoft.gia.cha.classes.LogTHItem;
 
 public final class ThermostatUtils {
 
@@ -37,7 +37,7 @@ public final class ThermostatUtils {
         // transparent margins
         renderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
         //renderer.setMargins(new int[] { 60, 60, 60, 60 });
-        renderer.setMargins(new int[] {30, 70, 10, 0});
+        renderer.setMargins(new int[]{30, 70, 10, 0});
 
         renderer.setClickEnabled(true);
         renderer.setShowGrid(true); // we show the grid
@@ -191,7 +191,7 @@ public final class ThermostatUtils {
         return new Date[]{minXX, maxXX};
     }
 
-    public static void FillSensorLog(int sensorId, String scope, String log, ArrayList<LogItem> logBuffer) {
+    public static void FillSensorLog(int sensorId, String scope, String log, ArrayList<LogTHItem> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
@@ -241,9 +241,52 @@ public final class ThermostatUtils {
                     continue;
                 }
 
-                logBuffer.add(new LogItem(XX, (float) T, (float) H));
+                logBuffer.add(new LogTHItem(XX, (float) T, (float) H));
             }
         }
     }
 
+    public static void FillRelayLog(int relayId, String scope, String log, ArrayList<LogRelayItem> logBuffer) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
+        String date0 = sdf.format(new Date());
+        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+
+        logBuffer.clear();
+
+        int id;
+        Date XX;
+        int state;
+
+
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == 8) {
+                try {
+                    XX = sdf.parse(date0 + logEntry.substring(0, 6));
+                } catch (ParseException ex) {
+                    Log.e("Log", "Invalid X", ex);
+                    continue;
+                }
+
+                try {
+                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid id", ex);
+                    continue;
+                }
+
+                if (id != relayId)
+                    continue;
+
+                try {
+                    state = Integer.parseInt(logEntry.substring(7, 8), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid Y", ex);
+                    continue;
+                }
+
+                logBuffer.add(new LogRelayItem(XX, state));
+            }
+        }
+    }
 }

@@ -61,17 +61,17 @@ public class BoilerChartActivity extends ChaActivity {
 
         switch (dataType) {
             case ThermostatBoilerSensorState:
-                int id = intent.getIntExtra("id", 0);
+                int id = intent.getIntExtra("id", -1);
 
                 BoilerSensorData data = ThermostatControllerData.Instance.boilerSensors(id);
                 float v = data.getTemperature();
                 if (!Float.isNaN(v)) {
-                    xyDataSet.getSeriesAt(id).add(data.getLastReadingTime(), v);
+                    xyDataSet.getSeriesAt(id).add(data.getLastSyncTime(), v);
                     mChartView.repaint();
                 }
                 break;
 
-            case ThermostatLog:
+            case Log:
                 if (intent.getStringExtra("type").startsWith("boiler"))
                     ThermostatUtils.DrawSensorChart(-1, "BoilerSensor", intent.getStringExtra("log"), null, 120, mChartView, mRenderer, xyDataSet);
                 break;

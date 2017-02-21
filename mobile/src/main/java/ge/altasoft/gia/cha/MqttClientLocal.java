@@ -24,6 +24,9 @@ import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 public class MqttClientLocal {
 
     private static final String TOPIC_CHA_SYS = "cha/sys/";
+    private static final String TOPIC_CHA_ALERT = "cha/alert";
+    private static final String TOPIC_CHA_LOG = "cha/log/"; // last "/" is important
+
     private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/light/state/"; // last "/" is important
 
     private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
@@ -37,7 +40,7 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_BOILER_RELAY_STATE = "cha/ts/br/"; // last "/" is important
     private static final String TOPIC_CHA_HEATER_RELAY_STATE = "cha/ts/hr/"; // last "/" is important
 
-    private static final String TOPIC_CHA_THERMOSTAT_LOG = "cha/ts/log/"; // last "/" is important
+    private static final String TOPIC_CHA_THERMOSTAT_STATE = "cha/ts/state";
 
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS = "cha/ts/settings/rs";
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER = "cha/ts/names/rs";
@@ -50,19 +53,22 @@ public class MqttClientLocal {
     static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
 
     public enum MQTTReceivedDataType {
+        Alert,
+        Log,
         ClientConnected,
+
         LightRelayState,
         LightSettings,
         LightNameAndOrders,
 
+        ThermostatState,
         ThermostatRoomSensorState,
         ThermostatBoilerSensorState,
         ThermostatBoilerPumpState,
         ThermostatRoomSensorSettings,
         ThermostatRoomSensorNameAndOrders,
         ThermostatHeaterRelayState,
-        ThermostatBoilerSettings,
-        ThermostatLog
+        ThermostatBoilerSettings
     }
 
     enum MQTTConnectionStatus {
@@ -318,10 +324,10 @@ public class MqttClientLocal {
 
             Intent broadcastDataIntent = new Intent();
             broadcastDataIntent.setAction(MQTT_DATA_INTENT);
+            try {
+                switch (topic) {
 
-            switch (topic) {
-
-                //region SYS
+                    //region SYS
 //                case TOPIC_CHA_SYS_OLD: // TODO: 1/24/2017  obsolete
 //                    switch (payload) {
 //                        case "light controller connected":
@@ -337,45 +343,58 @@ public class MqttClientLocal {
 //                            break;
 //                    }
 //                    break;
-                //endregion
+                    //endregion
 
-                //region Lights
-                case TOPIC_CHA_LIGHTS_SETTINGS:
-                    LightControllerData.Instance.decodeSettings(payload);
+                    case TOPIC_CHA_ALERT:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.Alert);
+                        broadcastDataIntent.putExtra("message", payload);
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
 
-                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightSettings);
-                    context.sendBroadcast(broadcastDataIntent);
-                    break;
+                    case TOPIC_CHA_THERMOSTAT_STATE:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatState);
+                        broadcastDataIntent.putExtra("state", Integer.parseInt(payload, 16));
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
 
-                case TOPIC_CHA_LIGHTS_NAMES_AND_ORDER:
-                    LightControllerData.Instance.decodeNamesAndOrder(payload);
 
-                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightNameAndOrders);
-                    context.sendBroadcast(broadcastDataIntent);
-                    break;
-                //endregion
+                    //region Lights
+                    case TOPIC_CHA_LIGHTS_SETTINGS:
+                        LightControllerData.Instance.decodeSettings(payload);
 
-                //region Thermostat
-                case TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS:
-                    ThermostatControllerData.Instance.decodeRoomSensorSettings(payload);
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightSettings);
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
 
-                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorSettings);
-                    context.sendBroadcast(broadcastDataIntent);
-                    break;
+                    case TOPIC_CHA_LIGHTS_NAMES_AND_ORDER:
+                        LightControllerData.Instance.decodeNamesAndOrder(payload);
 
-                case TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER:
-                    ThermostatControllerData.Instance.decodeRoomSensorNamesAndOrder(payload);
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightNameAndOrders);
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
+                    //endregion
 
-                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorNameAndOrders);
-                    context.sendBroadcast(broadcastDataIntent);
-                    break;
+                    //region Thermostat
+                    case TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS:
+                        ThermostatControllerData.Instance.decodeRoomSensorSettings(payload);
 
-                case TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS:
-                    ThermostatControllerData.Instance.decodeBoilerSettings(payload);
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorSettings);
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
 
-                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSettings);
-                    context.sendBroadcast(broadcastDataIntent);
-                    break;
+                    case TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER:
+                        ThermostatControllerData.Instance.decodeRoomSensorNamesAndOrder(payload);
+
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorNameAndOrders);
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
+
+                    case TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS:
+                        ThermostatControllerData.Instance.decodeBoilerSettings(payload);
+
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSettings);
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
 
 
 //                case TOPIC_CHA_THERMOSTAT_HEATER_RELAY_SETTINGS:
@@ -392,108 +411,110 @@ public class MqttClientLocal {
 //                    context.sendBroadcast(broadcastDataIntent);
 //                    break;
 
-                //endregion
+                    //endregion
 
-            }
-
-            if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE)) {
-                int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHT_RELAY_STATE.length()), 16);
-                LightControllerData.Instance.relays(id - 1).decodeState(payload);// TODO: 2/11/2017 id should start from 0
-
-                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MqttClientLocal.MQTTReceivedDataType.LightRelayState);
-                broadcastDataIntent.putExtra("id", id);
-                context.sendBroadcast(broadcastDataIntent);
-
-                return;
-            }
-
-            if (topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH)) {
-                int id = Integer.parseInt(topic.substring(TOPIC_CHA_ROOM_SENSOR_STATE.length()), 16);
-                RoomSensorData rs = ThermostatControllerData.Instance.roomSensors(id, false);
-                if (rs == null)
-                    broadcastDataIntent.putExtra("new_sensor", true);
-                ThermostatControllerData.Instance.roomSensors(id, true).decodeState(payload, topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE));
-
-                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorState);
-                broadcastDataIntent.putExtra("id", id);
-                context.sendBroadcast(broadcastDataIntent);
-                return;
-            }
-
-            if (topic.startsWith(TOPIC_CHA_HEATER_RELAY_STATE)) {
-                int id = Integer.parseInt(topic.substring(TOPIC_CHA_HEATER_RELAY_STATE.length()), 16);
-
-                ArrayList<Integer> ids = ThermostatControllerData.Instance.setHeaterRelayIsOn(id, !payload.equals("0"));
-                for (int idx : ids) {
-                    Intent intent = new Intent();
-                    intent.setAction(MQTT_DATA_INTENT);
-                    intent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorState);
-                    intent.putExtra("id", idx);
-                    context.sendBroadcast(intent);
                 }
 
-                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatHeaterRelayState);
-                broadcastDataIntent.putExtra("id", id);
-                context.sendBroadcast(broadcastDataIntent);
+                if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHT_RELAY_STATE.length()), 16);
+                    LightControllerData.Instance.relays(id - 1).decodeState(payload);// TODO: 2/11/2017 id should start from 0
 
-                return;
-            }
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MqttClientLocal.MQTTReceivedDataType.LightRelayState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
 
-            if (topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE_REFRESH)) {
-                int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_SENSOR_STATE.length()), 16);
-                ThermostatControllerData.Instance.boilerSensors(id).decodeState(payload);
-
-                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSensorState);
-                broadcastDataIntent.putExtra("id", id);
-                context.sendBroadcast(broadcastDataIntent);
-                return;
-            }
-
-            if (topic.startsWith(TOPIC_CHA_BOILER_RELAY_STATE)) {
-                int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_RELAY_STATE.length()), 16);
-                ThermostatControllerData.Instance.boilerPumps(id).decodeState(payload);
-
-                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerPumpState);
-                broadcastDataIntent.putExtra("id", id);
-                context.sendBroadcast(broadcastDataIntent);
-
-                return;
-            }
-
-            if (topic.startsWith(TOPIC_CHA_THERMOSTAT_LOG)) {
-                String type = topic.substring(TOPIC_CHA_THERMOSTAT_LOG.length());
-
-                broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatLog);
-                broadcastDataIntent.putExtra("type", type);
-                broadcastDataIntent.putExtra("log", payload);
-                context.sendBroadcast(broadcastDataIntent);
-            }
-
-
-            if (topic.startsWith(TOPIC_CHA_SYS)) {
-                String clientId = topic.substring(TOPIC_CHA_SYS.length());
-                switch (payload) {
-                    case "connected":
-                        if (!connectedClients.contains(clientId))
-                            connectedClients.add(clientId);
-
-                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ClientConnected);
-                        broadcastDataIntent.putExtra("id", clientId);
-                        broadcastDataIntent.putExtra("value", true);
-                        context.sendBroadcast(broadcastDataIntent);
-                        break;
-
-                    case "disconnected":
-                    case "":
-                        if (connectedClients.contains(clientId))
-                            connectedClients.remove(clientId);
-
-                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ClientConnected);
-                        broadcastDataIntent.putExtra("id", clientId);
-                        broadcastDataIntent.putExtra("value", false);
-                        context.sendBroadcast(broadcastDataIntent);
-                        break;
+                    return;
                 }
+
+                if (topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_ROOM_SENSOR_STATE.length()), 16);
+                    RoomSensorData rs = ThermostatControllerData.Instance.roomSensors(id, false);
+                    if (rs == null)
+                        broadcastDataIntent.putExtra("new_sensor", true);
+                    ThermostatControllerData.Instance.roomSensors(id, true).decodeState(payload, topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE));
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+                    return;
+                }
+
+                if (topic.startsWith(TOPIC_CHA_HEATER_RELAY_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_HEATER_RELAY_STATE.length()), 16);
+
+                    ArrayList<Integer> ids = ThermostatControllerData.Instance.setHeaterRelayIsOn(id, !payload.equals("0"));
+                    for (int idx : ids) {
+                        Intent intent = new Intent();
+                        intent.setAction(MQTT_DATA_INTENT);
+                        intent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorState);
+                        intent.putExtra("id", idx);
+                        context.sendBroadcast(intent);
+                    }
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatHeaterRelayState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+
+                    return;
+                }
+
+                if (topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE_REFRESH)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_SENSOR_STATE.length()), 16);
+                    ThermostatControllerData.Instance.boilerSensors(id).decodeState(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSensorState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+                    return;
+                }
+
+                if (topic.startsWith(TOPIC_CHA_BOILER_RELAY_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_RELAY_STATE.length()), 16);
+                    ThermostatControllerData.Instance.boilerPumps(id).decodeState(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerPumpState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+
+                    return;
+                }
+
+                if (topic.startsWith(TOPIC_CHA_LOG)) {
+                    String type = topic.substring(TOPIC_CHA_LOG.length());
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.Log);
+                    broadcastDataIntent.putExtra("type", type);
+                    broadcastDataIntent.putExtra("log", payload);
+                    context.sendBroadcast(broadcastDataIntent);
+                }
+
+                if (topic.startsWith(TOPIC_CHA_SYS)) {
+                    String clientId = topic.substring(TOPIC_CHA_SYS.length());
+                    switch (payload) {
+                        case "connected":
+                            if (!connectedClients.contains(clientId))
+                                connectedClients.add(clientId);
+
+                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ClientConnected);
+                            broadcastDataIntent.putExtra("id", clientId);
+                            broadcastDataIntent.putExtra("value", true);
+                            context.sendBroadcast(broadcastDataIntent);
+                            break;
+
+                        case "disconnected":
+                        case "":
+                            if (connectedClients.contains(clientId))
+                                connectedClients.remove(clientId);
+
+                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ClientConnected);
+                            broadcastDataIntent.putExtra("id", clientId);
+                            broadcastDataIntent.putExtra("value", false);
+                            context.sendBroadcast(broadcastDataIntent);
+                            break;
+                    }
+                }
+            } catch (Exception ex) {
+                Log.e("mqtt", ex.getMessage(), ex);
             }
         }
 

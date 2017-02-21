@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -17,37 +17,35 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.classes.LogRelayItem;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
+import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
-public class LogBooleanActivity extends ChaActivity {
-
-    public class LogItem {
-        public Date date;
-        public int state;
-
-        public LogItem(Date date, int state) {
-            this.date = date;
-            this.state = state;
-        }
-    }
+public class LogStateActivity extends ChaActivity {
 
     final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
     private String scope;
-    private int sensorId;
+    private int relayId;
 
     private StateLogAdapter adapter = null;
-    private ArrayList<LogItem> logBuffer;
+    private ArrayList<LogRelayItem> logBuffer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_log_boolean);
+        setContentView(R.layout.activity_log_state);
 
         Intent intent = getIntent();
-        String scope = intent.getStringExtra("scope");
-        sensorId = intent.getIntExtra("id", -1);
+        scope = intent.getStringExtra("scope");
+        relayId = intent.getIntExtra("id", -1);
+
+        logBuffer = new ArrayList<>();
+        adapter = new StateLogAdapter(this, logBuffer);
+
+        ListView listView = (ListView) findViewById(R.id.lvLogState);
+        listView.setAdapter(adapter);
     }
 
     @Override
@@ -75,12 +73,12 @@ public class LogBooleanActivity extends ChaActivity {
                 if (!scope.equals("BoilerPump"))
                     return;
                 int id = intent.getIntExtra("id", 0);
-                if (id != sensorId)
+                if (id != relayId)
                     return;
 
                 RelayData data = ThermostatControllerData.Instance.boilerPumps(id);
 
-                LogItem point = new LogItem(new Date(data.getLastReadingTime()), data.isOn() ? 1 : 0);
+                LogRelayItem point = new LogRelayItem(new Date(data.getLastSyncTime()), data.getState());
                 logBuffer.add(point);
                 adapter.notifyDataSetChanged();
 
@@ -90,33 +88,34 @@ public class LogBooleanActivity extends ChaActivity {
                 if (!scope.equals("LightRelay"))
                     return;
                 int id2 = intent.getIntExtra("id", 0);
-                if (id2 != sensorId)
+                if (id2 != relayId)
                     return;
 
                 RelayData data2 = LightControllerData.Instance.relays(id2);
 
-                LogItem point2 = new LogItem(new Date(data2.getLastReadingTime()), data2.isOn() ? 1 : 0);
+                LogRelayItem point2 = new LogRelayItem(new Date(data2.getLastSyncTime()), data2.getState());
                 logBuffer.add(point2);
                 adapter.notifyDataSetChanged();
 
                 break;
 
-            case ThermostatLog:
-                //case LightLog: // TODO: 2/20/2017
+            case Log:
                 switch (scope) {
                     case "BoilerPump":
                         if (intent.getStringExtra("type").startsWith("brelay")) {
                             String log = intent.getStringExtra("log");
-                            // TODO: 2/20/2017
-                            //ThermostatUtils.FillSensorLog(sensorId, scope, log, logBuffer);
+
+                            ThermostatUtils.FillRelayLog(relayId, scope, log, logBuffer);
                             adapter.notifyDataSetChanged();
                         }
                         break;
+
                     case "LightRelay":
+
                         if (intent.getStringExtra("type").startsWith("light")) {
                             String log = intent.getStringExtra("log");
-                            // TODO: 2/20/2017
-                            //ThermostatUtils.FillSensorLog(sensorId, scope, log, logBuffer);
+
+                            ThermostatUtils.FillRelayLog(relayId, scope, log, logBuffer);
                             adapter.notifyDataSetChanged();
                         }
                         break;
@@ -125,8 +124,8 @@ public class LogBooleanActivity extends ChaActivity {
         }
     }
 
-    public class StateLogAdapter extends ArrayAdapter<Pair<Date, Integer>> {
-        StateLogAdapter(Context context, ArrayList<Pair<Date, Integer>> points) {
+    public class StateLogAdapter extends ArrayAdapter<LogRelayItem> {
+        StateLogAdapter(Context context, ArrayList<LogRelayItem> points) {
             super(context, 0, points);
         }
 
@@ -139,10 +138,10 @@ public class LogBooleanActivity extends ChaActivity {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.log_view_boolean, parent, false);
             }
 
-            Pair<Date, Integer> point = getItem(position);
+            LogRelayItem point = getItem(position);
             if (point != null) {
-                ((TextView) convertView.findViewById(R.id.tvListViewItemKey)).setText(sdf.format(point.first));
-                ((TextView) convertView.findViewById(R.id.tvListViewItemValue)).setText(point.second == 0 ? "Off" : (point.second == 1 ? "On" : "Pending on"));
+                ((TextView) convertView.findViewById(R.id.tvListViewItemKey)).setText(sdf.format(point.date));
+                ((TextView) convertView.findViewById(R.id.tvListViewItemValue)).setText(point.state == 0 ? "Off" : (point.state == 1 ? "On" : "Pending on"));
             }
             return convertView;
         }

@@ -40,7 +40,7 @@
             android:label="@string/title_activity_settings" />
         <activity android:name=".thermostat.BoilerChartActivity" />
         <activity android:name=".LogTHActivity" />
-        <activity android:name=".LogBooleanActivity" />
+        <activity android:name=".LogStateActivity" />
         <activity android:name=".WhoIsOnlineActivity" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />

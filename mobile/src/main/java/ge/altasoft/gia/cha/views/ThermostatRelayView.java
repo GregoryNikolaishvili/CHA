@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import ge.altasoft.gia.cha.LogBooleanActivity;
+import ge.altasoft.gia.cha.LogStateActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.thermostat.ThermostatRelayData;
@@ -57,7 +57,7 @@ public class ThermostatRelayView extends LinearLayout {
             @Override
             public boolean onLongClick(View v) {
                 if (relayData != null) {
-                    Intent intent = new Intent(getContext(), LogBooleanActivity.class);
+                    Intent intent = new Intent(getContext(), LogStateActivity.class);
                     intent.putExtra("id", relayData.getId());
                     intent.putExtra("scope", "ThermostatRelay");
                     getContext().startActivity(intent);
@@ -117,6 +117,6 @@ public class ThermostatRelayView extends LinearLayout {
 
         setRelayName(value.getName() + ", order=" + String.valueOf(value.getOrder()));
         setComment(value.getComment());
-        setIsOn(value.isOn());
+        setIsOn(value.getState() != 0);
     }
 }

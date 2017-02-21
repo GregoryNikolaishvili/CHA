@@ -145,7 +145,8 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
             }
         } else {
             setTemperatureTrend('=');
-            setTemperature(Utils.decodeT(payload));
+            setTemperature(Utils.decodeT(payload.substring(0, 4)));
+            setLastSyncTime(Integer.parseInt(payload.substring(4, 8), 16));
         }
     }
 }

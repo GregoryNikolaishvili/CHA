@@ -7,10 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.IBinder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 public abstract class ChaActivity extends AppCompatActivity {
 
@@ -67,7 +70,7 @@ public abstract class ChaActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             MqttClientLocal.MQTTReceivedDataType dataType = (MqttClientLocal.MQTTReceivedDataType) intent.getSerializableExtra(MqttClientLocal.MQTT_DATA_TYPE);
-            processMqttData(dataType, intent);
+                processMqttData(dataType, intent);
         }
     };
 
@@ -97,6 +100,15 @@ public abstract class ChaActivity extends AppCompatActivity {
     }
 
     public void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
+        if (dataType == MqttClientLocal.MQTTReceivedDataType.Alert) {
+            String message = intent.getStringExtra("message");
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+                toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
+            }
+            return;
+        }
     }
 
     // service

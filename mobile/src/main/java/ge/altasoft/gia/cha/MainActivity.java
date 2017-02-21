@@ -3,6 +3,8 @@ package ge.altasoft.gia.cha;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -223,6 +225,49 @@ public class MainActivity extends ChaActivity {
         int id;
 
         switch (dataType) {
+//            case Alert:
+//                String message = intent.getStringExtra("message");
+//                if (message == null) {
+//                }
+//
+//                break;
+
+            case ThermostatState:
+                StringBuilder sb = new StringBuilder();
+                int state = intent.getIntExtra("state", 0);
+
+                if (state != 0) {
+                    if ((state & Utils.ERR_GENERAL) != 0) {
+                        sb.append("General error");
+                        sb.append("\n\r");
+                    }
+                    if ((state & Utils.ERR_SENSOR) != 0) {
+                        sb.append("Sensor error");
+                        sb.append("\n\r");
+                    }
+                    if ((state & Utils.ERR_EMOF) != 0) {
+                        sb.append("Emergency switch-off temperature of collector");
+                        sb.append("\n\r");
+                    }
+                    if ((state & Utils.ERR_95_DEGREE) != 0) {
+                        sb.append("Tank emergency temperature (95)");
+                        sb.append("\n\r");
+                    }
+                    if ((state & Utils.ERR_CMX) != 0) {
+                        sb.append("CMX Maximum limited collector temperature (collector cooling function)");
+                        sb.append("\n\r");
+                    }
+                    if ((state & Utils.ERR_SMX) != 0) {
+                        sb.append("SMX Maximum temperature of tank");
+                        sb.append("\n\r");
+                    }
+
+                    Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
+                    ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+                    toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
+                }
+                break;
+
             case ClientConnected:
                 String clientId = intent.getStringExtra("id");
                 ImageView image;
@@ -249,7 +294,7 @@ public class MainActivity extends ChaActivity {
                 break;
 
             case LightRelayState:
-                id = intent.getIntExtra("id", 0);
+                id = intent.getIntExtra("id", -1);
                 pagerAdapter.fragmentLight.drawState(id);
                 break;
 
@@ -262,7 +307,7 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentBoiler.rebuildUI(false);
                 break;
 
-            case ThermostatLog:
+            case Log:
                 if (intent.getStringExtra("type").startsWith("boiler"))
                     pagerAdapter.fragmentBoiler.rebuildGraph(intent.getStringExtra("log"));
                 break;
@@ -273,7 +318,7 @@ public class MainActivity extends ChaActivity {
 //                break;
 
             case ThermostatRoomSensorState:
-                id = intent.getIntExtra("id", 0);
+                id = intent.getIntExtra("id", -1);
                 if (intent.getBooleanExtra("new_sensor", false))
                     pagerAdapter.fragmentRoomSensors.rebuildUI();
 
@@ -281,13 +326,13 @@ public class MainActivity extends ChaActivity {
                 break;
 
             case ThermostatBoilerSensorState:
-                id = intent.getIntExtra("id", 0);
+                id = intent.getIntExtra("id", -1);
 
                 pagerAdapter.fragmentBoiler.drawSensorState(id);
                 break;
 
             case ThermostatBoilerPumpState:
-                id = intent.getIntExtra("id", 0);
+                id = intent.getIntExtra("id", -1);
 
                 pagerAdapter.fragmentBoiler.drawPumpState(id);
                 break;

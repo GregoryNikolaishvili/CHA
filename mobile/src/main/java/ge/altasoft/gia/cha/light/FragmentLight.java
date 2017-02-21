@@ -160,7 +160,7 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
             if (rv != null) {
                 LightRelayData data = rv.getRelayData();
                 if (data.getId() == id) {
-                    rv.setIsOn(data.isOn());
+                    rv.setIsOn(data.getState() != 0);
                     break;
                 }
             }

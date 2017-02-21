@@ -200,7 +200,7 @@ public class RoomSensorView extends LinearLayout {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
-        if (value.getLastReadingTime() < calendar.getTime().getTime())
+        if (value.getLastSyncTime() < calendar.getTime().getTime())
             ((CardView) getChildAt(0)).setCardBackgroundColor(Color.LTGRAY);
         else
             ((CardView) getChildAt(0)).setCardBackgroundColor(Color.WHITE);

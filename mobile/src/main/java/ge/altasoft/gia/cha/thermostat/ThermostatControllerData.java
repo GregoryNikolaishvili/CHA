@@ -33,7 +33,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     final static int HEATING_RELAY_COUNT = 15;
 
     final public static int BOILER_SENSOR_COUNT = 4;
-    final private static int BOILER_PUMP_COUNT = 2;
+    final private static int BOILER_PUMP_COUNT = 4;
 
     final public static ThermostatControllerData Instance = new ThermostatControllerData();
 
@@ -187,7 +187,7 @@ public final class ThermostatControllerData extends RelayControllerData {
 
     void saveToPreferences(SharedPreferences prefs) {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean("t_automatic_mode", isActive());
+        editor.putString("t_boiler_mode", String.valueOf(getBoilerMode()));
 
         for (int i = 0; i < HEATING_RELAY_COUNT; i++)
             relays(i).encodeSettings(editor);
@@ -207,6 +207,10 @@ public final class ThermostatControllerData extends RelayControllerData {
 
     char getBoilerMode() {
         return boilerSettings.Mode;
+    }
+
+    void setBoilerMode(char mode) {
+        boilerSettings.Mode = mode;
     }
 
     String getBoilerModeText() {
@@ -309,7 +313,7 @@ public final class ThermostatControllerData extends RelayControllerData {
 
     void decode(SharedPreferences prefs) {
 
-        setIsActive(prefs.getBoolean("t_automatic_mode", false));
+        setBoilerMode(prefs.getString("t_boiler_mode", "N").charAt(0));
 
         for (int i = 0; i < HEATING_RELAY_COUNT; i++)
             relays(i).decodeSettings(prefs);

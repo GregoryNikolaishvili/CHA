@@ -27,7 +27,14 @@ public class Utils {
 
     public final static float F_UNDEFINED = 999.9f;
 
-    public static final int LOG_BUFFER_SIZE = 1000;
+    public final static int ERR_GENERAL = 1;
+    public final static int ERR_SENSOR = 2;
+    public final static int ERR_EMOF = 4;
+    public final static int ERR_95_DEGREE = 8;
+    public final static int ERR_CMX = 16;
+    public final static int ERR_SMX = 32;
+
+    //public static final int LOG_BUFFER_SIZE = 1000;
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
     static final int ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS = 2;

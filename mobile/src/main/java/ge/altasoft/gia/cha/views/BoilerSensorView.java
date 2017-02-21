@@ -121,7 +121,7 @@ public class BoilerSensorView extends LinearLayout {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
-        if (value.getLastReadingTime() < calendar.getTime().getTime())
+        if (value.getLastSyncTime() < calendar.getTime().getTime())
             this.getChildAt(0).setBackgroundResource(R.drawable.rounded_border_red);
         else
             this.getChildAt(0).setBackgroundResource(R.drawable.rounded_border);

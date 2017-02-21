@@ -17,12 +17,11 @@ public class TempSensorData {
     private float targetT;
     private float deltaTargetT;
 
-    private long lastReadingTime = 0;
+    private long lastSyncTime;
 
     protected TempSensorData(int id) {
         this.id = id;
         this.order = 99;
-        //this.enabled = false;
         this.T = Float.NaN;
         this.targetT = Float.NaN;
         this.temperatureTrend = '=';
@@ -32,8 +31,12 @@ public class TempSensorData {
         return this.id;
     }
 
-    public long getLastReadingTime() {
-        return this.lastReadingTime;
+    public long getLastSyncTime() {
+        return this.lastSyncTime;
+    }
+
+    public void setLastSyncTime(int secondsPassed) {
+        lastSyncTime = new Date().getTime() - secondsPassed * 1000;
     }
 
     public float getTemperature() {
@@ -41,7 +44,7 @@ public class TempSensorData {
     }
 
     protected void setTemperature(float value) {
-        this.lastReadingTime = new Date().getTime();
+        this.lastSyncTime = new Date().getTime();
         if (value == Utils.F_UNDEFINED)
             this.T = Float.NaN;
         else
@@ -100,12 +103,12 @@ public class TempSensorData {
         return idx + 4;
     }
 
-    public void decodeState(String payload) {
-        char lastChar = payload.charAt(payload.length() - 1);
-        if ((lastChar == '+') || (lastChar == '-') || (lastChar == '=')) {
-            setTemperatureTrend(lastChar);
-            payload = payload.substring(0, payload.length() - 1);
-        }
-        setTemperature(Utils.decodeT(payload));
-    }
+//    public void decodeState(String payload) {
+//        char lastChar = payload.charAt(payload.length() - 1);
+//        if ((lastChar == '+') || (lastChar == '-') || (lastChar == '=')) {
+//            setTemperatureTrend(lastChar);
+//            payload = payload.substring(0, payload.length() - 1);
+//        }
+//        setTemperature(Utils.decodeT(payload));
+//    }
 }

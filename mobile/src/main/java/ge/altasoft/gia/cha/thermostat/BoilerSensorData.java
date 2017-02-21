@@ -17,13 +17,9 @@ public final class BoilerSensorData extends TempSensorData {
     }
 
     public void decodeState(String payload) {
-        char lastChar = payload.charAt(payload.length() - 1);
-        if ((lastChar == '+') || (lastChar == '-') || (lastChar == '=')) {
-            setTemperatureTrend(lastChar);
-            payload = payload.substring(0, payload.length() - 1);
-        }
-
-        setTemperature(Utils.decodeT(payload));
+        setTemperature(Utils.decodeT(payload.substring(0, 4)));
+        setTemperatureTrend(payload.charAt(4));
+        setLastSyncTime(Integer.parseInt(payload.substring(5, 9), 16));
     }
 
 }

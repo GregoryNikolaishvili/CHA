@@ -7,12 +7,12 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 
-import ge.altasoft.gia.cha.LogBooleanActivity;
+import ge.altasoft.gia.cha.LogStateActivity;
 import ge.altasoft.gia.cha.R;
 
 public class BoilerPumpView extends ImageView {
 
-    private boolean isOn;
+    private int state;
     private int relayId;
 
     public BoilerPumpView(Context context, AttributeSet attrs, int defStyle) {
@@ -31,13 +31,13 @@ public class BoilerPumpView extends ImageView {
     }
 
     private void initializeViews() {
-        isOn = false;
+        state = 0;
         setBackgroundResource(R.drawable.pump_off);
 
         this.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick (View v){
-                Intent intent = new Intent(getContext(), LogBooleanActivity.class);
+            public boolean onLongClick(View v) {
+                Intent intent = new Intent(getContext(), LogStateActivity.class);
                 intent.putExtra("id", relayId);
                 intent.putExtra("scope", "BoilerPump");
                 getContext().startActivity(intent);
@@ -51,20 +51,32 @@ public class BoilerPumpView extends ImageView {
         this.relayId = relayId;
     }
 
-    public void setIsOn(boolean value) {
-        if (isOn == value)
+    public void setState(int value) {
+        if (this.state == value)
             return;
 
-        isOn = value;
-        if (value) {
-            setBackgroundResource(R.drawable.pump_animation);
-            final AnimationDrawable frameAnimation = (AnimationDrawable) getBackground();
-            post(new Runnable() {
-                public void run() {
-                    frameAnimation.start();
-                }
-            });
-        } else
-            setBackgroundResource(R.drawable.pump_off);
+        state = value;
+        switch (value) {
+            case 1:
+                setBackgroundResource(R.drawable.pump_animation_active);
+                final AnimationDrawable frameAnimation = (AnimationDrawable) getBackground();
+                post(new Runnable() {
+                    public void run() {
+                        frameAnimation.start();
+                    }
+                });
+                break;
+            case 2:
+                setBackgroundResource(R.drawable.pump_animation_standby);
+                final AnimationDrawable frameAnimation2 = (AnimationDrawable) getBackground();
+                post(new Runnable() {
+                    public void run() {
+                        frameAnimation2.start();
+                    }
+                });
+                break;
+            default:
+                setBackgroundResource(R.drawable.pump_off);
+        }
     }
 }

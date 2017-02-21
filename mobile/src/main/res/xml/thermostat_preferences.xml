@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="Settings">
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="automatic_mode"
-        android:summary="Select thermostat is active or inactive"
-        android:title="Active" />
+    <ListPreference
+        android:key="t_boiler_mode"
+        android:title="Mode"
+        android:summary="Select thermostat mode"
+        android:entries="@array/boilerModeListArray"
+        android:entryValues="@array/boilerModeListArrayValues"/>>
+
     <PreferenceScreen android:title="Relays">
         <PreferenceCategory
             android:key="Relays"

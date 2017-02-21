@@ -46,4 +46,19 @@
         <item>T</item>
         <item>D</item>
     </string-array>
+
+    <string-array name="boilerModeListArray">
+        <item>Off</item>
+        <item>Summer</item>
+        <item>Summer and pool</item>
+        <item>Winter</item>
+    </string-array>
+
+    <string-array name="boilerModeListArrayValues">
+        <item>N</item>
+        <item>S</item>
+        <item>P</item>
+        <item>W</item>
+    </string-array>
+
 </resources>

@@ -306,9 +306,9 @@ public class FragmentBoiler extends Fragment {
 
             float v = data.getTemperature();
             if (!Float.isNaN(v)) {
-                series.add(data.getLastReadingTime(), v);
+                series.add(data.getLastSyncTime(), v);
 
-                if ((mMaxXX != null) && (data.getLastReadingTime() >= mMaxXX.getTime())) {
+                if ((mMaxXX != null) && (data.getLastSyncTime() >= mMaxXX.getTime())) {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(mMaxXX);
                     calendar.add(Calendar.MINUTE, 30);
@@ -339,7 +339,7 @@ public class FragmentBoiler extends Fragment {
         }
 
         if (resId != 0)
-            ((BoilerPumpView) rootView.findViewById(resId)).setIsOn(ThermostatControllerData.Instance.boilerPumps(id).isOn());
+            ((BoilerPumpView) rootView.findViewById(resId)).setState(ThermostatControllerData.Instance.boilerPumps(id).getState());
 
     }
 
@@ -350,8 +350,8 @@ public class FragmentBoiler extends Fragment {
         ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorTankTop)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_TOP));
         ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorRoom)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_ROOM));
 
-        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setIsOn(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_SOLAR_PUMP).isOn());
-        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setIsOn(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_HEATING_PUMP).isOn());
+        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_SOLAR_PUMP).getState());
+        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_HEATING_PUMP).getState());
 
         drawFooter();
     }

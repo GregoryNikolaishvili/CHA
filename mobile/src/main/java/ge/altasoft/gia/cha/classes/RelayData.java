@@ -1,7 +1,6 @@
 package ge.altasoft.gia.cha.classes;
 
 import android.support.annotation.NonNull;
-import android.util.Pair;
 
 import java.util.Date;
 import java.util.Locale;
@@ -12,21 +11,24 @@ public abstract class RelayData implements Comparable<RelayData> {
 
     final private int id;
     private int order;
-    private boolean isOn;
+    private int state;
 
     private String name;
-
-    final private CircularArrayList<Pair<Date, Boolean>> logBuffer = new CircularArrayList<>(Utils.LOG_BUFFER_SIZE);
+    private long lastSyncTime;
 
     protected RelayData(int id) {
         this.id = id;
         this.order = id;
-        this.isOn = false;
+        this.state = 0;
         this.name = "Default Relay #" + String.valueOf(id);
     }
 
-    public CircularArrayList<Pair<Date, Boolean>> getLogBuffer() {
-        return logBuffer;
+    public long getLastSyncTime() {
+        return this.lastSyncTime;
+    }
+
+    public void setLastSyncTime(int secondsPassed) {
+        lastSyncTime = new Date().getTime() - secondsPassed * 1000;
     }
 
     public int getId() {
@@ -37,19 +39,17 @@ public abstract class RelayData implements Comparable<RelayData> {
         return this.order;
     }
 
-    public boolean isOn() {
-        return this.isOn;
+    public int getState() {
+        return this.state;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public void setIsOn(boolean value) {
-        if (this.isOn != value) {
-            this.isOn = value;
-            logBuffer.add(new Pair<>(new Date(), value));
-        }
+    public void setState(int value) {
+        this.state = value;
+        this.lastSyncTime = new Date().getTime();
     }
 
     public void setName(String value) {
@@ -90,7 +90,6 @@ public abstract class RelayData implements Comparable<RelayData> {
     }
 
     public void decodeState(String payload) {
-        boolean value = !payload.equals("0");
-        setIsOn(value);
+        setState(Integer.parseInt(payload));
     }
 }

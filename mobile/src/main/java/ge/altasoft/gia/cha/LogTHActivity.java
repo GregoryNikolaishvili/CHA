@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
-import ge.altasoft.gia.cha.thermostat.LogItem;
+import ge.altasoft.gia.cha.classes.LogTHItem;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
@@ -39,7 +39,7 @@ public class LogTHActivity extends ChaActivity {
     private int sensorId;
 
     private THLogAdapter adapter = null;
-    private ArrayList<LogItem> logBuffer;
+    private ArrayList<LogTHItem> logBuffer;
 
     private GraphicalView mChartView;
     private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
@@ -52,7 +52,7 @@ public class LogTHActivity extends ChaActivity {
 
         Intent intent = getIntent();
         scope = intent.getStringExtra("scope");
-        sensorId = intent.getIntExtra("id", 0);
+        sensorId = intent.getIntExtra("id", -1);
 
         logBuffer = new ArrayList<>();
         adapter = new THLogAdapter(this, logBuffer, scope.equals("RoomSensor"));
@@ -102,23 +102,23 @@ public class LogTHActivity extends ChaActivity {
             case ThermostatBoilerSensorState:
                 if (!scope.equals("BoilerSensor"))
                     return;
-                int id = intent.getIntExtra("id", 0);
+                int id = intent.getIntExtra("id", -1);
                 if (id != sensorId)
                     return;
 
                 BoilerSensorData data = ThermostatControllerData.Instance.boilerSensors(id);
                 float v = data.getTemperature();
                 if (!Float.isNaN(v)) {
-                    LogItem point = new LogItem(new Date(data.getLastReadingTime()), v, 0f);
+                    LogTHItem point = new LogTHItem(new Date(data.getLastSyncTime()), v, 0f);
                     logBuffer.add(point);
                     adapter.notifyDataSetChanged();
 
-                    xyDataSet.getSeriesAt(0).add(data.getLastReadingTime(), v);
+                    xyDataSet.getSeriesAt(0).add(data.getLastSyncTime(), v);
                     mChartView.repaint();
                 }
                 break;
 
-            case ThermostatLog:
+            case Log:
                 switch (scope) {
                     case "BoilerSensor":
                         if (intent.getStringExtra("type").startsWith("boiler")) {
@@ -141,11 +141,11 @@ public class LogTHActivity extends ChaActivity {
         }
     }
 
-    public class THLogAdapter extends ArrayAdapter<LogItem> {
+    public class THLogAdapter extends ArrayAdapter<LogTHItem> {
 
         private boolean hasHumidity;
 
-        THLogAdapter(Context context, ArrayList<LogItem> points, boolean hasHumidity) {
+        THLogAdapter(Context context, ArrayList<LogTHItem> points, boolean hasHumidity) {
             super(context, 0, points);
 
             this.hasHumidity = hasHumidity;
@@ -160,7 +160,7 @@ public class LogTHActivity extends ChaActivity {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_item_key_value, parent, false);
             }
 
-            LogItem point = getItem(position);
+            LogTHItem point = getItem(position);
             if (point != null) {
                 ((TextView) convertView.findViewById(R.id.tvListViewItemKey)).setText(sdf.format(point.date));
                 ((TextView) convertView.findViewById(R.id.tvListViewItemValue1)).setText(String.format(Locale.US, "%.1f°", point.T));
