@@ -3,7 +3,9 @@ package ge.altasoft.gia.cha.views;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
+import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -34,13 +36,25 @@ public class BoilerPumpView extends ImageView {
         state = 0;
         setBackgroundResource(R.drawable.pump_off);
 
-        this.setOnLongClickListener(new View.OnLongClickListener() {
+        setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Intent intent = new Intent(getContext(), LogStateActivity.class);
-                intent.putExtra("id", relayId);
-                intent.putExtra("scope", "BoilerPump");
-                getContext().startActivity(intent);
+
+                PopupMenu popupMenu = new PopupMenu(getContext(), v);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Intent intent = new Intent(getContext(), LogStateActivity.class);
+                        intent.putExtra("id", relayId);
+                        intent.putExtra("scope", "BoilerPump");
+                        getContext().startActivity(intent);
+
+                        return false;
+                    }
+                });
+                popupMenu.inflate(R.menu.relay_popup_menu);
+                popupMenu.show();
+
                 return true;
             }
         });

@@ -36,7 +36,7 @@ public abstract class RelayControllerData {
         return haveSettings;
     }
 
-    protected RelayData relays(int index) {
+    public RelayData relays(int index) {
         return relayDatas[index];
     }
 

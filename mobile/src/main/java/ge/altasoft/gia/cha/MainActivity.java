@@ -24,7 +24,6 @@ import ge.altasoft.gia.cha.light.LightSettingsActivity;
 import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
 import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
-import ge.altasoft.gia.cha.thermostat.FragmentHeaterRelays;
 import ge.altasoft.gia.cha.thermostat.ThermostatSettingsActivity;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
@@ -93,8 +92,8 @@ public class MainActivity extends ChaActivity {
                 for (int I = 2; I < this.mainMenu.size(); I++)
                     this.mainMenu.getItem(I).setEnabled(true);
 
+                pagerAdapter.fragmentDashboard.setDraggableViews(false);
                 pagerAdapter.fragmentLight.setDraggableViews(false);
-                pagerAdapter.fragmentHeaterRelays.setDraggableViews(false);
                 pagerAdapter.fragmentRoomSensors.setDraggableViews(false);
 
                 if (id == R.id.action_ok) {
@@ -106,10 +105,9 @@ public class MainActivity extends ChaActivity {
                     LightControllerData.Instance.restoreRelayOrders();
                     pagerAdapter.fragmentLight.rebuildUI();
 
-                    ThermostatControllerData.Instance.restoreRelayOrders();
                     ThermostatControllerData.Instance.restoreRoomSensorRelayOrders();
                     pagerAdapter.fragmentRoomSensors.rebuildUI();
-                    pagerAdapter.fragmentHeaterRelays.rebuildUI();
+                    pagerAdapter.fragmentDashboard.rebuildUI();
                 }
                 return true;
 
@@ -149,8 +147,8 @@ public class MainActivity extends ChaActivity {
                 for (int I = 2; I < this.mainMenu.size(); I++)
                     this.mainMenu.getItem(I).setEnabled(false);
 
+                pagerAdapter.fragmentDashboard.setDraggableViews(true);
                 pagerAdapter.fragmentLight.setDraggableViews(true);
-                pagerAdapter.fragmentHeaterRelays.setDraggableViews(true);
                 pagerAdapter.fragmentRoomSensors.setDraggableViews(true);
                 return true;
 
@@ -176,8 +174,8 @@ public class MainActivity extends ChaActivity {
             pagerAdapter.fragmentBoiler.rebuildUI(true);
         if (pagerAdapter.fragmentRoomSensors != null)
             pagerAdapter.fragmentRoomSensors.rebuildUI();
-        if (pagerAdapter.fragmentHeaterRelays != null)
-            pagerAdapter.fragmentHeaterRelays.rebuildUI();
+        if (pagerAdapter.fragmentDashboard != null)
+            pagerAdapter.fragmentDashboard.rebuildUI();
 
         timerHandler.postDelayed(timerRunnable, 60000);
     }
@@ -254,13 +252,16 @@ public class MainActivity extends ChaActivity {
                         sb.append("\n\r");
                     }
                     if ((state & Utils.ERR_CMX) != 0) {
-                        sb.append("CMX Maximum limited collector temperature (collector cooling function)");
+                        sb.append("CMX Maximum limited collector temperature");
                         sb.append("\n\r");
                     }
                     if ((state & Utils.ERR_SMX) != 0) {
                         sb.append("SMX Maximum temperature of tank");
                         sb.append("\n\r");
                     }
+
+                    if (pagerAdapter.fragmentBoiler != null)
+                        pagerAdapter.fragmentBoiler.drawThermostatState(sb);
 
                     Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
                     ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
@@ -291,20 +292,24 @@ public class MainActivity extends ChaActivity {
             case LightSettings:
             case LightNameAndOrders:
                 pagerAdapter.fragmentLight.rebuildUI();
+                pagerAdapter.fragmentDashboard.rebuildUI();
                 break;
 
             case LightRelayState:
                 id = intent.getIntExtra("id", -1);
                 pagerAdapter.fragmentLight.drawState(id);
+                pagerAdapter.fragmentDashboard.drawLightState(id);
                 break;
 
             case ThermostatRoomSensorSettings:
             case ThermostatRoomSensorNameAndOrders:
                 pagerAdapter.fragmentRoomSensors.rebuildUI();
+                pagerAdapter.fragmentDashboard.rebuildUI();
                 break;
 
             case ThermostatBoilerSettings:
                 pagerAdapter.fragmentBoiler.rebuildUI(false);
+                pagerAdapter.fragmentDashboard.rebuildUI();
                 break;
 
             case Log:
@@ -323,12 +328,14 @@ public class MainActivity extends ChaActivity {
                     pagerAdapter.fragmentRoomSensors.rebuildUI();
 
                 pagerAdapter.fragmentRoomSensors.drawState(id);
+                pagerAdapter.fragmentDashboard.drawRoomSensorState(id);
                 break;
 
             case ThermostatBoilerSensorState:
                 id = intent.getIntExtra("id", -1);
 
                 pagerAdapter.fragmentBoiler.drawSensorState(id);
+                pagerAdapter.fragmentDashboard.drawBoilerSensorState(id);
                 break;
 
             case ThermostatBoilerPumpState:
@@ -362,30 +369,30 @@ public class MainActivity extends ChaActivity {
         FragmentLight fragmentLight = null;
         FragmentBoiler fragmentBoiler = null;
         FragmentRoomSensors fragmentRoomSensors = null;
-        FragmentHeaterRelays fragmentHeaterRelays = null;
+        FragmentDashboard fragmentDashboard = null;
 
         SectionsPagerAdapter(FragmentManager fm, boolean isLandscape) {
             super(fm);
 
             this.isLandscape = isLandscape;
 
+            fragmentDashboard = FragmentDashboard.newInstance();
             fragmentLight = FragmentLight.newInstance();
             fragmentBoiler = FragmentBoiler.newInstance();
             fragmentRoomSensors = FragmentRoomSensors.newInstance();
-            fragmentHeaterRelays = FragmentHeaterRelays.newInstance();
         }
 
         @Override
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return fragmentLight;
+                    return fragmentDashboard;
                 case 1:
                     return fragmentBoiler;
                 case 2:
-                    return fragmentRoomSensors;
+                    return fragmentLight;
                 case 3:
-                    return fragmentHeaterRelays;
+                    return fragmentRoomSensors;
             }
             return null;
         }
@@ -399,13 +406,13 @@ public class MainActivity extends ChaActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Lights";
+                    return "Dashboard";
                 case 1:
-                    return "Solar";
+                    return "Boiler";
                 case 2:
-                    return "T & H sensors";
+                    return "Lights";
                 case 3:
-                    return "Heater valves";
+                    return "T & H sensors";
             }
             return null;
         }

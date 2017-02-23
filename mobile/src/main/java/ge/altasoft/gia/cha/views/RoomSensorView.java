@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -18,9 +17,12 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.LogTHActivity;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.Utils;
+import ge.altasoft.gia.cha.classes.ChaCard;
+import ge.altasoft.gia.cha.classes.DashboardItems;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 
-public class RoomSensorView extends LinearLayout {
+public class RoomSensorView extends ChaCard {
 
     private TextView tvSensorName;
     private TextView tvTemperature;
@@ -32,10 +34,9 @@ public class RoomSensorView extends LinearLayout {
     private TextView tvRelayState;
 
     private RoomSensorData sensorData;
-    private boolean dragMode = false;
 
-    public RoomSensorView(Context context) {
-        super(context);
+    public RoomSensorView(Context context, boolean fromDashboard) {
+        super(context, fromDashboard);
         initializeViews(context);
     }
 
@@ -59,16 +60,26 @@ public class RoomSensorView extends LinearLayout {
 
                 final CardView card = ((CardView) ((ViewGroup) v).getChildAt(0));
 
-                card.setCardBackgroundColor(Color.GRAY);
+                card.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), true, false));
                 PopupMenu popupMenu = new PopupMenu(getContext(), v);
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        if (sensorData != null) {
-                            Intent intent = new Intent(getContext(), LogTHActivity.class);
-                            intent.putExtra("id", sensorData.getId());
-                            intent.putExtra("scope", "RoomSensor");
-                            getContext().startActivity(intent);
+                        switch (item.getItemId()) {
+                            case R.id.item_pin_to_dashboard:
+                                if (DashboardItems.hasItem(1, sensorData.getId()))
+                                    DashboardItems.remove(getContext(), 1, sensorData.getId());
+                                else
+                                    DashboardItems.add(getContext(), 1, sensorData.getId());
+                                break;
+                            case R.id.item_log:
+                                if (sensorData != null) {
+                                    Intent intent = new Intent(getContext(), LogTHActivity.class);
+                                    intent.putExtra("id", sensorData.getId());
+                                    intent.putExtra("scope", "RoomSensor");
+                                    getContext().startActivity(intent);
+                                }
+                                break;
                         }
                         return false;
                     }
@@ -76,19 +87,16 @@ public class RoomSensorView extends LinearLayout {
                 popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
                     @Override
                     public void onDismiss(PopupMenu menu) {
-                        card.setCardBackgroundColor(Color.WHITE);
+                        card.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, false));
                     }
                 });
-                popupMenu.inflate(R.menu.room_sensor_popup_menu);
+                popupMenu.inflate(R.menu.sensor_popup_menu);
+                popupMenu.getMenu().findItem(R.id.item_pin_to_dashboard).setChecked(DashboardItems.hasItem(1, sensorData.getId()));
                 popupMenu.show();
 
                 return true;
             }
         });
-    }
-
-    public void setDragMode(boolean dragMode) {
-        this.dragMode = dragMode;
     }
 
     private TextView getSensorNameTextView() {
@@ -163,11 +171,11 @@ public class RoomSensorView extends LinearLayout {
                 break;
             case '+':
                 getTemperatureTrendTextView().setText("↑"); // ▲
-                getTemperatureTrendTextView().setTextColor(Color.RED);
+                getTemperatureTrendTextView().setTextColor(0xFFFF3000);
                 break;
             case '-':
                 getTemperatureTrendTextView().setText("↓"); // ▼
-                getTemperatureTrendTextView().setTextColor(Color.BLUE);
+                getTemperatureTrendTextView().setTextColor(0xFF0050FF);
                 break;
         }
 
@@ -191,7 +199,7 @@ public class RoomSensorView extends LinearLayout {
 
         tvRelayState.setVisibility(value.hasRelay() ? VISIBLE : INVISIBLE);
         if (value.isOn()) {
-            tvRelayState.setTextColor(Color.RED);
+            tvRelayState.setTextColor(Color.YELLOW);
             tvRelayState.setText("On");
         } else {
             tvRelayState.setTextColor(Color.GRAY);
@@ -201,8 +209,8 @@ public class RoomSensorView extends LinearLayout {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
         if (value.getLastSyncTime() < calendar.getTime().getTime())
-            ((CardView) getChildAt(0)).setCardBackgroundColor(Color.LTGRAY);
+            ((CardView) getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, true));
         else
-            ((CardView) getChildAt(0)).setCardBackgroundColor(Color.WHITE);
+            ((CardView) getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, false));
     }
 }

@@ -1,27 +1,26 @@
 package ge.altasoft.gia.cha.light;
 
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.ItemTouchHelperAdapter;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
 import ge.altasoft.gia.cha.classes.RelayData;
-import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.SimpleItemTouchHelperCallback;
 import ge.altasoft.gia.cha.views.LightRelayView;
 
@@ -51,15 +50,34 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
         tvLoading.setText(getResources().getString(R.string.loading));
         rootView.addView(tvLoading, 0);
 
-        ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.lightsAutoMode));
-        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                if (!Utils.disableOnCheckedListener) {
-                    ((ToggleButton) button).setTextOn("");
-                    ((ToggleButton) button).setTextOff("");
-                    button.setEnabled(false);
-                    ((ChaActivity) getActivity()).publish("chac/light/mode", isChecked ? "A" : "M", false);
-                }
+        final CardView cv = ((CardView) rootView.findViewById(R.id.lightsAutoMode));
+
+        cv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                PopupMenu popupMenu = new PopupMenu(getContext(), v);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        ((TextView) cv.getChildAt(0)).setText("⌛");
+                        cv.setEnabled(false);
+
+                        switch (item.getItemId()) {
+                            case R.id.item_auto:
+                                ((ChaActivity) getActivity()).publish("chac/light/mode", "A", false);
+                                break;
+                            case R.id.item_manual:
+                                ((ChaActivity) getActivity()).publish("chac/light/mode", "M", false);
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.inflate(R.menu.light_mode_popup_menu);
+                popupMenu.show();
+
+                return true;
             }
         });
 
@@ -168,18 +186,8 @@ public class FragmentLight extends Fragment implements OnStartDragListener {
     }
 
     private void drawFooter() {
-        ToggleButton tvAuto = ((ToggleButton) rootView.findViewById(R.id.lightsAutoMode));
-        Utils.disableOnCheckedListener = true;
-        try {
-            tvAuto.setTextOn(getResources().getString(R.string.auto));
-            tvAuto.setTextOff(getResources().getString(R.string.manual));
-            tvAuto.setChecked(LightControllerData.Instance.isActive());
-            tvAuto.setEnabled(true);
-        } finally {
-            Utils.disableOnCheckedListener = false;
-        }
-
-        ((TextView) rootView.findViewById(R.id.lightsTimeTextView)).setText(LightControllerData.Instance.GetStatusText());
+        CardView cv = ((CardView) rootView.findViewById(R.id.lightsAutoMode));
+        ((TextView) cv.getChildAt(0)).setText(LightControllerData.Instance.isActive() ? "Auto" : "Manual");
     }
 
 //    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {

@@ -76,13 +76,13 @@ public class TempSensorData {
 
     public int getTemperatureColor() {
         if (Float.isNaN(this.targetT))
-            return Color.BLACK;
+            return Color.WHITE;
 
         float delta = T - this.targetT;
         if (Math.abs(delta) <= deltaTargetT)
-            return Color.BLACK;
+            return Color.WHITE;
 
-        return delta < 0 ? Color.BLUE : Color.RED;
+        return delta < 0 ? 0xFF0050FF : 0xFFFF3000;
     }
 
     public int getOrder() {

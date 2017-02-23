@@ -68,13 +68,13 @@ public final class ThermostatControllerData extends RelayControllerData {
             boilerSensorsData[i] = new BoilerSensorData(i);
 
         for (int i = 0; i < BOILER_PUMP_COUNT; i++)
-            boilerPumpsData[i] = new BoilerPumpData(i + 1);
+            boilerPumpsData[i] = new BoilerPumpData(i);
 
         boilerPumpsData[BOILER_SOLAR_PUMP].setName("Solar pump");
         boilerPumpsData[BOILER_HEATING_PUMP].setName("Heating pump");
 
         for (int i = 0; i < HEATING_RELAY_COUNT; i++) {
-            ThermostatRelayData relay = new ThermostatRelayData(i + 1);
+            ThermostatRelayData relay = new ThermostatRelayData(i);
             setRelay(i, relay);
         }
     }
@@ -92,7 +92,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         return this.haveRoomSensorsSettings;
     }
 
-    boolean haveBoilerSettings() {
+    public boolean haveBoilerSettings() {
         return this.haveBoilerSettings;
     }
 
@@ -156,7 +156,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         return roomSensorsReordered;
     }
 
-    RoomSensorData getRoomSensorFromUIIndex(int index) {
+    public RoomSensorData getRoomSensorFromUIIndex(int index) {
 
         Map<Integer, RoomSensorData> ss = sortByOrder(roomSensorsMap);
 

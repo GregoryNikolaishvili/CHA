@@ -1,9 +1,5 @@
 package ge.altasoft.gia.cha.thermostat;
 
-import android.content.SharedPreferences;
-
-import java.util.Locale;
-
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.TempSensorData;
 

@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.Map;
-
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.ItemTouchHelperAdapter;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
@@ -37,7 +35,7 @@ public class FragmentRoomSensors extends Fragment implements OnStartDragListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = (ViewGroup) inflater.inflate(R.layout.fragment_thermostat_sensors, container, false);
+        rootView = (ViewGroup) inflater.inflate(R.layout.fragment_room_sensors, container, false);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         tvLoading = new TextView(getContext());
@@ -118,7 +116,7 @@ public class FragmentRoomSensors extends Fragment implements OnStartDragListener
             RoomSensorView sensor = (RoomSensorView) recyclerView.getChildAt(i);
             if (sensor != null) {
                 RoomSensorData data = ThermostatControllerData.Instance.getRoomSensorFromUIIndex(i);
-                data.setOrder(i + 1);
+                data.setOrder(i);
                 sensor.setSensorData(data);
             }
         }

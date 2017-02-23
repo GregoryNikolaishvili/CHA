@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
@@ -13,7 +14,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -21,21 +21,23 @@ import java.util.Locale;
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.LogStateActivity;
 import ge.altasoft.gia.cha.Utils;
+import ge.altasoft.gia.cha.classes.ChaCard;
+import ge.altasoft.gia.cha.classes.DashboardItems;
 import ge.altasoft.gia.cha.light.LightRelayData;
 import ge.altasoft.gia.cha.R;
 
-public class LightRelayView extends LinearLayout {
+public class LightRelayView extends ChaCard {
 
     private enum ButtonState {UNKNOWN, ON, OFF, WAIT}
 
     private boolean isPressed = false;
-    private boolean dragMode = false;
+
     private ButtonState buttonState = ButtonState.UNKNOWN;
 
     private LightRelayData relayData;
 
-    public LightRelayView(Context context) {
-        super(context);
+    public LightRelayView(Context context, boolean fromDashboard) {
+        super(context, fromDashboard);
         initializeViews(context);
     }
 
@@ -47,10 +49,6 @@ public class LightRelayView extends LinearLayout {
     public LightRelayView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initializeViews(context);
-    }
-
-    public void setDragMode(boolean dragMode) {
-        this.dragMode = dragMode;
     }
 
 //    public static String actionToString(int action) {
@@ -97,7 +95,7 @@ public class LightRelayView extends LinearLayout {
         setOnTouchListener(new OnTouchListener() {
                                @Override
                                public boolean onTouch(View v, MotionEvent event) {
-                                   if (!dragMode) {
+                                   if (!getDragMode()) {
                                        switch (event.getAction()) {
                                            case MotionEvent.ACTION_DOWN:
                                                setIsPressed(true);
@@ -142,18 +140,28 @@ public class LightRelayView extends LinearLayout {
     private void onLongPress() {
         final CardView card = ((CardView) getChildAt(0));
 
-        card.setCardBackgroundColor(Color.GRAY);
+        card.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), true, false));
         PopupMenu popupMenu = new PopupMenu(getContext(), card);
         setTag(true);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 setTag(false);
-                if (relayData != null) {
-                    Intent intent = new Intent(getContext(), LogStateActivity.class);
-                    intent.putExtra("id", relayData.getId());
-                    intent.putExtra("scope", "LightRelay");
-                    getContext().startActivity(intent);
+                switch (item.getItemId()) {
+                    case R.id.item_pin_to_dashboard:
+                        if (DashboardItems.hasItem(0, relayData.getId()))
+                            DashboardItems.remove(getContext(), 0, relayData.getId());
+                        else
+                            DashboardItems.add(getContext(), 0, relayData.getId());
+                        break;
+                    case R.id.item_log:
+                        if (relayData != null) {
+                            Intent intent = new Intent(getContext(), LogStateActivity.class);
+                            intent.putExtra("id", relayData.getId());
+                            intent.putExtra("scope", "LightRelay");
+                            getContext().startActivity(intent);
+                        }
+                        break;
                 }
                 return false;
             }
@@ -162,10 +170,11 @@ public class LightRelayView extends LinearLayout {
             @Override
             public void onDismiss(PopupMenu menu) {
                 setTag(false);
-                card.setCardBackgroundColor(Color.WHITE);
+                card.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, false));
             }
         });
-        popupMenu.inflate(R.menu.light_relay_popup_menu);
+        popupMenu.inflate(R.menu.relay_popup_menu);
+        popupMenu.getMenu().findItem(R.id.item_pin_to_dashboard).setChecked(DashboardItems.hasItem(0, relayData.getId()));
         popupMenu.show();
     }
 
@@ -179,36 +188,25 @@ public class LightRelayView extends LinearLayout {
 
     public void setIsPressed(boolean pressed) {
         this.isPressed = pressed;
-        ((CardView) getChildAt(0)).setCardBackgroundColor(pressed ? Color.LTGRAY : Color.WHITE);
+        ((CardView) getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), pressed, false));
     }
 
     private void setState(ButtonState value) {
         buttonState = value;
-        //getOnOffButton();
 
-        Utils.disableOnCheckedListener = true;
-        try {
-            switch (value) {
-                case UNKNOWN:
-                    ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_unknown);
-                    setEnabled(false);
-                    break;
-                case ON:
-                    ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_on);
-                    setEnabled(true);
-                    break;
-                case OFF:
-                    ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_off);
-                    setEnabled(true);
-                    break;
-                case WAIT:
-                    ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_wait);
-                    setEnabled(false);
-                    setEnabled(true);//// TODO: 2/12/2017
-                    break;
-            }
-        } finally {
-            Utils.disableOnCheckedListener = false;
+        switch (value) {
+            case UNKNOWN:
+                ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_unknown);
+                break;
+            case ON:
+                ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_on);
+                break;
+            case OFF:
+                ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_off);
+                break;
+            case WAIT:
+                ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_wait);
+                break;
         }
     }
 

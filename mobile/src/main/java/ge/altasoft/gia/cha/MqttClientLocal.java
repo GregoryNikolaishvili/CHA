@@ -417,7 +417,7 @@ public class MqttClientLocal {
 
                 if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE)) {
                     int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHT_RELAY_STATE.length()), 16);
-                    LightControllerData.Instance.relays(id - 1).decodeState(payload);// TODO: 2/11/2017 id should start from 0
+                    LightControllerData.Instance.relays(id).decodeState(payload);
 
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MqttClientLocal.MQTTReceivedDataType.LightRelayState);
                     broadcastDataIntent.putExtra("id", id);

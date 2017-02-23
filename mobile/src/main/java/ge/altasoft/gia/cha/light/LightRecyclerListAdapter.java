@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.ItemTouchHelperAdapter;
 import ge.altasoft.gia.cha.classes.ItemTouchHelperViewHolder;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
@@ -25,7 +26,7 @@ public class LightRecyclerListAdapter extends RecyclerView.Adapter<LightRecycler
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = new LightRelayView(parent.getContext());
+        View itemView = new LightRelayView(parent.getContext(), false);
 
         //int height = parent.getMeasuredWidth() / 4;
         int height = parent.getMeasuredHeight() / 4;
@@ -76,17 +77,17 @@ public class LightRecyclerListAdapter extends RecyclerView.Adapter<LightRecycler
 
         ItemViewHolder(View itemView) {
             super(itemView);
-            handleView = itemView.findViewById(R.id.relay_layout);
+            handleView = itemView.findViewById(R.id.main_layout);
         }
 
         @Override
         public void onItemSelected() {
-            ((CardView) ((ViewGroup) itemView).getChildAt(0)).setCardBackgroundColor(Color.GRAY);
+            ((CardView) ((ViewGroup) itemView).getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(itemView.getContext(), true, false));
         }
 
         @Override
         public void onItemClear() {
-            ((CardView) ((ViewGroup) itemView).getChildAt(0)).setCardBackgroundColor(Color.WHITE);
+            ((CardView) ((ViewGroup) itemView).getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(itemView.getContext(), false, false));
         }
     }
 }

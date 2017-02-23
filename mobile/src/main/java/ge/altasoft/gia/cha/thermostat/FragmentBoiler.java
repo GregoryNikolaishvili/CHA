@@ -5,16 +5,17 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -29,9 +30,12 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.views.BoilerPumpView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
+
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER;
 
 public class FragmentBoiler extends Fragment {
 
@@ -63,17 +67,41 @@ public class FragmentBoiler extends Fragment {
         tvLoading.setText(getResources().getString(R.string.loading));
         rootView.addView(tvLoading, 0);
 
-        ToggleButton tb = ((ToggleButton) rootView.findViewById(R.id.boilerMode));
-        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                if (!Utils.disableOnCheckedListener) {
-                    ((ToggleButton) button).setTextOn("");
-                    ((ToggleButton) button).setTextOff("");
-                    button.setEnabled(false);
-                    ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(ThermostatControllerData.Instance.nextBoilerMode()), false);
-                }
+        final CardView cv = ((CardView) rootView.findViewById(R.id.boilerMode));
+
+        cv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                PopupMenu popupMenu = new PopupMenu(getContext(), v);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        ((TextView) cv.getChildAt(0)).setText("⌛");
+                        cv.setEnabled(false);
+
+                        switch (item.getItemId()) {
+                            case R.id.item_summer:
+                                ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_SUMMER), false);
+                                break;
+                            case R.id.item_summer_and_pool:
+                                ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_SUMMER_POOL), false);
+                                break;
+                            case R.id.item_winter:
+                                ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_WINTER), false);
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.inflate(R.menu.boiler_mode_popup_menu);
+                popupMenu.show();
+
+                return true;
             }
         });
+
+
         final View boilerLayout = rootView.findViewById(R.id.boilerLayout);
 
         //region relayout
@@ -357,17 +385,15 @@ public class FragmentBoiler extends Fragment {
     }
 
     private void drawFooter() {
-        ToggleButton tvAuto = ((ToggleButton) rootView.findViewById(R.id.boilerMode));
-        Utils.disableOnCheckedListener = true;
-        try {
-            tvAuto.setTextOn(ThermostatControllerData.Instance.getBoilerModeText());
-            tvAuto.setTextOff(getResources().getString(R.string.off));
-            tvAuto.setChecked(ThermostatControllerData.Instance.getBoilerMode() != BoilerSettings.BOILER_MODE_OFF);
-            tvAuto.setEnabled(true);
-        } finally {
-            Utils.disableOnCheckedListener = false;
-        }
+        CardView cv = ((CardView) rootView.findViewById(R.id.boilerMode));
+        ((TextView) cv.getChildAt(0)).setText(ThermostatControllerData.Instance.getBoilerModeText());
+        cv.setEnabled(true);
+    }
 
-        ((TextView) rootView.findViewById(R.id.boilerTimeTextView)).setText(ThermostatControllerData.Instance.GetStatusText());
+    public void drawThermostatState(StringBuilder sb) {
+        if (rootView == null)
+            return;
+
+        ((TextView)rootView.findViewById(R.id.boilerStatus)).setText(sb.toString().replace('\r', ' ').replace('\n', ','));
     }
 }

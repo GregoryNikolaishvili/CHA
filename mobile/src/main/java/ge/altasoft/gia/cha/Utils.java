@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -27,19 +28,17 @@ public class Utils {
 
     public final static float F_UNDEFINED = 999.9f;
 
-    public final static int ERR_GENERAL = 1;
-    public final static int ERR_SENSOR = 2;
-    public final static int ERR_EMOF = 4;
-    public final static int ERR_95_DEGREE = 8;
-    public final static int ERR_CMX = 16;
-    public final static int ERR_SMX = 32;
+    final static int ERR_GENERAL = 1;
+    final static int ERR_SENSOR = 2;
+    final static int ERR_EMOF = 4;
+    final static int ERR_95_DEGREE = 8;
+    final static int ERR_CMX = 16;
+    final static int ERR_SMX = 32;
 
     //public static final int LOG_BUFFER_SIZE = 1000;
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
     static final int ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS = 2;
-
-    public static boolean disableOnCheckedListener = false;
 
     public static String shortToHex4(short value) {
         return String.format(Locale.US, "%04X", value);
@@ -75,14 +74,14 @@ public class Utils {
         mqttBrokerGlobalUrl = prefs.getString("mtqq_url_global", mqttBrokerGlobalUrl);
     }
 
-    public static String millisToTimeString(String format, double x) {
-        if (format == null)
-            format = "HH:mm";
-        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis((long) x);
-        return sdf.format(calendar.getTimeInMillis());
-    }
+//    public static String millisToTimeString(String format, double x) {
+//        if (format == null)
+//            format = "HH:mm";
+//        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis((long) x);
+//        return sdf.format(calendar.getTimeInMillis());
+//    }
 
 
     @NonNull
@@ -184,7 +183,7 @@ public class Utils {
         return null;
     }
 
-    public static boolean isGiaWifi(WifiInfo wifiInfo) {
+    private static boolean isGiaWifi(WifiInfo wifiInfo) {
         return wifiInfo.getSSID().trim().equals("\"GIA\"") || wifiInfo.getSSID().trim().equals("\"GIA2\"");
     }
 
@@ -246,6 +245,18 @@ public class Utils {
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    public static int getCardBackgroundColor(Context context, boolean isPressed, boolean isError) {
+        int color;
+        if (isPressed)
+            color = Color.LTGRAY;
+        else if (isError)
+            color = 0x50FF0000;
+        else
+            color = context.getResources().getColor(R.color.cardview_dark_background);
+
+        return color;
     }
 
     //    public static void InputDialog(Context context, String title, String value, int type, final RunnableWithParams positiveAction) {

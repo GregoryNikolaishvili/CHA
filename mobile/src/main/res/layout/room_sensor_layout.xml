@@ -6,13 +6,13 @@
     android:layout_marginLeft="@dimen/sensor_margin_size"
     android:layout_marginStart="@dimen/sensor_margin_size"
     android:layout_marginTop="@dimen/sensor_margin_size"
-    card_view:cardBackgroundColor="@color/cardview_light_background"
+    card_view:cardBackgroundColor="@color/cardview_dark_background"
     card_view:cardCornerRadius="4dp"
     card_view:cardPreventCornerOverlap="true"
     card_view:cardUseCompatPadding="true">
 
     <LinearLayout
-        android:id="@+id/sensor_layout"
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -55,6 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="50"
+                android:gravity="center_vertical"
                 android:text="↑"
                 android:textSize="@dimen/sensor_trend_size" />
         </LinearLayout>
