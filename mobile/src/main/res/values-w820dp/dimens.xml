@@ -9,7 +9,7 @@
     <dimen name="sensor_name_size">18sp</dimen>
     <dimen name="sensor_t_size">30sp</dimen>
     <dimen name="sensor_trend_size">20sp</dimen>
-    <dimen name="sensor_h_size">24sp</dimen>
+    <dimen name="sensor_h_size">22sp</dimen>
     <dimen name="sensor_footer_size">13sp</dimen>
     <dimen name="sensor_margin_size">4dp</dimen>
 
