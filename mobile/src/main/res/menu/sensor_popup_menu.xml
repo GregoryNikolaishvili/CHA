@@ -8,7 +8,7 @@
         android:title="Pin to dashboard"
         android:visible="true" />
     <item
-        android:id="@+id/item_log"
+        android:id="@+id/item_log_and_chart"
         android:title="Log and chart"
         android:visible="true" />
 </menu>

@@ -39,7 +39,7 @@ class DatabaseMessageStore implements MessageStore {
 	// The other database column names are defined in MqttServiceConstants
 	private static final String MTIMESTAMP = "mtimestamp";
 
-	// the name of the table in the database to which we will save messages
+	// the name of the table in the database to which we will saveToPreferences messages
 	private static final String ARRIVED_MESSAGE_TABLE_NAME = "MqttArrivedMessageTable";
 
 	// the database

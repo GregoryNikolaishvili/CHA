@@ -2,9 +2,6 @@ package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -17,13 +14,12 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.LogTHActivity;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.classes.ChaCard;
-import ge.altasoft.gia.cha.classes.DashboardItems;
+import ge.altasoft.gia.cha.classes.ChaWidget;
+import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
 
-public class BoilerSensorView extends ChaCard {
+public class BoilerSensorView extends ChaWidget {
 
     private TextView tvTemperature;
     private TextView tvTemperatureTrend;
@@ -47,128 +43,91 @@ public class BoilerSensorView extends ChaCard {
         initializeViews(context);
     }
 
-    private void initializeViews(final Context context) {
+    @Override
+    protected boolean canClick() {
+        return false;
+    }
+
+    @Override
+    protected void onClick() {
+
+    }
+
+    @Override
+    public WidgetType getWidgetType() {
+        return WidgetType.BoilerSensor;
+    }
+
+    @Override
+    public int getWidgetId() {
+        return sensorData.getId();
+    }
+
+    @Override
+    protected int getPopupMenuResId() {
+        return R.menu.sensor_popup_menu;
+    }
+
+    private void initializeViews(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(getIsFromDashboard() ? R.layout.boiler_sensor_layout2 : R.layout.boiler_sensor_layout, this);
 
-        getChildAt(0).setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
+        afterInflate();
 
-                final CardView card = (CardView) v;
-
-                card.setCardBackgroundColor(Utils.getCardBackgroundColor(context, true, false));
-                PopupMenu popupMenu = new PopupMenu(getContext(), v);
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.item_pin_to_dashboard:
-                                if (DashboardItems.hasItem(2, sensorData.getId()))
-                                    DashboardItems.remove(getContext(), 2, sensorData.getId());
-                                else
-                                    DashboardItems.add(getContext(), 2, sensorData.getId());
-                                break;
-                            case R.id.item_log:
-                                if (sensorData != null) {
-                                    Intent intent = new Intent(getContext(), LogTHActivity.class);
-                                    intent.putExtra("id", sensorData.getId());
-                                    intent.putExtra("scope", "BoilerSensor");
-                                    getContext().startActivity(intent);
-                                }
-                                break;
-                        }
-                        return false;
-                    }
-                });
-                popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
-                    @Override
-                    public void onDismiss(PopupMenu menu) {
-                        card.setCardBackgroundColor(Utils.getCardBackgroundColor(context, false, false));
-                    }
-                });
-                popupMenu.inflate(R.menu.sensor_popup_menu);
-                popupMenu.getMenu().findItem(R.id.item_pin_to_dashboard).setChecked(DashboardItems.hasItem(2, sensorData.getId()));
-                popupMenu.show();
-
-                return true;
-            }
-        });
+        tvTemperature = (TextView) this.findViewById(R.id.temperature_value);
+        tvTemperatureTrend = (TextView) this.findViewById(R.id.temperature_trend);
+        tvTargetTemperature = (TextView) this.findViewById(R.id.target_temperature_value);
+        llTargetTemperature = (LinearLayout) this.findViewById(R.id.target_temperature);
     }
 
-    private TextView getTemperatureTextView() {
-        if (tvTemperature == null)
-            tvTemperature = (TextView) this.findViewById(R.id.temperature_value);
-        return tvTemperature;
-    }
-
-    private TextView getTemperatureTrendTextView() {
-        if (tvTemperatureTrend == null)
-            tvTemperatureTrend = (TextView) this.findViewById(R.id.temperature_trend);
-        return tvTemperatureTrend;
-    }
-
-    private TextView getTargetTemperatureTextView() {
-        if (tvTargetTemperature == null)
-            tvTargetTemperature = (TextView) this.findViewById(R.id.target_temperature_value);
-        return tvTargetTemperature;
-    }
-
-    private LinearLayout getTargetTemperatureLayout() {
-        if (llTargetTemperature == null)
-            llTargetTemperature = (LinearLayout) this.findViewById(R.id.target_temperature);
-        return llTargetTemperature;
-    }
-
-    public BoilerSensorData getSensorData() {
-        return this.sensorData;
-    }
+//    public BoilerSensorData getSensorData() {
+//        return this.sensorData;
+//    }
 
     public void setSensorData(BoilerSensorData value) {
         this.sensorData = value;
+        refresh();
+    }
 
-        getTemperatureTextView();
-        getTemperatureTrendTextView();
-        getTargetTemperatureLayout();
-
-        float v = value.getTemperature();
+    @Override
+    public void refresh() {
+        float v = this.sensorData.getTemperature();
         if (Float.isNaN(v))
             tvTemperature.setText("- - - -");
         else
-            tvTemperature.setText(String.format(Locale.US, "%.1f°", value.getTemperature()));
-        tvTemperature.setTextColor(value.getTemperatureColor());
+            tvTemperature.setText(String.format(Locale.US, "%.1f°", this.sensorData.getTemperature()));
+        tvTemperature.setTextColor(this.sensorData.getTemperatureColor());
 
-        switch (value.getTemperatureTrend()) {
+        switch (this.sensorData.getTemperatureTrend()) {
             case '+':
                 tvTemperatureTrend.setText("↑");
-                tvTemperatureTrend.setTextColor(0xFFFF3000);
+                tvTemperatureTrend.setTextColor(Utils.COLOR_TEMP_HIGH);
                 break;
             case '-':
                 tvTemperatureTrend.setText("↓");
-                tvTemperatureTrend.setTextColor(0xFF0050FF);
+                tvTemperatureTrend.setTextColor(Utils.COLOR_TEMP_LOW);
                 break;
             case '=':
                 tvTemperatureTrend.setText("");
                 break;
         }
 
-        v = value.getTargetTemperature();
+        v = this.sensorData.getTargetTemperature();
         if (Float.isNaN(v))
             llTargetTemperature.setVisibility(View.GONE);
         else {
-            getTargetTemperatureTextView();
-            tvTargetTemperature.setText(String.format(Locale.US, "%.1f°", value.getTargetTemperature()));
+            tvTargetTemperature.setText(String.format(Locale.US, "%.1f°", this.sensorData.getTargetTemperature()));
             llTargetTemperature.setVisibility(View.VISIBLE);
         }
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
-        if (value.getLastSyncTime() < calendar.getTime().getTime())
-            ((CardView) getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, true));
+        if (this.sensorData.getLastSyncTime() < calendar.getTime().getTime())
+            cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, true));
         else
-            ((CardView) getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, false));
+            cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, false));
 
         if (getIsFromDashboard())
-            ((TextView) findViewById(R.id.boiler_sensor_caption)).setText("T".concat(String.valueOf(value.getId() + 1)));
+            ((TextView) findViewById(R.id.boiler_sensor_caption)).setText("T".concat(String.valueOf(this.sensorData.getId() + 1)));
     }
 }

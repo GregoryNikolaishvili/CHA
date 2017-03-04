@@ -3,19 +3,19 @@ package ge.altasoft.gia.cha.classes;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
-import org.json.JSONArray;
+import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class DashboardItems {
 
     private final static ArrayList<DashboardItem> dashboardItems = new ArrayList<>();
+    //private static ArrayList<DashboardItem> savedDashboardItems;
+    private static boolean widgetsReordered;
 
-    public static boolean hasItem(int type, int id) {
+    public static boolean hasItem(WidgetType type, int id) {
         for (DashboardItem item : dashboardItems) {
             if ((item.type == type) && (item.id == id))
                 return true;
@@ -23,14 +23,25 @@ public class DashboardItems {
         return false;
     }
 
-    public static void add(Context context, int type, int id) {
+    public static void add(Context context, WidgetType type, int id) {
         if (hasItem(type, id))
             return;
 
         dashboardItems.add(new DashboardItem(type, id));
 
         notifyChanges(context);
-        save(context);
+        saveToPreferences(context);
+    }
+
+    public static void add(WidgetType type, int id) {
+        if (hasItem(type, id))
+            return;
+
+        dashboardItems.add(new DashboardItem(type, id));
+    }
+
+    public static void clear() {
+        dashboardItems.clear();
     }
 
     private static void notifyChanges(Context context) {
@@ -39,7 +50,7 @@ public class DashboardItems {
         context.sendBroadcast(broadcastIntent);
     }
 
-    public static void remove(Context context, int type, int id) {
+    public static void remove(Context context, WidgetType type, int id) {
         for (DashboardItem item : dashboardItems) {
             if ((item.type == type) && (item.id == id)) {
                 dashboardItems.remove(item);
@@ -48,7 +59,7 @@ public class DashboardItems {
         }
 
         notifyChanges(context);
-        save(context);
+        saveToPreferences(context);
     }
 
     public static int size() {
@@ -59,21 +70,20 @@ public class DashboardItems {
         return dashboardItems.get(position);
     }
 
-    public static void save(Context context) {
+    public static void saveToPreferences(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         StringBuilder sb = new StringBuilder();
 
         for (DashboardItem item : dashboardItems) {
-            sb.append(item.type).append(':').append(item.id).append(";");
+            sb.append(item.type.name()).append(':').append(item.id).append(";");
         }
-
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("dashboard_items", sb.toString());
         editor.apply();
     }
 
-    public static void restore(Context context) {
+    public static void restoreFromPreferences(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         String saved = prefs.getString("dashboard_items", null);
@@ -85,9 +95,41 @@ public class DashboardItems {
         for (int i = 0; i < items.length; i++) {
             String[] parts = items[i].split(":");
 
-            dashboardItems.add(new DashboardItem(Integer.valueOf(parts[0]), Integer.valueOf(parts[1])));
+            WidgetType wt;
+            if (Character.isDigit(parts[0].charAt(0)))
+                wt = WidgetType.fromInt(Integer.parseInt(parts[0]));
+            else
+                wt = WidgetType.valueOf(parts[0]);
 
+            dashboardItems.add(new DashboardItem(wt, Integer.valueOf(parts[1])));
         }
+    }
+
+    public static void reorderMapping(int firstIndex, int secondIndex) {
+
+        //Collections.swap(dashboardItems, firstIndex, secondIndex);
+        widgetsReordered = true;
+    }
+
+    public static boolean widgetOrderChanged() {
+
+        return widgetsReordered;
+    }
+
+    public static void saveWidgetOrders() {
+        widgetsReordered = false;
+//        savedDashboardItems = new ArrayList<>();
+//        for (DashboardItem item : dashboardItems)
+//            savedDashboardItems.add(new DashboardItem(item.type, item.id));
+    }
+
+    public static void restoreWidgetOrders(Context context) {
+
+//        dashboardItems.clear();
+//        for (DashboardItem item : savedDashboardItems)
+//            dashboardItems.add(new DashboardItem(item.type, item.id));
+//        widgetsReordered = false;
+        notifyChanges(context);
     }
 }
 

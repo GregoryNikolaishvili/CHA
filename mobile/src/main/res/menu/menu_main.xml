@@ -37,7 +37,7 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_light_reorder"
+        android:id="@+id/action_reorder_widgets"
         android:orderInCategory="200"
         android:title="@string/action_reorder"
         app:showAsAction="never" />

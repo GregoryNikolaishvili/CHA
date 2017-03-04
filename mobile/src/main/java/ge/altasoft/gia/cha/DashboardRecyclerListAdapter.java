@@ -1,17 +1,20 @@
 package ge.altasoft.gia.cha;
 
-import android.graphics.Color;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
+import ge.altasoft.gia.cha.classes.ChaWidget;
 import ge.altasoft.gia.cha.classes.DashboardItem;
 import ge.altasoft.gia.cha.classes.DashboardItems;
 import ge.altasoft.gia.cha.classes.ItemTouchHelperAdapter;
-import ge.altasoft.gia.cha.classes.ItemTouchHelperViewHolder;
+import ge.altasoft.gia.cha.classes.ItemViewHolder;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.light.LightControllerData;
@@ -21,41 +24,29 @@ import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
 import ge.altasoft.gia.cha.views.LightRelayView;
+import ge.altasoft.gia.cha.views.OutsideSensorView;
+import ge.altasoft.gia.cha.views.PressureSensorView;
+import ge.altasoft.gia.cha.views.RainSensorView;
 import ge.altasoft.gia.cha.views.RoomSensorView;
+import ge.altasoft.gia.cha.views.WindSensorView;
 
-public class DashboardRecyclerListAdapter extends RecyclerView.Adapter<DashboardRecyclerListAdapter.ItemViewHolder> implements ItemTouchHelperAdapter {
+class DashboardRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> implements ItemTouchHelperAdapter {
 
     private final OnStartDragListener mDragStartListener;
 
-    public DashboardRecyclerListAdapter(OnStartDragListener dragStartListener) {
+    DashboardRecyclerListAdapter(OnStartDragListener dragStartListener) {
         mDragStartListener = dragStartListener;
     }
 
     @Override
     public int getItemViewType(int position) {
-        DashboardItem item = DashboardItems.getItemAt(position);
-        return item.type;
+        return 0;
     }
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView;
+        View itemView = new FrameLayout(parent.getContext());
 
-        switch (viewType) {
-            case 0:
-                itemView = new LightRelayView(parent.getContext(), true);
-                break;
-            case 1:
-                itemView = new RoomSensorView(parent.getContext(), true);
-                break;
-            case 2:
-                itemView = new BoilerSensorView(parent.getContext(), true);
-                break;
-            default:
-                return null;
-        }
-
-        //int height = parent.getMeasuredWidth() / 4;
         int height = parent.getMeasuredHeight() / 4;
         itemView.setMinimumHeight(height);
 
@@ -65,32 +56,63 @@ public class DashboardRecyclerListAdapter extends RecyclerView.Adapter<Dashboard
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, int position) {
 
+        ViewGroup ll = (ViewGroup) holder.itemView;
+        if (ll.getChildCount() > 0)
+            ll.removeAllViews();
+
+        ChaWidget w;
+
         DashboardItem item = DashboardItems.getItemAt(position);
         switch (item.type) {
-            case 0: {
-                RelayData data = LightControllerData.Instance.relays(item.id);
-                ((LightRelayView) holder.itemView).setRelayData((LightRelayData) data);
-            }
-            break;
+            case LightRelay:
+                RelayData rd = LightControllerData.Instance.relays(item.id);
+                w = new LightRelayView(ll.getContext(), true);
+                ((LightRelayView) w).setRelayData((LightRelayData) rd);
+                break;
 
-            case 1: {
-                RoomSensorData data = ThermostatControllerData.Instance.roomSensors(item.id, false);
-                ((RoomSensorView) holder.itemView).setSensorData(data);
-            }
-            break;
+            case RoomSensor:
+                RoomSensorData rsd = ThermostatControllerData.Instance.roomSensors(item.id, false);
+                w = new RoomSensorView(ll.getContext(), true);
+                ((RoomSensorView) w).setSensorData(rsd);
+                break;
 
-            case 2: {
-                BoilerSensorData data = ThermostatControllerData.Instance.boilerSensors(item.id);
-                ((BoilerSensorView) holder.itemView).setSensorData(data);
-            }
-            break;
+            case BoilerSensor:
+                BoilerSensorData sd = ThermostatControllerData.Instance.boilerSensors(item.id);
+                w = new BoilerSensorView(ll.getContext(), true);
+                ((BoilerSensorView) w).setSensorData(sd);
+                break;
+
+            case OutsideSensor:
+                w = new OutsideSensorView(ll.getContext(), true);
+                w.refresh();
+                break;
+            case WindSensor:
+                w = new WindSensorView(ll.getContext(), true);
+                w.refresh();
+                break;
+            case PressureSensor:
+                w = new PressureSensorView(ll.getContext(), true);
+                w.refresh();
+                break;
+            case RainSensor:
+                w = new RainSensorView(ll.getContext(), true);
+                w.refresh();
+                break;
 
             default:
                 return;
         }
 
+        int height = ViewCompat.getMinimumHeight(ll);
+        w.setMinimumHeight(height);
+        w.setLayoutParams(new FrameLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT));
+        ll.addView(w);
+        View handleView = w.findViewById(R.id.main_layout);
+
         //Start a drag whenever the handle view it touched
-        holder.handleView.setOnTouchListener(new View.OnTouchListener() {
+        handleView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
@@ -109,7 +131,7 @@ public class DashboardRecyclerListAdapter extends RecyclerView.Adapter<Dashboard
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        //LightControllerData.Instance.reorderRelayMapping(fromPosition, toPosition);
+        DashboardItems.reorderMapping(fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }
@@ -117,25 +139,5 @@ public class DashboardRecyclerListAdapter extends RecyclerView.Adapter<Dashboard
     @Override
     public int getItemCount() {
         return DashboardItems.size();
-    }
-
-    static class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
-
-        private final View handleView;
-
-        ItemViewHolder(View itemView) {
-            super(itemView);
-            handleView = itemView.findViewById(R.id.main_layout);
-        }
-
-        @Override
-        public void onItemSelected() {
-            ((CardView) ((ViewGroup) itemView).getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(itemView.getContext(), true, false));
-        }
-
-        @Override
-        public void onItemClear() {
-            ((CardView) ((ViewGroup) itemView).getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(itemView.getContext(), false, false));
-        }
     }
 }

@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
 import ge.altasoft.gia.cha.classes.LogTHItem;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
@@ -35,7 +36,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 public class LogTHActivity extends ChaActivity {
 
     final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
-    private String scope;
+    private WidgetType scope;
     private int sensorId;
 
     private THLogAdapter adapter = null;
@@ -51,11 +52,11 @@ public class LogTHActivity extends ChaActivity {
         setContentView(R.layout.activity_log_th);
 
         Intent intent = getIntent();
-        scope = intent.getStringExtra("scope");
+        scope = (WidgetType) intent.getSerializableExtra("widget");
         sensorId = intent.getIntExtra("id", -1);
 
         logBuffer = new ArrayList<>();
-        adapter = new THLogAdapter(this, logBuffer, scope.equals("RoomSensor"));
+        adapter = new THLogAdapter(this, logBuffer, scope == WidgetType.RoomSensor);
 
         ListView listView = (ListView) findViewById(R.id.lvLogTemperatureAndHumidity);
         listView.setAdapter(adapter);
@@ -63,7 +64,7 @@ public class LogTHActivity extends ChaActivity {
         LinearLayout chartLayout = (LinearLayout) findViewById(R.id.chartLogBig);
         XYSeries seriesT = new XYSeries("T");
 
-        mRenderer = ThermostatUtils.getChartRenderer(this, 1, new int[]{Color.RED});
+        mRenderer = ThermostatUtils.getChartRenderer(this, false, 1, new int[]{Color.RED});
         mRenderer.setZoomEnabled(true, true);
         mRenderer.setPanEnabled(true, true);
         mRenderer.setZoomButtonsVisible(true);
@@ -83,14 +84,12 @@ public class LogTHActivity extends ChaActivity {
         super.ServiceConnected();
 
         switch (scope) {
-            case "BoilerSensor": {
+            case BoilerSensor:
                 publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
-            }
-            case "RoomSensor": {
+            case RoomSensor:
                 publish("cha/hub/getlog", "room_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
-            }
         }
     }
 
@@ -100,7 +99,7 @@ public class LogTHActivity extends ChaActivity {
 
         switch (dataType) {
             case ThermostatBoilerSensorState:
-                if (!scope.equals("BoilerSensor"))
+                if (scope != WidgetType.BoilerSensor)
                     return;
                 int id = intent.getIntExtra("id", -1);
                 if (id != sensorId)
@@ -120,7 +119,7 @@ public class LogTHActivity extends ChaActivity {
 
             case Log:
                 switch (scope) {
-                    case "BoilerSensor":
+                    case BoilerSensor:
                         if (intent.getStringExtra("type").startsWith("boiler")) {
                             String log = intent.getStringExtra("log");
                             ThermostatUtils.FillSensorLog(sensorId, scope, log, logBuffer);
@@ -128,7 +127,7 @@ public class LogTHActivity extends ChaActivity {
                             ThermostatUtils.DrawSensorChart(sensorId, scope, log, null, 120, mChartView, mRenderer, xyDataSet);
                         }
                         break;
-                    case "RoomSensor":
+                    case RoomSensor:
                         if (intent.getStringExtra("type").startsWith("room")) {
                             String log = intent.getStringExtra("log");
                             ThermostatUtils.FillSensorLog(sensorId, scope, log, logBuffer);
@@ -241,20 +240,17 @@ public class LogTHActivity extends ChaActivity {
 
         if (wd >= 0) {
             switch (scope) {
-                case "BoilerSensor": {
+                case BoilerSensor:
                     publish("cha/hub/getlog", "boiler_".concat(String.valueOf(wd)), false);
                     break;
-                }
-                case "RoomSensor": {
+                case RoomSensor:
                     publish("cha/hub/getlog", "room_".concat(String.valueOf(wd)), false);
                     break;
-                }
             }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-
     }
 
 }

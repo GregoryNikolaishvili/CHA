@@ -18,13 +18,9 @@
             android:id="@+id/sensor_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="none"
             android:gravity="center"
-            android:maxLines="2"
-            android:minLines="2"
-            android:scrollHorizontally="false"
-            android:text="@string/sample_sensor_name"
-            android:textSize="@dimen/sensor_name_size" />
+            android:text="@string/outside"
+            android:textSize="@dimen/widget_caption" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -71,18 +67,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="10" />
-
-            <TextView
-                android:id="@+id/target_temperature_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sample_temperature"
-                android:textSize="@dimen/sensor_footer_size" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="20" />
 
             <TextView
                 android:id="@+id/signal_level"

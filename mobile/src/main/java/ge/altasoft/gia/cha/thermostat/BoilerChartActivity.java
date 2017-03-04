@@ -19,6 +19,7 @@ import java.util.Calendar;
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.MqttClientLocal;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.classes.WidgetType;
 
 public class BoilerChartActivity extends ChaActivity {
 
@@ -37,7 +38,7 @@ public class BoilerChartActivity extends ChaActivity {
         XYSeries series3 = new XYSeries("T3");
         XYSeries series4 = new XYSeries("T4");
 
-        mRenderer = ThermostatUtils.getChartRenderer(this, 4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
+        mRenderer = ThermostatUtils.getChartRenderer(this, false, 4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
         mRenderer.setZoomEnabled(true, true);
         mRenderer.setPanEnabled(true, true);
         mRenderer.setZoomButtonsVisible(true);
@@ -73,7 +74,7 @@ public class BoilerChartActivity extends ChaActivity {
 
             case Log:
                 if (intent.getStringExtra("type").startsWith("boiler"))
-                    ThermostatUtils.DrawSensorChart(-1, "BoilerSensor", intent.getStringExtra("log"), null, 120, mChartView, mRenderer, xyDataSet);
+                    ThermostatUtils.DrawSensorChart(-1, WidgetType.BoilerSensor, intent.getStringExtra("log"), null, 120, mChartView, mRenderer, xyDataSet);
                 break;
         }
     }

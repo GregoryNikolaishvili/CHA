@@ -24,12 +24,13 @@ import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.LogRelayItem;
 import ge.altasoft.gia.cha.classes.LogTHItem;
+import ge.altasoft.gia.cha.classes.WidgetType;
 
 public final class ThermostatUtils {
 
     public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 3;
 
-    public static XYMultipleSeriesRenderer getChartRenderer(Context context, int rendererCount, int[] colors) {
+    public static XYMultipleSeriesRenderer getChartRenderer(Context context, boolean isSmall, int rendererCount, int[] colors) {
 
         XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 
@@ -50,9 +51,11 @@ public final class ThermostatUtils {
         renderer.setAxesColor(Color.DKGRAY);
         renderer.setLabelsColor(Color.BLACK);
 
+        renderer.setXLabels(0);
+        if (isSmall)
+            renderer.setYLabels(3);
         renderer.setXLabelsAlign(Paint.Align.CENTER);
         renderer.setYLabelsAlign(Paint.Align.RIGHT);
-        renderer.setXLabels(0);
 
         renderer.setShowGridY(true);
         //renderer.setYLabelsVerticalPadding(30);
@@ -82,13 +85,13 @@ public final class ThermostatUtils {
         return renderer;
     }
 
-    public static Date[] DrawSensorChart(int sensorId, String scope, String log, Date startDt, int dateLabelIntervalMinutes, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+    public static Date[] DrawSensorChart(int sensorId, WidgetType scope, String log, Date startDt, int dateLabelIntervalMinutes, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        boolean isRoomSensorLog = !scope.equals("BoilerSensor");
+        boolean isRoomSensorLog = scope == WidgetType.RoomSensor;
         int logEntryLen = isRoomSensorLog ? 18 : 11;
 
         for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
@@ -191,12 +194,12 @@ public final class ThermostatUtils {
         return new Date[]{minXX, maxXX};
     }
 
-    public static void FillSensorLog(int sensorId, String scope, String log, ArrayList<LogTHItem> logBuffer) {
+    public static void FillSensorLog(int sensorId, WidgetType scope, String log, ArrayList<LogTHItem> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        boolean isRoomSensorLog = !scope.equals("BoilerSensor");
+        boolean isRoomSensorLog = scope == WidgetType.RoomSensor;
         int logEntryLen = isRoomSensorLog ? 18 : 11;
 
         logBuffer.clear();
@@ -246,7 +249,7 @@ public final class ThermostatUtils {
         }
     }
 
-    public static void FillRelayLog(int relayId, String scope, String log, ArrayList<LogRelayItem> logBuffer) {
+    public static void FillRelayLog(int relayId, WidgetType scope, String log, ArrayList<LogRelayItem> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);

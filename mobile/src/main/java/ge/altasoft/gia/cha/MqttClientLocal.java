@@ -17,6 +17,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import ge.altasoft.gia.cha.light.LightControllerData;
+import ge.altasoft.gia.cha.other.OtherControllerData;
+import ge.altasoft.gia.cha.other.Sensor5in1Data;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
@@ -27,13 +29,15 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_ALERT = "cha/alert";
     private static final String TOPIC_CHA_LOG = "cha/log/"; // last "/" is important
 
+    private static final String TOPIC_CHA_5IN1 = "cha/5in1_sensor/"; // last "/" is important
+    private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/room_sensor/"; // last "/" is important
+    private static final String TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH = "cha/ROOM_SENSOR/"; // last "/" is important
+
     private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/light/state/"; // last "/" is important
 
     private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
     private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
 
-    private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/ts/rs/"; // last "/" is important
-    private static final String TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH = "cha/ts/RS/"; // last "/" is important
 
     private static final String TOPIC_CHA_BOILER_SENSOR_STATE = "cha/ts/bs/"; // last "/" is important
     private static final String TOPIC_CHA_BOILER_SENSOR_STATE_REFRESH = "cha/ts/BS/"; // last "/" is important
@@ -57,12 +61,15 @@ public class MqttClientLocal {
         Log,
         ClientConnected,
 
+        Sensor5in1StateTH,
+        Sensor5in1StateW,
+        SensorRoomState,
+
         LightRelayState,
         LightSettings,
         LightNameAndOrders,
 
         ThermostatState,
-        ThermostatRoomSensorState,
         ThermostatBoilerSensorState,
         ThermostatBoilerPumpState,
         ThermostatRoomSensorSettings,
@@ -221,6 +228,7 @@ public class MqttClientLocal {
                         broadcastServiceStatus("Connected", false);
 
                         publish(TOPIC_CHA_SYS.concat(clientId), "connected", true);
+                        publish("chac/ts/refresh", "1", false);
 
                         new Thread(new Runnable() {
                             @Override
@@ -433,9 +441,23 @@ public class MqttClientLocal {
                         broadcastDataIntent.putExtra("new_sensor", true);
                     ThermostatControllerData.Instance.roomSensors(id, true).decodeState(payload, topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE));
 
-                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorState);
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.SensorRoomState);
                     broadcastDataIntent.putExtra("id", id);
                     context.sendBroadcast(broadcastDataIntent);
+                    return;
+                }
+
+                if (topic.startsWith(TOPIC_CHA_5IN1)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_5IN1.length()), 16);
+                    boolean isWeatherSensor = id == 0xA0000;
+                    if ((id == 0) || isWeatherSensor) {
+                        Sensor5in1Data sd = OtherControllerData.Instance.get5in1SensorData();
+                        sd.decodeState(payload, isWeatherSensor);
+
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, isWeatherSensor ? MQTTReceivedDataType.Sensor5in1StateW : MQTTReceivedDataType.Sensor5in1StateTH);
+                        broadcastDataIntent.putExtra("id", 0);
+                        context.sendBroadcast(broadcastDataIntent);
+                    }
                     return;
                 }
 
@@ -446,7 +468,7 @@ public class MqttClientLocal {
                     for (int idx : ids) {
                         Intent intent = new Intent();
                         intent.setAction(MQTT_DATA_INTENT);
-                        intent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorState);
+                        intent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.SensorRoomState);
                         intent.putExtra("id", idx);
                         context.sendBroadcast(intent);
                     }

@@ -12,7 +12,7 @@ import java.util.Locale;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.TempSensorData;
 
-public final class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
+public class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
 
     private float H;
     private int signalLevel;
@@ -22,7 +22,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
     private int responsibleRelayId;
     private boolean isDeleted;
 
-    RoomSensorData(int id) {
+    public RoomSensorData(int id) {
         super(id);
 
         H = Float.NaN;
@@ -47,7 +47,7 @@ public final class RoomSensorData extends TempSensorData implements Comparable<R
         return this.isDeleted;
     }
 
-    public void setIsOn(boolean value) {
+    void setIsOn(boolean value) {
         this.isOn = value;
     }
 

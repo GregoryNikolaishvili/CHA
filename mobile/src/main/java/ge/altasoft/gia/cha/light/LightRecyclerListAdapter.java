@@ -1,22 +1,18 @@
 package ge.altasoft.gia.cha.light;
 
-import android.graphics.Color;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.ItemTouchHelperAdapter;
-import ge.altasoft.gia.cha.classes.ItemTouchHelperViewHolder;
+import ge.altasoft.gia.cha.classes.ItemViewHolder;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.views.LightRelayView;
 
-public class LightRecyclerListAdapter extends RecyclerView.Adapter<LightRecyclerListAdapter.ItemViewHolder> implements ItemTouchHelperAdapter {
+public class LightRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> implements ItemTouchHelperAdapter {
 
     private final OnStartDragListener mDragStartListener;
 
@@ -42,7 +38,7 @@ public class LightRecyclerListAdapter extends RecyclerView.Adapter<LightRecycler
         ((LightRelayView) holder.itemView).setRelayData((LightRelayData) data);
 
         //Start a drag whenever the handle view it touched
-        holder.handleView.setOnTouchListener(new View.OnTouchListener() {
+        holder.mainLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
@@ -69,25 +65,5 @@ public class LightRecyclerListAdapter extends RecyclerView.Adapter<LightRecycler
     @Override
     public int getItemCount() {
         return LightControllerData.Instance.relayCount();
-    }
-
-    static class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
-
-        private final View handleView;
-
-        ItemViewHolder(View itemView) {
-            super(itemView);
-            handleView = itemView.findViewById(R.id.main_layout);
-        }
-
-        @Override
-        public void onItemSelected() {
-            ((CardView) ((ViewGroup) itemView).getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(itemView.getContext(), true, false));
-        }
-
-        @Override
-        public void onItemClear() {
-            ((CardView) ((ViewGroup) itemView).getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(itemView.getContext(), false, false));
-        }
     }
 }

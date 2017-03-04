@@ -8,12 +8,6 @@
         android:entries="@array/boilerModeListArray"
         android:entryValues="@array/boilerModeListArrayValues"/>>
 
-    <PreferenceScreen android:title="Relays">
-        <PreferenceCategory
-            android:key="Relays"
-            android:title="Relays" />
-    </PreferenceScreen>
-
     <PreferenceScreen android:title="Sensors">
         <PreferenceCategory
             android:key="Sensors"

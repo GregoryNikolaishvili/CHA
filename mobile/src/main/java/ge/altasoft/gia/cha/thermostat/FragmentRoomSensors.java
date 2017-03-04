@@ -1,137 +1,55 @@
 package ge.altasoft.gia.cha.thermostat;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.classes.ItemTouchHelperAdapter;
+import ge.altasoft.gia.cha.classes.ChaFragment;
+import ge.altasoft.gia.cha.classes.ChaWidget;
+import ge.altasoft.gia.cha.classes.ItemViewHolder;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
-import ge.altasoft.gia.cha.classes.SimpleItemTouchHelperCallback;
 import ge.altasoft.gia.cha.views.RoomSensorView;
 
-public class FragmentRoomSensors extends Fragment implements OnStartDragListener {
-
-    private ViewGroup rootView = null;
-    private boolean dragMode = false;
-    private TextView tvLoading;
-    private ItemTouchHelper mItemTouchHelper;
+public class FragmentRoomSensors extends ChaFragment implements OnStartDragListener {
 
     public FragmentRoomSensors() {
     }
 
-    public static FragmentRoomSensors newInstance() {
-        return new FragmentRoomSensors();
+    @Override
+    protected boolean canReorder() {
+        return true;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = (ViewGroup) inflater.inflate(R.layout.fragment_room_sensors, container, false);
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        tvLoading = new TextView(getContext());
-
-        tvLoading.setLayoutParams(lp);
-        tvLoading.setGravity(Gravity.CENTER);
-        tvLoading.setText(getResources().getString(R.string.loading));
-        rootView.addView(tvLoading, 0);
-
-        rebuildUI();
-
-        return rootView;
-    }
-
-    private class MySimpleItemTouchHelperCallback extends SimpleItemTouchHelperCallback {
-        public MySimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
-            super(adapter);
-        }
-
-        @Override
-        public boolean isLongPressDragEnabled() {
-            return dragMode;
-        }
+    protected int getLayoutResId() {
+        return R.layout.fragment_room_sensors;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        final RoomSensorRecyclerListAdapter adapter = new RoomSensorRecyclerListAdapter(this);
-
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.thermostatRecyclerView);
-        //recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter);
-
-        final GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 4);
-        recyclerView.setLayoutManager(layoutManager);
-
-        ItemTouchHelper.Callback callback = new MySimpleItemTouchHelperCallback(adapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+    protected RecyclerView.Adapter<ItemViewHolder> getRecycleAdapter() {
+        return new RoomSensorRecyclerListAdapter(this);
     }
 
     @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        if (dragMode)
-            mItemTouchHelper.startDrag(viewHolder);
-    }
-
-    public void setDraggableViews(boolean on) {
-        dragMode = on;
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.thermostatRecyclerView);
-        for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            RoomSensorView view = (RoomSensorView) recyclerView.getChildAt(i);
-            view.setDragMode(on);
-        }
-    }
-
     public void checkSensors() {
-        if (rootView != null)
-            drawStates();
+        if (rootView != null) {
+            for (int i = 0; i < recyclerView.getChildCount(); i++)
+                ((ChaWidget) recyclerView.getChildAt(i)).refresh();
+        }
     }
 
-    // rebuild everything and draws new state
+    @Override
     public void rebuildUI() {
         if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveRoomSensorsSettings())
             return;
 
-        if (tvLoading != null) {
-            rootView.removeView(tvLoading);
-            tvLoading = null;
-        }
+        hideWaitingScreen();
 
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.thermostatRecyclerView);
-
-        int prevOrder = -1;
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            RoomSensorView sensor = (RoomSensorView) recyclerView.getChildAt(i);
-            if (sensor != null) {
-                RoomSensorData data = ThermostatControllerData.Instance.getRoomSensorFromUIIndex(i);
+            RoomSensorView w = (RoomSensorView) recyclerView.getChildAt(i);
+            RoomSensorData data = ThermostatControllerData.Instance.getRoomSensorFromUIIndex(i);
+            if ((w != null) && (data != null)) {
                 data.setOrder(i);
-                sensor.setSensorData(data);
-            }
-        }
-    }
-
-    public void drawStates() {
-        if (rootView == null)
-            return;
-
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.thermostatRecyclerView);
-        for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            RoomSensorView sensor = (RoomSensorView) recyclerView.getChildAt(i);
-            if (sensor != null) {
-                RoomSensorData data = sensor.getSensorData();
-                sensor.setSensorData(data);
+                w.setSensorData(data);
             }
         }
     }
@@ -141,12 +59,10 @@ public class FragmentRoomSensors extends Fragment implements OnStartDragListener
         if (rootView == null)
             return;
 
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.thermostatRecyclerView);
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            RoomSensorView sensor = (RoomSensorView) recyclerView.getChildAt(i);
-            RoomSensorData data = sensor.getSensorData();
-            if (data.getId() == id) {
-                sensor.setSensorData(data);
+            ChaWidget w = (ChaWidget) recyclerView.getChildAt(i);
+            if ((w != null) && (w.getWidgetId() == id)) {
+                w.refresh();
                 break;
             }
         }

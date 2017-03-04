@@ -3,11 +3,9 @@ package ge.altasoft.gia.cha.thermostat;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
-import android.view.Gravity;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +28,9 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.classes.ChaFragment;
+import ge.altasoft.gia.cha.classes.ItemViewHolder;
+import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.views.BoilerPumpView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
 
@@ -37,35 +38,34 @@ import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER;
 
-public class FragmentBoiler extends Fragment {
+public class FragmentBoiler extends ChaFragment {
 
-    private boolean haveLogData = false;
-
-    private ViewGroup rootView = null;
     private GraphicalView mChartView;
     private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
     private XYMultipleSeriesRenderer mRenderer;
     private Date mMaxXX;
-    private TextView tvLoading;
 
     public FragmentBoiler() {
     }
 
-    public static FragmentBoiler newInstance() {
-        return new FragmentBoiler();
+    @Override
+    protected boolean canReorder() {
+        return false;
+    }
+
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.fragment_boiler;
+    }
+
+    @Override
+    protected RecyclerView.Adapter<ItemViewHolder> getRecycleAdapter() {
+        return null;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = (ViewGroup) inflater.inflate(R.layout.fragment_boiler, container, false);
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        tvLoading = new TextView(getContext());
-
-        tvLoading.setLayoutParams(lp);
-        tvLoading.setGravity(Gravity.CENTER);
-        tvLoading.setText(getResources().getString(R.string.loading));
-        rootView.addView(tvLoading, 0);
+        super.onCreateView(inflater, container, savedInstanceState);
 
         final CardView cv = ((CardView) rootView.findViewById(R.id.boilerMode));
 
@@ -196,7 +196,7 @@ public class FragmentBoiler extends Fragment {
         XYSeries series3 = new XYSeries("T3");
         XYSeries series4 = new XYSeries("T4");
 
-        mRenderer = ThermostatUtils.getChartRenderer(this.getContext(), 4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
+        mRenderer = ThermostatUtils.getChartRenderer(this.getContext(), true, 4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
         mRenderer.setPanEnabled(false, false);
 
         xyDataSet.addSeries(series1);
@@ -214,19 +214,7 @@ public class FragmentBoiler extends Fragment {
             }
         });
 
-        rebuildUI(false);
-
         return rootView;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -242,38 +230,29 @@ public class FragmentBoiler extends Fragment {
         super.onStop();
     }
 
+    @Override
     public void checkSensors() {
         if (rootView != null)
             drawSensorAndRelayStates();
     }
 
-    // rebuild everything and draws new state
-    public void rebuildUI(boolean requestGraphLog) {
+
+    @Override
+    public void rebuildUI() {
         if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveBoilerSettings())
             return;
 
-        if (tvLoading != null) {
-            rootView.removeView(tvLoading);
-            tvLoading = null;
-        }
+        hideWaitingScreen();
 
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setRelayId(ThermostatControllerData.BOILER_SOLAR_PUMP);
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);
 
         drawSensorAndRelayStates();
-
-        if (requestGraphLog || !haveLogData) {
-            haveLogData = false;
-            ((ChaActivity) getActivity()).publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
-        }
     }
 
     public void rebuildGraph(String log) {
 
-        haveLogData = true;
-
-        Date[] dates = ThermostatUtils.DrawSensorChart(-1, "BoilerSensor", log, getNowMinus4Hour(), 30, mChartView, mRenderer, xyDataSet);
-        //double mMinXX = dates[0].getTime();
+        Date[] dates = ThermostatUtils.DrawSensorChart(-1, WidgetType.BoilerSensor, log, getNowMinus4Hour(), 30, mChartView, mRenderer, xyDataSet);
         mMaxXX = dates[1];
     }
 
@@ -288,17 +267,6 @@ public class FragmentBoiler extends Fragment {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
-
-//    public void drawState() {
-//        if (rootView == null)
-//            return;
-//
-//        drawSensorAndRelayStates();
-//
-//        for (int i = 0; i < ThermostatControllerData.BOILER_SENSOR_COUNT; i++) {
-//            pointSeries.getItem(i).append(ThermostatControllerData.Instance.boilerSensors(i));
-//        }
-//    }
 
     public void drawSensorState(int id) {
         if (rootView == null)
@@ -394,6 +362,6 @@ public class FragmentBoiler extends Fragment {
         if (rootView == null)
             return;
 
-        ((TextView)rootView.findViewById(R.id.boilerStatus)).setText(sb.toString().replace('\r', ' ').replace('\n', ','));
+        ((TextView) rootView.findViewById(R.id.boilerStatus)).setText(sb.toString().replace('\r', ' ').replace('\n', ','));
     }
 }

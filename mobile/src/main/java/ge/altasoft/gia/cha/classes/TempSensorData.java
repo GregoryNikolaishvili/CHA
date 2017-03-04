@@ -17,7 +17,7 @@ public class TempSensorData {
     private float targetT;
     private float deltaTargetT;
 
-    private long lastSyncTime;
+    protected long lastSyncTime;
 
     protected TempSensorData(int id) {
         this.id = id;
@@ -76,13 +76,13 @@ public class TempSensorData {
 
     public int getTemperatureColor() {
         if (Float.isNaN(this.targetT))
-            return Color.WHITE;
+            return Utils.COLOR_TEMP_NORMAL;
 
         float delta = T - this.targetT;
         if (Math.abs(delta) <= deltaTargetT)
-            return Color.WHITE;
+            return Utils.COLOR_TEMP_NORMAL;
 
-        return delta < 0 ? 0xFF0050FF : 0xFFFF3000;
+        return delta < 0 ? Utils.COLOR_TEMP_LOW : Utils.COLOR_TEMP_HIGH;
     }
 
     public int getOrder() {

@@ -1,6 +1,5 @@
 package ge.altasoft.gia.cha;
 
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,15 +15,21 @@ import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
 
 public class Utils {
 
     static String mqttBrokerLocalUrl = "192.168.3.1:1883";
     static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
+
+    public final static int COLOR_TEMP_HIGH = 0xFFFF3000;
+    public final static int COLOR_TEMP_LOW = 0xFF00DDFF;
+    public final static int COLOR_TEMP_NORMAL = Color.WHITE;
+    private final static int COLOR_CARD_BK = 0xFF424242;
+    private final static int COLOR_CARD_BK_ERROR = 0xFF500000;
+    private final static int COLOR_CARD_BK_PRESSED = Color.GRAY;
 
     public final static float F_UNDEFINED = 999.9f;
 
@@ -34,8 +39,6 @@ public class Utils {
     final static int ERR_95_DEGREE = 8;
     final static int ERR_CMX = 16;
     final static int ERR_SMX = 32;
-
-    //public static final int LOG_BUFFER_SIZE = 1000;
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
     static final int ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS = 2;
@@ -250,14 +253,18 @@ public class Utils {
     public static int getCardBackgroundColor(Context context, boolean isPressed, boolean isError) {
         int color;
         if (isPressed)
-            color = Color.LTGRAY;
+            color = COLOR_CARD_BK_PRESSED;
         else if (isError)
-            color = 0x50FF0000;
+            color = COLOR_CARD_BK_ERROR;
         else
-            color = context.getResources().getColor(R.color.cardview_dark_background);
+            color = COLOR_CARD_BK;
 
         return color;
     }
+
+//    public static int getColorFromResource(Context context, int resId) {
+//        return ContextCompat.getColor(context, resId);
+//    }
 
     //    public static void InputDialog(Context context, String title, String value, int type, final RunnableWithParams positiveAction) {
 //

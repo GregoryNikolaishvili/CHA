@@ -17,4 +17,9 @@
 
     <dimen name="chart_label_size">10sp</dimen>
 
+    <dimen name="widget_t_size">36sp</dimen>
+    <dimen name="widget_l_size">20sp</dimen>
+    <dimen name="widget_caption">16sp</dimen>
+    <dimen name="widget_dimension_size">16sp</dimen>
+
 </resources>

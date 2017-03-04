@@ -76,7 +76,7 @@ public class LightSettingsActivity extends ChaPreferenceActivity {
 
                 // Create the Preferences Manually - so that the key can be refresh programatically.
 
-                for (int id = 1; id <= LightControllerData.RELAY_COUNT; id++) {// TODO: 2/11/2017 id should start from 0
+                for (int id = 0; id < LightControllerData.RELAY_COUNT; id++) {
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 
                     screen.setTitle(Integer.toString(id));

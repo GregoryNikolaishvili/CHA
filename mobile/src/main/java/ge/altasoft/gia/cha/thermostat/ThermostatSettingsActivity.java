@@ -26,7 +26,6 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         ThermostatControllerData.Instance.saveToPreferences(prefs);
@@ -43,10 +42,7 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
                     new Runnable() {
                         public void run() {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
                             ThermostatControllerData.Instance.decode(prefs);
-
-                            //Log.d("Settings refresh", ThermostatControllerData.Instance.Encode());
 
                             setResult(Activity.RESULT_OK, null); //The data you want to send back
                             context.finish();
@@ -72,36 +68,6 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
             addPreferencesFromResource(R.xml.thermostat_preferences);
 
             PreferenceScreen root = this.getPreferenceScreen();
-            PreferenceCategory relaysCat = (PreferenceCategory) root.findPreference("Relays");
-            if (relaysCat != null) {
-                PreferenceManager prefMan = this.getPreferenceManager();
-                Context prefContext = root.getContext();
-
-                // Create the Preferences Manually - so that the key can be refresh programatically.
-
-                for (int id = 0; id < ThermostatControllerData.HEATING_RELAY_COUNT; id++) {
-                    PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
-
-                    screen.setTitle(Integer.toString(id));
-
-                    Preference p0 = new Preference(prefContext);
-                    p0.setPersistent(false);
-                    p0.setSelectable(false);
-                    p0.setTitle("Relay #" + Integer.toString(id));
-                    screen.addPreference(p0);
-
-                    FriendlyEditTextPreference p1 = new FriendlyEditTextPreference(prefContext);
-                    p1.setKey("t_relay_name_" + Integer.toString(id));
-                    p1.setSummary("%s");
-                    p1.setTitle("Name");
-                    screen.addPreference(p1);
-
-                    relaysCat.addPreference(screen);
-                }
-
-                setRelayNamesAndSummary();
-            }
-
             PreferenceCategory sensorsCat = (PreferenceCategory) root.findPreference("Sensors");
             if (sensorsCat != null) {
                 PreferenceManager prefMan = this.getPreferenceManager();
@@ -109,8 +75,6 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
 
                 Map<Integer, RoomSensorData> sensors = ThermostatControllerData.Instance.sortedRoomSensors();
                 for (int id : sensors.keySet()) {
-                    //RoomSensorData data = ThermostatControllerData.Instance.roomSensors(id);
-
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 
                     screen.setTitle(Integer.toString(id));
@@ -174,9 +138,7 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
                                                             screen.setSummary("Deleted");
                                                             screen.setEnabled(false);
 
-                                                            //sensors.removePreference(screen);
                                                             setSensorNamesAndSummary();
-
                                                             break;
                                                         }
                                                     }
@@ -213,27 +175,7 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
-            setRelayNamesAndSummary();
             setSensorNamesAndSummary();
-        }
-
-        private void setRelayNamesAndSummary() {
-            PreferenceScreen root = getPreferenceScreen();
-            PreferenceCategory relays = (PreferenceCategory) root.findPreference("Relays");
-            if (relays != null) {
-                for (int i = 0; i < relays.getPreferenceCount(); i++) {
-                    if (relays.getPreference(i) instanceof PreferenceScreen) {
-                        PreferenceScreen screen = (PreferenceScreen) relays.getPreference(i);
-                        FriendlyEditTextPreference namePref = (FriendlyEditTextPreference) screen.getPreference(1);
-
-                        String name = namePref.getText();
-                        if (name == null)
-                            name = "Relay #" + Integer.toString(ThermostatControllerData.Instance.relays(i).getId());
-                        screen.setTitle(name);
-                    }
-                }
-            }
-            ((BaseAdapter) root.getRootAdapter()).notifyDataSetChanged();
         }
 
         private void setSensorNamesAndSummary() {

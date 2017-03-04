@@ -1,40 +1,29 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Handler;
-import android.support.v4.util.Pair;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.ChaActivity;
-import ge.altasoft.gia.cha.LogStateActivity;
-import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.classes.ChaCard;
-import ge.altasoft.gia.cha.classes.DashboardItems;
+import ge.altasoft.gia.cha.classes.ChaWidget;
+import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.light.LightRelayData;
 import ge.altasoft.gia.cha.R;
 
-public class LightRelayView extends ChaCard {
+public class LightRelayView extends ChaWidget {
 
-    private enum ButtonState {UNKNOWN, ON, OFF, WAIT}
-
-    private boolean isPressed = false;
+    public enum ButtonState {UNKNOWN, ON, OFF, WAIT}
 
     private ButtonState buttonState = ButtonState.UNKNOWN;
 
     private LightRelayData relayData;
+
+    private TextView tvRelayName;
+    private ImageView ivLight;
 
     public LightRelayView(Context context, boolean fromDashboard) {
         super(context, fromDashboard);
@@ -51,174 +40,73 @@ public class LightRelayView extends ChaCard {
         initializeViews(context);
     }
 
-//    public static String actionToString(int action) {
-//        switch (action) {
-//            case MotionEvent.ACTION_DOWN:
-//                return "ACTION_DOWN";
-//            case MotionEvent.ACTION_UP:
-//                return "ACTION_UP";
-//            case MotionEvent.ACTION_CANCEL:
-//                return "ACTION_CANCEL";
-//            case MotionEvent.ACTION_OUTSIDE:
-//                return "ACTION_OUTSIDE";
-//            case MotionEvent.ACTION_MOVE:
-//                return "ACTION_MOVE";
-//            case MotionEvent.ACTION_HOVER_MOVE:
-//                return "ACTION_HOVER_MOVE";
-//            case MotionEvent.ACTION_SCROLL:
-//                return "ACTION_SCROLL";
-//            case MotionEvent.ACTION_HOVER_ENTER:
-//                return "ACTION_HOVER_ENTER";
-//            case MotionEvent.ACTION_HOVER_EXIT:
-//                return "ACTION_HOVER_EXIT";
-//            case MotionEvent.ACTION_BUTTON_PRESS:
-//                return "ACTION_BUTTON_PRESS";
-//            case MotionEvent.ACTION_BUTTON_RELEASE:
-//                return "ACTION_BUTTON_RELEASE";
-//        }
-//        int index = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-//        switch (action & MotionEvent.ACTION_MASK) {
-//            case MotionEvent.ACTION_POINTER_DOWN:
-//                return "ACTION_POINTER_DOWN(" + index + ")";
-//            case MotionEvent.ACTION_POINTER_UP:
-//                return "ACTION_POINTER_UP(" + index + ")";
-//            default:
-//                return Integer.toString(action);
-//        }
-//    }
-
-    private void initializeViews(Context context) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.light_relay_layout, this);
-        setTag(false);
-
-        setOnTouchListener(new OnTouchListener() {
-                               @Override
-                               public boolean onTouch(View v, MotionEvent event) {
-                                   if (!getDragMode()) {
-                                       switch (event.getAction()) {
-                                           case MotionEvent.ACTION_DOWN:
-                                               setIsPressed(true);
-                                               longPressHandle.postDelayed(longPressCall, ViewConfiguration.getLongPressTimeout());
-                                               break;
-
-                                           case MotionEvent.ACTION_CANCEL:
-                                               longPressHandle.removeCallbacks(longPressCall);
-                                               setIsPressed(false);
-                                               break;
-
-                                           case MotionEvent.ACTION_UP:
-                                               longPressHandle.removeCallbacks(longPressCall);
-                                               if (!(boolean) getTag()) {
-                                                   setIsPressed(false);
-                                                   onClick();
-                                               }
-                                       }
-                                       //Log.d("Touch", actionToString(event.getAction()));
-                                       return true;
-                                   }
-                                   return false;
-                               }
-                           }
-        );
+    @Override
+    protected boolean canClick() {
+        return true;
     }
 
-    final Handler longPressHandle = new Handler();
-    final Runnable longPressCall = new Runnable() {
-        @Override
-        public void run() {
-            if (isPressed)
-                onLongPress();
-        }
-    };
+    @Override
+    public WidgetType getWidgetType() {
+        return WidgetType.LightRelay;
+    }
 
-    private void onClick() {
+    @Override
+    public int getWidgetId() {
+        return relayData.getId();
+    }
+
+    @Override
+    protected int getPopupMenuResId() {
+        return R.menu.relay_popup_menu;
+    }
+
+    @Override
+    protected void onClick() {
         ((ChaActivity) getContext()).publish(String.format(Locale.US, "chac/light/state/%01X", relayData.getId()), buttonState == ButtonState.OFF ? "1" : "0", false);
         setState(ButtonState.WAIT);
     }
 
-    private void onLongPress() {
-        final CardView card = ((CardView) getChildAt(0));
+    private void initializeViews(Context context) {
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater.inflate(R.layout.light_relay_layout, this);
 
-        card.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), true, false));
-        PopupMenu popupMenu = new PopupMenu(getContext(), card);
-        setTag(true);
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                setTag(false);
-                switch (item.getItemId()) {
-                    case R.id.item_pin_to_dashboard:
-                        if (DashboardItems.hasItem(0, relayData.getId()))
-                            DashboardItems.remove(getContext(), 0, relayData.getId());
-                        else
-                            DashboardItems.add(getContext(), 0, relayData.getId());
-                        break;
-                    case R.id.item_log:
-                        if (relayData != null) {
-                            Intent intent = new Intent(getContext(), LogStateActivity.class);
-                            intent.putExtra("id", relayData.getId());
-                            intent.putExtra("scope", "LightRelay");
-                            getContext().startActivity(intent);
-                        }
-                        break;
-                }
-                return false;
-            }
-        });
-        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
-            @Override
-            public void onDismiss(PopupMenu menu) {
-                setTag(false);
-                card.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, false));
-            }
-        });
-        popupMenu.inflate(R.menu.relay_popup_menu);
-        popupMenu.getMenu().findItem(R.id.item_pin_to_dashboard).setChecked(DashboardItems.hasItem(0, relayData.getId()));
-        popupMenu.show();
+        afterInflate();
+
+        tvRelayName = ((TextView) this.findViewById(R.id.relay_name));
+        ivLight = ((ImageView) findViewById(R.id.relay_light));
     }
 
-    private void setRelayName(CharSequence value) {
-        ((TextView) this.findViewById(R.id.relay_name)).setText(value);
-    }
-
-    public void setIsOn(boolean value) {
-        setState(value ? ButtonState.ON : ButtonState.OFF);
-    }
-
-    public void setIsPressed(boolean pressed) {
-        this.isPressed = pressed;
-        ((CardView) getChildAt(0)).setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), pressed, false));
-    }
-
-    private void setState(ButtonState value) {
+    public void setState(ButtonState value) {
         buttonState = value;
 
         switch (value) {
             case UNKNOWN:
-                ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_unknown);
+                ivLight.setImageResource(R.drawable.button_onoff_indicator_unknown);
                 break;
             case ON:
-                ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_on);
+                ivLight.setImageResource(R.drawable.button_onoff_indicator_on);
                 break;
             case OFF:
-                ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_off);
+                ivLight.setImageResource(R.drawable.button_onoff_indicator_off);
                 break;
             case WAIT:
-                ((ImageView) findViewById(R.id.relay_light)).setImageResource(R.drawable.button_onoff_indicator_wait);
+                ivLight.setImageResource(R.drawable.button_onoff_indicator_wait);
                 break;
         }
     }
 
-    public LightRelayData getRelayData() {
-        return this.relayData;
-    }
+//    public LightRelayData getRelayData() {
+//        return this.relayData;
+//    }
 
     public void setRelayData(LightRelayData value) {
         this.relayData = value;
+        refresh();
+    }
 
-        setRelayName(value.getName()); // + ", order=" + String.valueOf(value.getOrder()));
-        //setComment(value.getComment());
-        setIsOn(value.getState() != 0);
+    @Override
+    public void refresh() {
+        tvRelayName.setText(this.relayData.getName()); // + ", order=" + String.valueOf(value.getOrder()));
+        setState(this.relayData.getState() != 0 ? ButtonState.ON : ButtonState.OFF);
     }
 }

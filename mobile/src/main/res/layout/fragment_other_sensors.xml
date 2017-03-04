@@ -23,6 +23,5 @@
         android:paddingRight="8dp"
         android:paddingStart="8dp"
         android:paddingTop="4dp"
-        android:weightSum="1">
-    </LinearLayout>
+        android:weightSum="1" />
 </LinearLayout>

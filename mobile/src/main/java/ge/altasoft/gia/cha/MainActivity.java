@@ -11,16 +11,22 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import ge.altasoft.gia.cha.classes.ChaFragment;
+import ge.altasoft.gia.cha.classes.DashboardItems;
+import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.FragmentLight;
 import ge.altasoft.gia.cha.light.LightSettingsActivity;
 
+import ge.altasoft.gia.cha.other.FragmentOtherSensors;
+import ge.altasoft.gia.cha.other.OtherControllerData;
 import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
 import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
@@ -60,10 +66,8 @@ public class MainActivity extends ChaActivity {
 
         @Override
         public void run() {
-            if (pagerAdapter.fragmentBoiler != null)
-                pagerAdapter.fragmentBoiler.checkSensors();
-            if (pagerAdapter.fragmentRoomSensors != null)
-                pagerAdapter.fragmentRoomSensors.checkSensors();
+            for (int i = 0; i < pagerAdapter.getCount(); i++)
+                ((ChaFragment) pagerAdapter.getItem(i)).checkSensors();
 
             timerHandler.postDelayed(this, 60000);
         }
@@ -92,27 +96,28 @@ public class MainActivity extends ChaActivity {
                 for (int I = 2; I < this.mainMenu.size(); I++)
                     this.mainMenu.getItem(I).setEnabled(true);
 
-                pagerAdapter.fragmentDashboard.setDraggableViews(false);
-                pagerAdapter.fragmentLight.setDraggableViews(false);
-                pagerAdapter.fragmentRoomSensors.setDraggableViews(false);
+                for (int i = 0; i < pagerAdapter.getCount(); i++)
+                    ((ChaFragment) pagerAdapter.getItem(i)).setDraggableViews(false);
 
                 if (id == R.id.action_ok) {
-                    if (LightControllerData.Instance.relayOrderChanged())
+                    if (LightControllerData.Instance.widgetOrderChanged())
                         publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
-                    if (ThermostatControllerData.Instance.roomSensorOrderChanged())
+                    if (ThermostatControllerData.Instance.widgetOrderChanged())
                         publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
+                    if (OtherControllerData.Instance.widgetOrderChanged()) {
+                        pagerAdapter.fragmentDashboard.saveWidgetOrders();
+                        DashboardItems.saveToPreferences(this);
+                    }
                 } else {
-                    LightControllerData.Instance.restoreRelayOrders();
-                    pagerAdapter.fragmentLight.rebuildUI();
-
-                    ThermostatControllerData.Instance.restoreRoomSensorRelayOrders();
-                    pagerAdapter.fragmentRoomSensors.rebuildUI();
-                    pagerAdapter.fragmentDashboard.rebuildUI();
+                    LightControllerData.Instance.restoreWidgetOrders();
+                    ThermostatControllerData.Instance.restoreWidgetOrders();
+                    OtherControllerData.Instance.restoreWidgetOrders(this);
+                    rebuildUI();
                 }
                 return true;
 
             case R.id.action_refresh:
-                publish("chac/light/refresh", "1", false);
+                //publish("chac/light/refresh", "1", false);
                 publish("chac/ts/refresh", "1", false);
                 return true;
 
@@ -135,10 +140,11 @@ public class MainActivity extends ChaActivity {
                 startActivityForResult(new Intent(this, LightSettingsActivity.class), Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS);
                 return true;
 
-            case R.id.action_light_reorder:
-                LightControllerData.Instance.saveRelayOrders();
-                ThermostatControllerData.Instance.saveRelayOrders();
-                ThermostatControllerData.Instance.saveRoomSensorOrders();
+            case R.id.action_reorder_widgets:
+                LightControllerData.Instance.saveWidgetOrders();
+                ThermostatControllerData.Instance.saveWidgetOrders();
+                ThermostatControllerData.Instance.saveWidgetOrders();
+                OtherControllerData.Instance.saveWidgetOrders();
 
                 this.mainMenu.findItem(R.id.action_ok).setVisible(true);
                 this.mainMenu.findItem(R.id.action_cancel).setVisible(true);
@@ -147,9 +153,9 @@ public class MainActivity extends ChaActivity {
                 for (int I = 2; I < this.mainMenu.size(); I++)
                     this.mainMenu.getItem(I).setEnabled(false);
 
-                pagerAdapter.fragmentDashboard.setDraggableViews(true);
-                pagerAdapter.fragmentLight.setDraggableViews(true);
-                pagerAdapter.fragmentRoomSensors.setDraggableViews(true);
+                for (int i = 0; i < pagerAdapter.getCount(); i++)
+                    ((ChaFragment) pagerAdapter.getItem(i)).setDraggableViews(true);
+
                 return true;
 
             //region Thermostat
@@ -167,15 +173,7 @@ public class MainActivity extends ChaActivity {
     public void onResume() {
         super.onResume();
 
-        if (pagerAdapter.fragmentLight != null)
-            pagerAdapter.fragmentLight.rebuildUI();
-
-        if (pagerAdapter.fragmentBoiler != null)
-            pagerAdapter.fragmentBoiler.rebuildUI(true);
-        if (pagerAdapter.fragmentRoomSensors != null)
-            pagerAdapter.fragmentRoomSensors.rebuildUI();
-        if (pagerAdapter.fragmentDashboard != null)
-            pagerAdapter.fragmentDashboard.rebuildUI();
+        rebuildUI();
 
         timerHandler.postDelayed(timerRunnable, 60000);
     }
@@ -214,6 +212,11 @@ public class MainActivity extends ChaActivity {
                 }
                 break;
         }
+    }
+
+    private void rebuildUI() {
+        for (int i = 0; i < pagerAdapter.getCount(); i++)
+            ((ChaFragment) pagerAdapter.getItem(i)).rebuildUI();
     }
 
     @Override
@@ -275,14 +278,20 @@ public class MainActivity extends ChaActivity {
                 boolean value;
                 switch (clientId) {
                     case "Lights controller":
-                        image = (ImageView) findViewById(R.id.lightControllerIsOnline);
                         value = intent.getBooleanExtra("value", false);
+                        image = (ImageView) findViewById(R.id.lightControllerIsOnline);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        image = (ImageView) findViewById(R.id.lightControllerIsOnline2);
                         if (image != null)
                             image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
                         break;
                     case "TS controller":
-                        image = (ImageView) findViewById(R.id.tsControllerIsOnline);
                         value = intent.getBooleanExtra("value", false);
+                        image = (ImageView) findViewById(R.id.tsControllerIsOnline);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        image = (ImageView) findViewById(R.id.tsControllerIsOnline2);
                         if (image != null)
                             image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
                         break;
@@ -298,7 +307,7 @@ public class MainActivity extends ChaActivity {
             case LightRelayState:
                 id = intent.getIntExtra("id", -1);
                 pagerAdapter.fragmentLight.drawState(id);
-                pagerAdapter.fragmentDashboard.drawLightState(id);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.LightRelay, id);
                 break;
 
             case ThermostatRoomSensorSettings:
@@ -308,7 +317,7 @@ public class MainActivity extends ChaActivity {
                 break;
 
             case ThermostatBoilerSettings:
-                pagerAdapter.fragmentBoiler.rebuildUI(false);
+                pagerAdapter.fragmentBoiler.rebuildUI();
                 pagerAdapter.fragmentDashboard.rebuildUI();
                 break;
 
@@ -317,25 +326,36 @@ public class MainActivity extends ChaActivity {
                     pagerAdapter.fragmentBoiler.rebuildGraph(intent.getStringExtra("log"));
                 break;
 
-//            case ThermostatHeaterRelaySettings:
-//            case ThermostatHeaterRelayNameAndOrders:
-//                pagerAdapter.fragmentHeaterRelays.rebuildUI();
-//                break;
 
-            case ThermostatRoomSensorState:
+            case SensorRoomState:
                 id = intent.getIntExtra("id", -1);
                 if (intent.getBooleanExtra("new_sensor", false))
                     pagerAdapter.fragmentRoomSensors.rebuildUI();
 
                 pagerAdapter.fragmentRoomSensors.drawState(id);
-                pagerAdapter.fragmentDashboard.drawRoomSensorState(id);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.RoomSensor, id);
+                break;
+
+            case Sensor5in1StateTH:
+                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_TH);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.OutsideSensor, OtherControllerData._5IN1_SENSOR_ID_TH);
+                break;
+
+            case Sensor5in1StateW:
+                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_WIND);
+                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_PRESSURE);
+                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_RAIN);
+
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.WindSensor, OtherControllerData._5IN1_SENSOR_ID_WIND);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.PressureSensor, OtherControllerData._5IN1_SENSOR_ID_PRESSURE);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.RainSensor, OtherControllerData._5IN1_SENSOR_ID_RAIN);
                 break;
 
             case ThermostatBoilerSensorState:
                 id = intent.getIntExtra("id", -1);
 
                 pagerAdapter.fragmentBoiler.drawSensorState(id);
-                pagerAdapter.fragmentDashboard.drawBoilerSensorState(id);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.BoilerSensor, id);
                 break;
 
             case ThermostatBoilerPumpState:
@@ -366,20 +386,22 @@ public class MainActivity extends ChaActivity {
 
         final private boolean isLandscape;
 
-        FragmentLight fragmentLight = null;
-        FragmentBoiler fragmentBoiler = null;
-        FragmentRoomSensors fragmentRoomSensors = null;
         FragmentDashboard fragmentDashboard = null;
+        FragmentBoiler fragmentBoiler = null;
+        FragmentLight fragmentLight = null;
+        FragmentRoomSensors fragmentRoomSensors = null;
+        FragmentOtherSensors fragmentOtherSensors = null;
 
         SectionsPagerAdapter(FragmentManager fm, boolean isLandscape) {
             super(fm);
 
             this.isLandscape = isLandscape;
 
-            fragmentDashboard = FragmentDashboard.newInstance();
-            fragmentLight = FragmentLight.newInstance();
-            fragmentBoiler = FragmentBoiler.newInstance();
-            fragmentRoomSensors = FragmentRoomSensors.newInstance();
+            fragmentDashboard = new FragmentDashboard();
+            fragmentBoiler = new FragmentBoiler();
+            fragmentLight = new FragmentLight();
+            fragmentRoomSensors = new FragmentRoomSensors();
+            fragmentOtherSensors = new FragmentOtherSensors();
         }
 
         @Override
@@ -393,13 +415,15 @@ public class MainActivity extends ChaActivity {
                     return fragmentLight;
                 case 3:
                     return fragmentRoomSensors;
+                case 4:
+                    return fragmentOtherSensors;
             }
             return null;
         }
 
         @Override
         public int getCount() {
-            return 4;
+            return 5;
         }
 
         @Override
@@ -412,7 +436,9 @@ public class MainActivity extends ChaActivity {
                 case 2:
                     return "Lights";
                 case 3:
-                    return "T & H sensors";
+                    return "Room sensors";
+                case 4:
+                    return "Other sensors";
             }
             return null;
         }

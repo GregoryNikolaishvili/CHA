@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import ge.altasoft.gia.cha.LogStateActivity;
 import ge.altasoft.gia.cha.R;
+import ge.altasoft.gia.cha.classes.WidgetType;
 
 public class BoilerPumpView extends ImageView {
 
@@ -46,13 +47,13 @@ public class BoilerPumpView extends ImageView {
                     public boolean onMenuItemClick(MenuItem item) {
                         Intent intent = new Intent(getContext(), LogStateActivity.class);
                         intent.putExtra("id", relayId);
-                        intent.putExtra("scope", "BoilerPump");
+                        intent.putExtra("widget", WidgetType.BoilerPump);
                         getContext().startActivity(intent);
 
                         return false;
                     }
                 });
-                popupMenu.inflate(R.menu.relay_popup_menu);
+                popupMenu.inflate(R.menu.pump_popup_menu);
                 popupMenu.show();
 
                 return true;

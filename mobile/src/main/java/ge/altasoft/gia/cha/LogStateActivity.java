@@ -19,6 +19,7 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.classes.LogRelayItem;
 import ge.altasoft.gia.cha.classes.RelayData;
+import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
@@ -26,7 +27,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 public class LogStateActivity extends ChaActivity {
 
     final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
-    private String scope;
+    private WidgetType scope;
     private int relayId;
 
     private StateLogAdapter adapter = null;
@@ -38,7 +39,7 @@ public class LogStateActivity extends ChaActivity {
         setContentView(R.layout.activity_log_state);
 
         Intent intent = getIntent();
-        scope = intent.getStringExtra("scope");
+        scope = (WidgetType) intent.getSerializableExtra("widget");
         relayId = intent.getIntExtra("id", -1);
 
         logBuffer = new ArrayList<>();
@@ -53,14 +54,12 @@ public class LogStateActivity extends ChaActivity {
         super.ServiceConnected();
 
         switch (scope) {
-            case "BoilerPump": {
+            case BoilerPump:
                 publish("cha/hub/getlog", "brelay_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
-            }
-            case "LightRelay": {
+            case LightRelay:
                 publish("cha/hub/getlog", "light_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
-            }
         }
     }
 
@@ -70,7 +69,7 @@ public class LogStateActivity extends ChaActivity {
 
         switch (dataType) {
             case ThermostatBoilerPumpState:
-                if (!scope.equals("BoilerPump"))
+                if (scope != WidgetType.BoilerPump)
                     return;
                 int id = intent.getIntExtra("id", 0);
                 if (id != relayId)
@@ -85,7 +84,7 @@ public class LogStateActivity extends ChaActivity {
                 break;
 
             case LightRelayState:
-                if (!scope.equals("LightRelay"))
+                if (scope != WidgetType.LightRelay)
                     return;
                 int id2 = intent.getIntExtra("id", 0);
                 if (id2 != relayId)
@@ -101,7 +100,7 @@ public class LogStateActivity extends ChaActivity {
 
             case Log:
                 switch (scope) {
-                    case "BoilerPump":
+                    case BoilerPump:
                         if (intent.getStringExtra("type").startsWith("brelay")) {
                             String log = intent.getStringExtra("log");
 
@@ -110,8 +109,7 @@ public class LogStateActivity extends ChaActivity {
                         }
                         break;
 
-                    case "LightRelay":
-
+                    case LightRelay:
                         if (intent.getStringExtra("type").startsWith("light")) {
                             String log = intent.getStringExtra("log");
 

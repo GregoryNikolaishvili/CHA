@@ -2,11 +2,8 @@ package ge.altasoft.gia.cha.classes;
 
 import android.util.Log;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -15,19 +12,17 @@ public abstract class RelayControllerData {
 
     private boolean isActive;
     private boolean haveSettings;
-    private Date controllerCurrentTime;
 
     final private RelayData[] relayDatas;
     final private int[] savedRelayOrders;
-    private boolean relaysReordered;
+    protected boolean widgetsReordered;
 
     protected abstract int relayCount();
 
     protected RelayControllerData() {
         isActive = false;
-        relaysReordered = false;
+        widgetsReordered = false;
         haveSettings = false;
-        this.controllerCurrentTime = new Date();
         relayDatas = new RelayData[relayCount()];
         savedRelayOrders = new int[relayCount()];
     }
@@ -50,21 +45,9 @@ public abstract class RelayControllerData {
         return isActive;
     }
 
-    public boolean relayOrderChanged() {
-        return relaysReordered;
+    public boolean widgetOrderChanged() {
+        return widgetsReordered;
     }
-
-    protected Date getControllerCurrentTime() {
-        return this.controllerCurrentTime;
-    }
-
-//    protected void setControllerCurrentTime(String dateAndTime) {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-//        try {
-//            this.controllerCurrentTime = sdf.parse(dateAndTime);
-//        } catch (ParseException ignored) {
-//        }
-//    }
 
     protected void setRelay(int index, RelayData relay) {
         relayDatas[index] = relay;
@@ -78,16 +61,16 @@ public abstract class RelayControllerData {
         this.haveSettings = true;
     }
 
-    public void saveRelayOrders() {
-        relaysReordered = false;
+    public void saveWidgetOrders() {
+        widgetsReordered = false;
         for (int i = 0; i < relayDatas.length; i++)
             savedRelayOrders[i] = relayDatas[i].getOrder();
     }
 
-    public void restoreRelayOrders() {
+    public void restoreWidgetOrders() {
         for (int i = 0; i < relayDatas.length; i++)
             relayDatas[i].setOrder(savedRelayOrders[i]);
-        relaysReordered = false;
+        widgetsReordered = false;
     }
 
     public RelayData getRelayFromUIIndex(int index) {
@@ -107,7 +90,7 @@ public abstract class RelayControllerData {
         firstRelay.setOrder(secondRelay.getOrder());
         secondRelay.setOrder(order);
 
-        relaysReordered = true;
+        widgetsReordered = true;
     }
 
     protected static <K, V extends Comparable<V>> Map<K, V> sortByOrder(final Map<K, V> map) {

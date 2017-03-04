@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.util.SparseIntArray;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,8 +44,6 @@ public final class ThermostatControllerData extends RelayControllerData {
     final private HashMap<Integer, RoomSensorData> roomSensorsMap;
     final private SparseIntArray savedRoomSensorOrders;
 
-    private boolean roomSensorsReordered;
-
     private boolean haveRoomSensorsSettings;
     private boolean haveBoilerSettings;
 
@@ -56,7 +53,6 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         haveRoomSensorsSettings = false;
         haveBoilerSettings = false;
-        roomSensorsReordered = false;
 
         boilerSensorsData = new BoilerSensorData[BOILER_SENSOR_COUNT];
         boilerPumpsData = new BoilerPumpData[BOILER_PUMP_COUNT];
@@ -136,24 +132,20 @@ public final class ThermostatControllerData extends RelayControllerData {
         return roomSensorData;
     }
 
-    public void saveRoomSensorOrders() {
-        roomSensorsReordered = false;
+    public void saveWidgetOrders() {
+        widgetsReordered = false;
 
         savedRoomSensorOrders.clear();
         for (int id : roomSensorsMap.keySet())
             savedRoomSensorOrders.append(id, roomSensorsMap.get(id).getOrder());
     }
 
-    public void restoreRoomSensorRelayOrders() {
+    public void restoreWidgetOrders() {
         for (int id : roomSensorsMap.keySet())
             roomSensorsMap.get(id).setOrder(savedRoomSensorOrders.get(id));
 
-        roomSensorsReordered = false;
+        widgetsReordered = false;
         savedRoomSensorOrders.clear();
-    }
-
-    public boolean roomSensorOrderChanged() {
-        return roomSensorsReordered;
     }
 
     public RoomSensorData getRoomSensorFromUIIndex(int index) {
@@ -182,7 +174,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         firstSensor.setOrder(secondSensor.getOrder());
         secondSensor.setOrder(order);
 
-        roomSensorsReordered = true;
+        widgetsReordered = true;
     }
 
     void saveToPreferences(SharedPreferences prefs) {
@@ -199,10 +191,6 @@ public final class ThermostatControllerData extends RelayControllerData {
 //            bs.encodeSettings(editor);
 
         editor.apply();
-    }
-
-    String GetStatusText() {
-        return DateFormat.getDateTimeInstance().format(this.getControllerCurrentTime());
     }
 
     char getBoilerMode() {
