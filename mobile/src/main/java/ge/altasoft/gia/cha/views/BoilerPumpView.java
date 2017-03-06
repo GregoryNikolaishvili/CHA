@@ -7,13 +7,12 @@ import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 
 import ge.altasoft.gia.cha.LogStateActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.WidgetType;
 
-public class BoilerPumpView extends ImageView {
+public class BoilerPumpView extends android.support.v7.widget.AppCompatImageView {
 
     private int state;
     private int relayId;

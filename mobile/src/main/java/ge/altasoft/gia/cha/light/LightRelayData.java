@@ -36,12 +36,12 @@ public final class LightRelayData extends RelayData {
         return String.format(Locale.US, "%d:%02d", hours, minutes);
     }
 
-    public String getComment() {
-        if (isActive)
-            return getOnTime() + " - " + getOffTime();
-        else
-            return "";
-    }
+//    public String getComment() {
+//        if (isActive)
+//            return getOnTime() + " - " + getOffTime();
+//        else
+//            return "";
+//    }
 
     private String getOffTime() {
         int minutes = 0;

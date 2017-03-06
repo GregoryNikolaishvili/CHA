@@ -7,7 +7,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 
 public class Sensor5in1Data extends RoomSensorData {
@@ -20,7 +19,7 @@ public class Sensor5in1Data extends RoomSensorData {
     private int dailyRain;
     private int pressure;
 
-    protected long lastWeatherSyncTime;
+    private long lastWeatherSyncTime;
 
     Sensor5in1Data(int id) {
         super(id);

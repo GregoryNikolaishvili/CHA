@@ -3,7 +3,6 @@ package ge.altasoft.gia.cha.other;
 import android.content.Context;
 
 import ge.altasoft.gia.cha.classes.ChaWidget;
-import ge.altasoft.gia.cha.classes.DashboardItems;
 import ge.altasoft.gia.cha.views.OutsideSensorView;
 import ge.altasoft.gia.cha.views.PressureSensorView;
 import ge.altasoft.gia.cha.views.RainSensorView;
@@ -20,7 +19,7 @@ public final class OtherControllerData {
 
     final public static OtherControllerData Instance = new OtherControllerData();
 
-    private Sensor5in1Data sensor5in1Data;
+    private final Sensor5in1Data sensor5in1Data;
 
     private OtherControllerData() {
 
@@ -49,18 +48,5 @@ public final class OtherControllerData {
 
     public Sensor5in1Data get5in1SensorData() {
         return this.sensor5in1Data;
-    }
-
-    public static void saveWidgetOrders() {
-        DashboardItems.saveWidgetOrders();
-    }
-
-
-    public static void restoreWidgetOrders(Context context) {
-        DashboardItems.restoreWidgetOrders(context);
-    }
-
-    public boolean widgetOrderChanged() {
-        return DashboardItems.widgetOrderChanged();
     }
 }

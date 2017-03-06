@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import ge.altasoft.gia.cha.classes.ChaFragment;
-import ge.altasoft.gia.cha.classes.DashboardItems;
 import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.FragmentLight;
@@ -60,9 +58,9 @@ public class MainActivity extends ChaActivity {
         viewPager.setAdapter(pagerAdapter);
     }
 
-    Handler timerHandler = new Handler();
+    private final Handler timerHandler = new Handler();
 
-    Runnable timerRunnable = new Runnable() {
+    private final Runnable timerRunnable = new Runnable() {
 
         @Override
         public void run() {
@@ -99,22 +97,28 @@ public class MainActivity extends ChaActivity {
                 for (int i = 0; i < pagerAdapter.getCount(); i++)
                     ((ChaFragment) pagerAdapter.getItem(i)).setDraggableViews(false);
 
+
                 if (id == R.id.action_ok) {
-                    if (LightControllerData.Instance.widgetOrderChanged())
-                        publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
-                    if (ThermostatControllerData.Instance.widgetOrderChanged())
-                        publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
-                    if (OtherControllerData.Instance.widgetOrderChanged()) {
-                        pagerAdapter.fragmentDashboard.saveWidgetOrders();
-                        DashboardItems.saveToPreferences(this);
-                    }
-                } else {
-                    LightControllerData.Instance.restoreWidgetOrders();
-                    ThermostatControllerData.Instance.restoreWidgetOrders();
-                    OtherControllerData.Instance.restoreWidgetOrders(this);
+                    for (int i = 0; i < pagerAdapter.getCount(); i++)
+                        ((ChaFragment) pagerAdapter.getItem(i)).saveWidgetOrders();
+                } else
                     rebuildUI(false);
-                }
+
                 return true;
+
+            case R.id.action_reorder_widgets:
+                this.mainMenu.findItem(R.id.action_ok).setVisible(true);
+                this.mainMenu.findItem(R.id.action_cancel).setVisible(true);
+                this.mainMenu.findItem(R.id.action_refresh).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+                for (int I = 2; I < this.mainMenu.size(); I++)
+                    this.mainMenu.getItem(I).setEnabled(false);
+
+                for (int i = 0; i < pagerAdapter.getCount(); i++)
+                    ((ChaFragment) pagerAdapter.getItem(i)).setDraggableViews(true);
+
+                return true;
+
 
             case R.id.action_refresh:
                 //publish("chac/light/refresh", "1", false);
@@ -138,24 +142,6 @@ public class MainActivity extends ChaActivity {
             //region Light
             case R.id.action_light_settings:
                 startActivityForResult(new Intent(this, LightSettingsActivity.class), Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS);
-                return true;
-
-            case R.id.action_reorder_widgets:
-                LightControllerData.Instance.saveWidgetOrders();
-                ThermostatControllerData.Instance.saveWidgetOrders();
-                ThermostatControllerData.Instance.saveWidgetOrders();
-                OtherControllerData.Instance.saveWidgetOrders();
-
-                this.mainMenu.findItem(R.id.action_ok).setVisible(true);
-                this.mainMenu.findItem(R.id.action_cancel).setVisible(true);
-                this.mainMenu.findItem(R.id.action_refresh).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
-                for (int I = 2; I < this.mainMenu.size(); I++)
-                    this.mainMenu.getItem(I).setEnabled(false);
-
-                for (int i = 0; i < pagerAdapter.getCount(); i++)
-                    ((ChaFragment) pagerAdapter.getItem(i)).setDraggableViews(true);
-
                 return true;
 
             //region Thermostat

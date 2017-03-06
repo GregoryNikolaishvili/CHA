@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/item_summer"
-        android:title="Summer"
+        android:title="@string/summer"
         android:visible="true" />
     <item
         android:id="@+id/item_summer_and_pool"
-        android:title="Summer &amp; Pool"
+        android:title="@string/summer_and_pool"
         android:visible="true" />
     <item
         android:id="@+id/item_winter"
-        android:title="Winter"
+        android:title="@string/winter"
         android:visible="true" />
 </menu>

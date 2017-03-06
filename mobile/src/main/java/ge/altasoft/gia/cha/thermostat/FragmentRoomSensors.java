@@ -2,6 +2,7 @@ package ge.altasoft.gia.cha.thermostat;
 
 import android.support.v7.widget.RecyclerView;
 
+import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.ChaFragment;
 import ge.altasoft.gia.cha.classes.ChaWidget;
@@ -36,6 +37,21 @@ public class FragmentRoomSensors extends ChaFragment implements OnStartDragListe
                 ((ChaWidget) recyclerView.getChildAt(i)).refresh();
         }
     }
+
+    @Override
+    public void saveWidgetOrders() {
+        if (ThermostatControllerData.Instance.widgetOrderChanged()) {
+            for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                ChaWidget w = getWidgetAt(recyclerView, i);
+                if (w != null)
+                    ThermostatControllerData.Instance.roomSensors(w.getWidgetId(), false).setOrder(i);
+            }
+
+            ((ChaActivity) getActivity()).publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
+            ThermostatControllerData.Instance.setWidgetOrderChanged(false);
+        }
+    }
+
 
     @Override
     public void rebuildUI(boolean isStart) {

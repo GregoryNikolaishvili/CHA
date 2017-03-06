@@ -27,17 +27,17 @@ public abstract class RelayData implements Comparable<RelayData> {
         return this.lastSyncTime;
     }
 
-    public void setLastSyncTime(int secondsPassed) {
-        lastSyncTime = new Date().getTime() - secondsPassed * 1000;
-    }
+//    public void setLastSyncTime(int secondsPassed) {
+//        lastSyncTime = new Date().getTime() - secondsPassed * 1000;
+//    }
 
     public int getId() {
         return this.id;
     }
 
-    public int getOrder() {
-        return this.order;
-    }
+//    public int getOrder() {
+//        return this.order;
+//    }
 
     public int getState() {
         return this.state;
@@ -47,7 +47,7 @@ public abstract class RelayData implements Comparable<RelayData> {
         return this.name;
     }
 
-    public void setState(int value) {
+    private void setState(int value) {
         this.state = value;
         this.lastSyncTime = new Date().getTime();
     }

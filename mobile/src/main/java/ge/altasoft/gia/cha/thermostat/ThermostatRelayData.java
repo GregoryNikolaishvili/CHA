@@ -10,9 +10,9 @@ public final class ThermostatRelayData extends RelayData {
         super(id);
     }
 
-    public String getComment() {
-        return "";
-    }
+//    public String getComment() {
+//        return "";
+//    }
 
     void decodeSettings(SharedPreferences prefs) {
         String suffix = Integer.toString(getId());

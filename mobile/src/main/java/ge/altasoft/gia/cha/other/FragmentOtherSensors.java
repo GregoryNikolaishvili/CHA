@@ -1,8 +1,6 @@
 package ge.altasoft.gia.cha.other;
 
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.view.ViewGroup;
 
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.ChaFragment;
@@ -34,12 +32,17 @@ public class FragmentOtherSensors extends ChaFragment implements OnStartDragList
     public void checkSensors() {
         if (rootView != null) {
             for (int i = 0; i < recyclerView.getChildCount(); i++) {
-                ChaWidget w = (ChaWidget) getViewAt(recyclerView, i);
+                ChaWidget w = getWidgetAt(recyclerView, i);
                 if (w != null)
                     w.refresh();
             }
         }
     }
+
+    @Override
+    public void saveWidgetOrders() {
+    }
+
 
     @Override
     public void rebuildUI(boolean isStart) {
@@ -49,7 +52,7 @@ public class FragmentOtherSensors extends ChaFragment implements OnStartDragList
         hideWaitingScreen();
 
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            ChaWidget w = (ChaWidget) getViewAt(recyclerView, i);
+            ChaWidget w = getWidgetAt(recyclerView, i);
             if (w != null)
                 w.refresh();
         }
@@ -60,19 +63,11 @@ public class FragmentOtherSensors extends ChaFragment implements OnStartDragList
             return;
 
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            ChaWidget w = (ChaWidget) getViewAt(recyclerView, i);
+            ChaWidget w = getWidgetAt(recyclerView, i);
             if ((w != null) && (w.getWidgetId() == id)) {
                 w.refresh();
                 break;
             }
         }
-    }
-
-    private View getViewAt(RecyclerView recyclerView, int position) {
-        View v = recyclerView.getChildAt(position);
-        if (v instanceof ViewGroup)
-            return ((ViewGroup) v).getChildAt(0);
-        else
-            return null;
     }
 }

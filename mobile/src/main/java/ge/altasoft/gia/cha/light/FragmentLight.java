@@ -14,6 +14,7 @@ import android.widget.TextView;
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.ChaFragment;
+import ge.altasoft.gia.cha.classes.ChaWidget;
 import ge.altasoft.gia.cha.classes.ItemViewHolder;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
 import ge.altasoft.gia.cha.classes.RelayData;
@@ -94,6 +95,21 @@ public class FragmentLight extends ChaFragment implements OnStartDragListener {
         }
 
         drawFooter();
+    }
+
+    @Override
+    public void saveWidgetOrders() {
+        if (LightControllerData.Instance.widgetOrderChanged()) {
+            for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                ChaWidget w = getWidgetAt(recyclerView, i);
+                if (w != null)
+                    LightControllerData.Instance.relays(w.getWidgetId()).setOrder(i);
+            }
+
+            ((ChaActivity) getActivity()).publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
+
+            LightControllerData.Instance.setWidgetOrderChanged(false);
+        }
     }
 
     @Override

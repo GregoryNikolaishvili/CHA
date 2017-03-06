@@ -66,8 +66,8 @@ public abstract class ChaPreferenceActivity extends AppCompatActivity {
     final private BroadcastReceiver broadcastDataReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MqttClientLocal.MQTTReceivedDataType dataType = (MqttClientLocal.MQTTReceivedDataType) intent.getSerializableExtra(MqttClientLocal.MQTT_DATA_TYPE);
-            processMqttData(dataType, intent);
+            //MqttClientLocal.MQTTReceivedDataType dataType = (MqttClientLocal.MQTTReceivedDataType) intent.getSerializableExtra(MqttClientLocal.MQTT_DATA_TYPE);
+            //processMqttData(dataType, intent);
         }
     };
 
@@ -96,8 +96,8 @@ public abstract class ChaPreferenceActivity extends AppCompatActivity {
         }
     }
 
-    void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
-    }
+    //private void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
+    //}
 
     // service
 
@@ -112,10 +112,11 @@ public abstract class ChaPreferenceActivity extends AppCompatActivity {
 
         client.publish(topic, message, retained);
     }
-    boolean mBound;
-    MqttServiceLocal mService = null;
 
-    protected void ServiceConnected() {
+    private boolean mBound;
+    private MqttServiceLocal mService = null;
+
+    private void ServiceConnected() {
 
     }
 
@@ -125,7 +126,7 @@ public abstract class ChaPreferenceActivity extends AppCompatActivity {
 //        }
 //    }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private final ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             MqttServiceLocal.LocalBinder binder = (MqttServiceLocal.LocalBinder) service;
             mService = binder.getService();

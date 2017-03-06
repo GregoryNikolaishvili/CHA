@@ -24,7 +24,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  *
  * @author Paul Burke (ipaulpro)
  */
-public interface ItemTouchHelperViewHolder {
+interface ItemTouchHelperViewHolder {
 
     /**
      * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped.

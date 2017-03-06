@@ -14,24 +14,22 @@ public abstract class RelayControllerData {
     private boolean haveSettings;
 
     final private RelayData[] relayDatas;
-    final private int[] savedRelayOrders;
-    protected boolean widgetsReordered;
+    private boolean widgetOrderChanged;
 
     protected abstract int relayCount();
 
     protected RelayControllerData() {
         isActive = false;
-        widgetsReordered = false;
+        widgetOrderChanged = false;
         haveSettings = false;
         relayDatas = new RelayData[relayCount()];
-        savedRelayOrders = new int[relayCount()];
     }
 
     public boolean haveSettings() {
         return haveSettings;
     }
 
-    public RelayData relays(int index) {
+    protected RelayData relays(int index) {
         return relayDatas[index];
     }
 
@@ -45,10 +43,6 @@ public abstract class RelayControllerData {
         return isActive;
     }
 
-    public boolean widgetOrderChanged() {
-        return widgetsReordered;
-    }
-
     protected void setRelay(int index, RelayData relay) {
         relayDatas[index] = relay;
     }
@@ -57,21 +51,10 @@ public abstract class RelayControllerData {
         this.isActive = value;
     }
 
-    protected void setHaveSettings() {
+    private void setHaveSettings() {
         this.haveSettings = true;
     }
 
-    public void saveWidgetOrders() {
-        widgetsReordered = false;
-        for (int i = 0; i < relayDatas.length; i++)
-            savedRelayOrders[i] = relayDatas[i].getOrder();
-    }
-
-    public void restoreWidgetOrders() {
-        for (int i = 0; i < relayDatas.length; i++)
-            relayDatas[i].setOrder(savedRelayOrders[i]);
-        widgetsReordered = false;
-    }
 
     public RelayData getRelayFromUIIndex(int index) {
         RelayData[] r = Arrays.copyOf(relayDatas, relayDatas.length);
@@ -80,18 +63,13 @@ public abstract class RelayControllerData {
         return r[index];
     }
 
-    // TODO: 3/7/2017  
-    public void reorderRelayMapping(int firstIndex, int secondIndex) {
+    public boolean widgetOrderChanged() {
+        return this.widgetOrderChanged;
+    }
 
-        RelayData firstRelay = getRelayFromUIIndex(firstIndex);
-        RelayData secondRelay = getRelayFromUIIndex(secondIndex);
+    public void setWidgetOrderChanged(boolean value) {
 
-        int order = firstRelay.getOrder();
-
-        firstRelay.setOrder(secondRelay.getOrder());
-        secondRelay.setOrder(order);
-
-        widgetsReordered = true;
+        this.widgetOrderChanged = value;
     }
 
     protected static <K, V extends Comparable<V>> Map<K, V> sortByOrder(final Map<K, V> map) {

@@ -45,7 +45,7 @@ public class LogTHActivity extends ChaActivity {
     private ArrayList<LogTHItem> logBuffer;
 
     private GraphicalView mChartView;
-    private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
+    private final XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
     private XYMultipleSeriesRenderer mRenderer;
 
     @Override
@@ -189,7 +189,7 @@ public class LogTHActivity extends ChaActivity {
 
     public class THLogAdapter extends ArrayAdapter<LogTHItem> {
 
-        private boolean hasHumidity;
+        private final boolean hasHumidity;
 
         THLogAdapter(Context context, ArrayList<LogTHItem> points, boolean hasHumidity) {
             super(context, 0, points);

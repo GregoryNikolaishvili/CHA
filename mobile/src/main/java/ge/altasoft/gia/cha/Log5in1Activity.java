@@ -37,13 +37,12 @@ public class Log5in1Activity extends ChaActivity {
 
     final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
     private WidgetType scope;
-    private int sensorId;
 
     private _5in1LogAdapter adapter = null;
     private ArrayList<Log5in1Item> logBuffer;
 
     private GraphicalView mChartView;
-    private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
+    private final XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
     private XYMultipleSeriesRenderer mRenderer;
 
     @Override
@@ -53,7 +52,7 @@ public class Log5in1Activity extends ChaActivity {
 
         Intent intent = getIntent();
         scope = (WidgetType) intent.getSerializableExtra("widget");
-        sensorId = intent.getIntExtra("id", -1); // doesn't matter
+        //int sensorId = intent.getIntExtra("id", -1); // doesn't matter
 
         logBuffer = new ArrayList<>();
         adapter = new _5in1LogAdapter(this, logBuffer, scope == WidgetType.WindSensor);
@@ -97,7 +96,7 @@ public class Log5in1Activity extends ChaActivity {
         super.processMqttData(dataType, intent);
 
         Sensor5in1Data data = OtherControllerData.Instance.get5in1SensorData();
-        int value1 = 0, value2 = 0;
+        int value1, value2 = 0;
 
         switch (dataType) {
             case Sensor5in1StateW:
@@ -147,7 +146,7 @@ public class Log5in1Activity extends ChaActivity {
 
     public class _5in1LogAdapter extends ArrayAdapter<Log5in1Item> {
 
-        private boolean has2ndValue;
+        private final boolean has2ndValue;
 
         _5in1LogAdapter(Context context, ArrayList<Log5in1Item> points, boolean has2ndValue) {
             super(context, 0, points);

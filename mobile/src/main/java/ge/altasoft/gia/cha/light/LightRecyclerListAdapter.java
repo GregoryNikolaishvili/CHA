@@ -57,7 +57,7 @@ public class LightRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolde
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        LightControllerData.Instance.reorderRelayMapping(fromPosition, toPosition);
+        LightControllerData.Instance.setWidgetOrderChanged(true);
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }

@@ -4,18 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class DashboardItems {
 
     private final static ArrayList<DashboardItem> dashboardItems = new ArrayList<>();
-    //private static ArrayList<DashboardItem> savedDashboardItems;
-    private static boolean widgetsReordered;
+    private static boolean widgetOrderChanged;
 
-    public static boolean hasItem(WidgetType type, int id) {
+    static boolean hasItem(WidgetType type, int id) {
         for (DashboardItem item : dashboardItems) {
             if ((item.type == type) && (item.id == id))
                 return true;
@@ -92,8 +89,8 @@ public class DashboardItems {
 
         dashboardItems.clear();
         String[] items = saved.split(";");
-        for (int i = 0; i < items.length; i++) {
-            String[] parts = items[i].split(":");
+        for (String item : items) {
+            String[] parts = item.split(":");
 
             WidgetType wt;
             if (Character.isDigit(parts[0].charAt(0)))
@@ -105,31 +102,15 @@ public class DashboardItems {
         }
     }
 
-    public static void reorderMapping(int firstIndex, int secondIndex) {
-
-        //Collections.swap(dashboardItems, firstIndex, secondIndex);
-        widgetsReordered = true;
-    }
 
     public static boolean widgetOrderChanged() {
 
-        return widgetsReordered;
+        return widgetOrderChanged;
     }
 
-    public static void saveWidgetOrders() {
-        widgetsReordered = false;
-//        savedDashboardItems = new ArrayList<>();
-//        for (DashboardItem item : dashboardItems)
-//            savedDashboardItems.add(new DashboardItem(item.type, item.id));
-    }
+    public static void setWidgetOrderChanged(boolean value) {
 
-    public static void restoreWidgetOrders(Context context) {
-
-//        dashboardItems.clear();
-//        for (DashboardItem item : savedDashboardItems)
-//            dashboardItems.add(new DashboardItem(item.type, item.id));
-//        widgetsReordered = false;
-        notifyChanges(context);
+        widgetOrderChanged = value;
     }
 }
 

@@ -60,7 +60,7 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
         hideWaitingScreen();
 
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            ChaWidget w = (ChaWidget) getWidgetAt(recyclerView, i);
+            ChaWidget w = getWidgetAt(recyclerView, i);
             if (w != null)
                 w.refresh();
         }
@@ -72,7 +72,7 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
     public void checkSensors() {
         if (rootView != null) {
             for (int i = 0; i < recyclerView.getChildCount(); i++) {
-                ChaWidget w = (ChaWidget) getWidgetAt(recyclerView, i);
+                ChaWidget w = getWidgetAt(recyclerView, i);
                 if (w != null)
                     w.refresh();
             }
@@ -82,20 +82,12 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
 //    private void drawFooter() {
 //    }
 
-    private View getWidgetAt(RecyclerView recyclerView, int position) {
-        View v = recyclerView.getChildAt(position);
-        if (v instanceof ViewGroup)
-            return ((ViewGroup) v).getChildAt(0);
-        else
-            return null;
-    }
-
     public void drawWidgetState(WidgetType wt, int widgetId) {
         if (rootView == null)
             return;
 
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            ChaWidget w = (ChaWidget) getWidgetAt(recyclerView, i);
+            ChaWidget w = getWidgetAt(recyclerView, i);
             if (w != null) {
                 if ((w.getWidgetId() == widgetId) && (w.getWidgetType() == wt)) {
                     w.refresh();
@@ -105,12 +97,19 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
         }
     }
 
+    @Override
     public void saveWidgetOrders() {
-        DashboardItems.clear();
-        for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            ChaWidget w = (ChaWidget) getWidgetAt(recyclerView, i);
-            if (w != null)
-                DashboardItems.add(w.getWidgetType(), w.getWidgetId());
+        if (DashboardItems.widgetOrderChanged()) {
+            DashboardItems.clear();
+            for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                ChaWidget w = getWidgetAt(recyclerView, i);
+                if (w != null)
+                    DashboardItems.add(w.getWidgetType(), w.getWidgetId());
+            }
+
+            DashboardItems.saveToPreferences(getActivity());
+
+            DashboardItems.setWidgetOrderChanged(false);
         }
     }
 

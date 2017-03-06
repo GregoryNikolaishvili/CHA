@@ -2,8 +2,6 @@ package ge.altasoft.gia.cha.light;
 
 import android.content.SharedPreferences;
 
-import java.text.DateFormat;
-
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 
 
@@ -13,8 +11,8 @@ public final class LightControllerData extends RelayControllerData {
 
     public final static LightControllerData Instance = new LightControllerData();
 
-    private short sunriseMin;
-    private short sunsetMin;
+    private final short sunriseMin;
+    private final short sunsetMin;
 
     private LightControllerData() {
         super();

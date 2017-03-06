@@ -27,11 +27,11 @@ public class MqttServiceLocal extends Service {
         return mBinder;
     }
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-
-        return super.onUnbind(intent);
-    }
+//    @Override
+//    public boolean onUnbind(Intent intent) {
+//
+//        return super.onUnbind(intent);
+//    }
 
     public MqttClientLocal mqttClient() {
         return this.mqttClientLocal;

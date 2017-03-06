@@ -70,7 +70,7 @@ public abstract class ChaActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             MqttClientLocal.MQTTReceivedDataType dataType = (MqttClientLocal.MQTTReceivedDataType) intent.getSerializableExtra(MqttClientLocal.MQTT_DATA_TYPE);
-                processMqttData(dataType, intent);
+            processMqttData(dataType, intent);
         }
     };
 
@@ -99,7 +99,7 @@ public abstract class ChaActivity extends AppCompatActivity {
         }
     }
 
-    public void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
+    protected void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
         if (dataType == MqttClientLocal.MQTTReceivedDataType.Alert) {
             String message = intent.getStringExtra("message");
             if (message != null) {
@@ -107,13 +107,12 @@ public abstract class ChaActivity extends AppCompatActivity {
                 ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
                 toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
             }
-            return;
         }
     }
 
     // service
 
-    protected MqttClientLocal getMqttClient() {
+    MqttClientLocal getMqttClient() {
         if (mService == null)
             return null;
         return mService.mqttClient();
@@ -127,8 +126,8 @@ public abstract class ChaActivity extends AppCompatActivity {
         client.publish(topic, message, retained);
     }
 
-    boolean mBound;
-    MqttServiceLocal mService = null;
+    private boolean mBound;
+    private MqttServiceLocal mService = null;
 
     protected void ServiceConnected() {
 

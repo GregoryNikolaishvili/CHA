@@ -33,11 +33,11 @@ public class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouch
 
     @Override
     public void onItemSelected() {
-        getWidgetCard().setCardBackgroundColor(Utils.getCardBackgroundColor(itemView.getContext(), true, false));
+        getWidgetCard().setCardBackgroundColor(Utils.getCardBackgroundColor(true, false));
     }
 
     @Override
     public void onItemClear() {
-        getWidgetCard().setCardBackgroundColor(Utils.getCardBackgroundColor(itemView.getContext(), false, false));
+        getWidgetCard().setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
     }
 }

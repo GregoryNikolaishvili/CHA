@@ -19,12 +19,11 @@ import java.util.Calendar;
 import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.MqttClientLocal;
 import ge.altasoft.gia.cha.R;
-import ge.altasoft.gia.cha.classes.WidgetType;
 
 public class BoilerChartActivity extends ChaActivity {
 
     private GraphicalView mChartView;
-    private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
+    private final XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
     private XYMultipleSeriesRenderer mRenderer;
 
     @Override

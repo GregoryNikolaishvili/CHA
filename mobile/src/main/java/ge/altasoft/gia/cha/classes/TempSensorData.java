@@ -1,7 +1,5 @@
 package ge.altasoft.gia.cha.classes;
 
-import android.graphics.Color;
-
 import java.util.Date;
 
 import ge.altasoft.gia.cha.Utils;
@@ -17,7 +15,7 @@ public class TempSensorData {
     private float targetT;
     private float deltaTargetT;
 
-    protected long lastSyncTime;
+    private long lastSyncTime;
 
     protected TempSensorData(int id) {
         this.id = id;
@@ -35,7 +33,7 @@ public class TempSensorData {
         return this.lastSyncTime;
     }
 
-    public void setLastSyncTime(int secondsPassed) {
+    protected void setLastSyncTime(int secondsPassed) {
         lastSyncTime = new Date().getTime() - secondsPassed * 1000;
     }
 
@@ -85,9 +83,9 @@ public class TempSensorData {
         return delta < 0 ? Utils.COLOR_TEMP_LOW : Utils.COLOR_TEMP_HIGH;
     }
 
-    public int getOrder() {
-        return this.order;
-    }
+//    public int getOrder() {
+//        return this.order;
+//    }
 
     public void setOrder(int order) {
         this.order = order;

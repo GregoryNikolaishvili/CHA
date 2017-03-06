@@ -4,7 +4,6 @@ package ge.altasoft.gia.cha.thermostat;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.util.SparseIntArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import java.util.Map;
 
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 
-import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_OFF;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER;
@@ -29,20 +27,19 @@ public final class ThermostatControllerData extends RelayControllerData {
     final static int BOILER_SOLAR_PUMP = 0;
     final static int BOILER_HEATING_PUMP = 1;
 
-    final static int HEATING_RELAY_COUNT = 15;
+    final static private int HEATING_RELAY_COUNT = 15;
 
-    final public static int BOILER_SENSOR_COUNT = 4;
+    final private static int BOILER_SENSOR_COUNT = 4;
     final private static int BOILER_PUMP_COUNT = 4;
 
     final public static ThermostatControllerData Instance = new ThermostatControllerData();
 
-    private BoilerSettings boilerSettings = new BoilerSettings();
+    private final BoilerSettings boilerSettings = new BoilerSettings();
 
     final private BoilerSensorData[] boilerSensorsData;
     final private BoilerPumpData[] boilerPumpsData;
 
     final private HashMap<Integer, RoomSensorData> roomSensorsMap;
-    final private SparseIntArray savedRoomSensorOrders;
 
     private boolean haveRoomSensorsSettings;
     private boolean haveBoilerSettings;
@@ -58,7 +55,6 @@ public final class ThermostatControllerData extends RelayControllerData {
         boilerPumpsData = new BoilerPumpData[BOILER_PUMP_COUNT];
 
         roomSensorsMap = new HashMap<>();
-        savedRoomSensorOrders = new SparseIntArray();
 
         for (int i = 0; i < BOILER_SENSOR_COUNT; i++)
             boilerSensorsData[i] = new BoilerSensorData(i);
@@ -132,23 +128,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         return roomSensorData;
     }
 
-    public void saveWidgetOrders() {
-        widgetsReordered = false;
-
-        savedRoomSensorOrders.clear();
-        for (int id : roomSensorsMap.keySet())
-            savedRoomSensorOrders.append(id, roomSensorsMap.get(id).getOrder());
-    }
-
-    public void restoreWidgetOrders() {
-        for (int id : roomSensorsMap.keySet())
-            roomSensorsMap.get(id).setOrder(savedRoomSensorOrders.get(id));
-
-        widgetsReordered = false;
-        savedRoomSensorOrders.clear();
-    }
-
-    public RoomSensorData getRoomSensorFromUIIndex(int index) {
+    RoomSensorData getRoomSensorFromUIIndex(int index) {
 
         Map<Integer, RoomSensorData> ss = sortByOrder(roomSensorsMap);
 
@@ -159,22 +139,6 @@ public final class ThermostatControllerData extends RelayControllerData {
             idx++;
         }
         return null;
-    }
-
-    void reorderRoomSensorMapping(int firstIndex, int secondIndex) {
-
-        RoomSensorData firstSensor = getRoomSensorFromUIIndex(firstIndex);
-        RoomSensorData secondSensor = getRoomSensorFromUIIndex(secondIndex);
-
-        if ((firstSensor == null) || (secondSensor == null))
-            return;
-
-        int order = firstSensor.getOrder();
-
-        firstSensor.setOrder(secondSensor.getOrder());
-        secondSensor.setOrder(order);
-
-        widgetsReordered = true;
     }
 
     void saveToPreferences(SharedPreferences prefs) {
@@ -193,11 +157,11 @@ public final class ThermostatControllerData extends RelayControllerData {
         editor.apply();
     }
 
-    char getBoilerMode() {
+    private char getBoilerMode() {
         return boilerSettings.Mode;
     }
 
-    void setBoilerMode(char mode) {
+    private void setBoilerMode(char mode) {
         boilerSettings.Mode = mode;
     }
 
@@ -214,20 +178,20 @@ public final class ThermostatControllerData extends RelayControllerData {
         }
     }
 
-    char nextBoilerMode() {
-        switch (boilerSettings.Mode) {
-            case BOILER_MODE_OFF:
-                return BOILER_MODE_SUMMER;
-            case BOILER_MODE_SUMMER:
-                return BOILER_MODE_SUMMER_POOL;
-            case BOILER_MODE_SUMMER_POOL:
-                return BOILER_MODE_WINTER;
-            case BOILER_MODE_WINTER:
-                return BOILER_MODE_OFF;
-            default:
-                return BOILER_MODE_SUMMER;
-        }
-    }
+//    private char nextBoilerMode() {
+//        switch (boilerSettings.Mode) {
+//            case BOILER_MODE_OFF:
+//                return BOILER_MODE_SUMMER;
+//            case BOILER_MODE_SUMMER:
+//                return BOILER_MODE_SUMMER_POOL;
+//            case BOILER_MODE_SUMMER_POOL:
+//                return BOILER_MODE_WINTER;
+//            case BOILER_MODE_WINTER:
+//                return BOILER_MODE_OFF;
+//            default:
+//                return BOILER_MODE_SUMMER;
+//        }
+//    }
 
     //region Encode/Decode
     public String encodeRoomSensorSettings() {

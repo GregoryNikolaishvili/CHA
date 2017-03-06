@@ -42,7 +42,7 @@ public class FragmentBoiler extends ChaFragment {
     private boolean haveLogData = false;
 
     private GraphicalView mChartView;
-    private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
+    private final XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
     private XYMultipleSeriesRenderer mRenderer;
     private Date mMaxXX;
 
@@ -227,16 +227,15 @@ public class FragmentBoiler extends ChaFragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void checkSensors() {
         if (rootView != null)
             drawSensorAndRelayStates();
     }
 
+
+    @Override
+    public void saveWidgetOrders() {
+    }
 
     @Override
     public void rebuildUI(boolean isStart) {

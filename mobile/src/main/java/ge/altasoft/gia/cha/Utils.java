@@ -15,7 +15,6 @@ import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 
 import java.util.Locale;
 
@@ -130,7 +129,7 @@ public class Utils {
         if (Debug.isDebuggerConnected())
             return mqttBrokerLocalUrl;
 
-        final ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final ConnectivityManager conMgr = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr == null)
             return null;
         final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
@@ -141,7 +140,7 @@ public class Utils {
         if (activeNetwork.getType() != ConnectivityManager.TYPE_WIFI)
             return mqttBrokerGlobalUrl;
 
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (wifiManager == null)
             return mqttBrokerGlobalUrl;
 
@@ -159,7 +158,7 @@ public class Utils {
         if (Debug.isDebuggerConnected())
             return "Inside Debugger";
 
-        final ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final ConnectivityManager conMgr = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr == null)
             return "No connectivity service";
 
@@ -172,7 +171,7 @@ public class Utils {
         if (activeNetwork.getType() != ConnectivityManager.TYPE_WIFI)
             return "No WiFi";
 
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (wifiManager == null)
             return "No WiFi manager";
 
@@ -250,7 +249,7 @@ public class Utils {
         alert.show();
     }
 
-    public static int getCardBackgroundColor(Context context, boolean isPressed, boolean isError) {
+    public static int getCardBackgroundColor(boolean isPressed, boolean isError) {
         int color;
         if (isPressed)
             color = COLOR_CARD_BK_PRESSED;

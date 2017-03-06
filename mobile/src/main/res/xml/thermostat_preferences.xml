@@ -2,11 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="Settings">
     <ListPreference
-        android:key="t_boiler_mode"
-        android:title="Mode"
-        android:summary="Select thermostat mode"
         android:entries="@array/boilerModeListArray"
-        android:entryValues="@array/boilerModeListArrayValues"/>>
+        android:entryValues="@array/boilerModeListArrayValues"
+        android:key="t_boiler_mode"
+        android:summary="Select thermostat mode"
+        android:title="Mode" />>
 
     <PreferenceScreen android:title="Sensors">
         <PreferenceCategory

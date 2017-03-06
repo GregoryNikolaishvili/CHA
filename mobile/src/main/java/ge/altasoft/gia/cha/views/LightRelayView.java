@@ -16,7 +16,7 @@ import ge.altasoft.gia.cha.R;
 
 public class LightRelayView extends ChaWidget {
 
-    public enum ButtonState {UNKNOWN, ON, OFF, WAIT}
+    private enum ButtonState {UNKNOWN, ON, OFF, WAIT}
 
     private ButtonState buttonState = ButtonState.UNKNOWN;
 
@@ -76,7 +76,7 @@ public class LightRelayView extends ChaWidget {
         ivLight = ((ImageView) findViewById(R.id.relay_light));
     }
 
-    public void setState(ButtonState value) {
+    private void setState(ButtonState value) {
         buttonState = value;
 
         switch (value) {

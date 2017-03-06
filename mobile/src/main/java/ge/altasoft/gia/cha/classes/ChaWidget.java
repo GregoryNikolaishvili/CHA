@@ -26,7 +26,7 @@ public abstract class ChaWidget extends LinearLayout {
 
     protected CardView cardView = null;
 
-    public ChaWidget(Context context, boolean fromDashboard) {
+    protected ChaWidget(Context context, boolean fromDashboard) {
         this(context, null);
         this.fromDashboard = fromDashboard;
     }
@@ -43,7 +43,7 @@ public abstract class ChaWidget extends LinearLayout {
         this.dragMode = dragMode;
     }
 
-    protected boolean getDragMode() {
+    private boolean getDragMode() {
         return this.dragMode;
     }
 
@@ -80,7 +80,7 @@ public abstract class ChaWidget extends LinearLayout {
             @Override
             public boolean onLongClick(View v) {
 
-                cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), true, false));
+                cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(true, false));
                 PopupMenu popupMenu = new PopupMenu(getContext(), v);
 
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -93,7 +93,7 @@ public abstract class ChaWidget extends LinearLayout {
                 popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
                     @Override
                     public void onDismiss(PopupMenu menu) {
-                        cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, false));
+                        cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
                     }
                 });
 
@@ -141,12 +141,12 @@ public abstract class ChaWidget extends LinearLayout {
 
     private void setIsPressed(boolean pressed) {
         this.isPressed = pressed;
-        cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), pressed, false));
+        cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(pressed, false));
     }
 
-    final Handler longPressHandle = new Handler();
+    final private Handler longPressHandle = new Handler();
 
-    final Runnable longPressCall = new Runnable() {
+    final private Runnable longPressCall = new Runnable() {
         @Override
         public void run() {
             if (isPressed)
@@ -155,7 +155,7 @@ public abstract class ChaWidget extends LinearLayout {
     };
 
     private void onLongPress() {
-        cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), true, false));
+        cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(true, false));
         PopupMenu popupMenu = new PopupMenu(getContext(), cardView);
         setTag(true);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -170,7 +170,7 @@ public abstract class ChaWidget extends LinearLayout {
             @Override
             public void onDismiss(PopupMenu menu) {
                 setTag(false);
-                cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(getContext(), false, false));
+                cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
             }
         });
         popupMenu.inflate(getPopupMenuResId());

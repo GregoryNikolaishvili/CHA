@@ -18,6 +18,7 @@ import ge.altasoft.gia.cha.R;
 public abstract class ChaFragment extends Fragment implements OnStartDragListener {
 
     protected ViewGroup rootView = null;
+
     private boolean dragMode = false;
     private TextView tvLoading;
     private ItemTouchHelper mItemTouchHelper;
@@ -35,6 +36,8 @@ public abstract class ChaFragment extends Fragment implements OnStartDragListene
     public abstract void rebuildUI(boolean isStart);
 
     public abstract void checkSensors();
+
+    public abstract void saveWidgetOrders();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -111,5 +114,19 @@ public abstract class ChaFragment extends Fragment implements OnStartDragListene
             rootView.removeView(tvLoading);
             tvLoading = null;
         }
+    }
+
+    protected ChaWidget getWidgetAt(RecyclerView recyclerView, int position) {
+        if (recyclerView != null) {
+            View v = recyclerView.getChildAt(position);
+            if (v instanceof ChaWidget)
+                return (ChaWidget) v;
+
+            if (v instanceof ViewGroup)
+                return (ChaWidget) ((ViewGroup) v).getChildAt(0);
+            else
+                return null;
+        } else
+            return null;
     }
 }

@@ -31,13 +31,13 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  *
  * @author Paul Burke (ipaulpro)
  */
-public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
+class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
-    public static final float ALPHA_FULL = 1.0f;
+    private static final float ALPHA_FULL = 1.0f;
 
     private final ItemTouchHelperAdapter mAdapter;
 
-    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
+    SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
         mAdapter = adapter;
     }
 

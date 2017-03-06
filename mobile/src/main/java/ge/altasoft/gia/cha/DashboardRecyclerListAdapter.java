@@ -2,7 +2,6 @@ package ge.altasoft.gia.cha;
 
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
@@ -131,7 +130,7 @@ class DashboardRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> 
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        DashboardItems.reorderMapping(fromPosition, toPosition);
+        DashboardItems.setWidgetOrderChanged(true);
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }

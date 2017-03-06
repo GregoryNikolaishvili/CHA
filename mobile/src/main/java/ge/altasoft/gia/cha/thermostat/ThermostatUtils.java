@@ -130,7 +130,7 @@ public final class ThermostatUtils {
         return renderer;
     }
 
-    public static Date[] DrawBoilerSensorChart(String log, Date startDt, int dateLabelIntervalMinutes, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+    static Date[] DrawBoilerSensorChart(String log, Date startDt, int dateLabelIntervalMinutes, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
@@ -335,61 +335,6 @@ public final class ThermostatUtils {
         chartView.repaint();
 
         return new Date[]{minXX, maxXX};
-    }
-
-
-    public static XYMultipleSeriesRenderer get5in1ChartRenderer(Context context, int rendererCount, int[] colors) {
-
-        XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer(3);
-
-        // We want to avoid black border
-        // transparent margins
-        renderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-        //renderer.setMargins(new int[] { 60, 60, 60, 60 });
-        renderer.setMargins(new int[]{30, 70, 10, 0});
-
-        renderer.setClickEnabled(true);
-        renderer.setShowGrid(true); // we show the grid
-        renderer.setShowLegend(false);
-        renderer.setShowLabels(true, true);
-        renderer.setShowTickMarks(true);
-        renderer.setShowCustomTextGrid(true);
-
-        renderer.setPointSize(5f);
-        renderer.setAxesColor(Color.DKGRAY);
-        renderer.setLabelsColor(Color.BLACK);
-
-        renderer.setXLabels(0);
-        renderer.setXLabelsAlign(Paint.Align.CENTER);
-        renderer.setYLabelsAlign(Paint.Align.RIGHT);
-
-
-        renderer.setShowGridY(true);
-        //renderer.setYLabelsVerticalPadding(30);
-        renderer.setXLabelsPadding(5);
-        renderer.setYLabelsPadding(5);
-
-        renderer.setYLabelsAngle(-90);
-        renderer.setLabelsTextSize(context.getResources().getDimension(R.dimen.chart_label_size));
-
-        //DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        //float sz = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, metrics);
-        //renderer.setLabelsTextSize(sz);
-
-        for (int i = 0; i < rendererCount; i++) {
-            XYSeriesRenderer r = new XYSeriesRenderer();
-            r.setPointStyle(PointStyle.POINT);
-            if (i < colors.length)
-                r.setColor(colors[i]);
-            //r.setFillPoints(true);
-            r.setLineWidth(2);
-            // Include low and max value
-            r.setDisplayBoundingPoints(true);
-            r.setPointStrokeWidth(1);
-            renderer.addSeriesRenderer(r);
-        }
-
-        return renderer;
     }
 
     public static void Fill5in1SensorLog(WidgetType scope, String log, ArrayList<Log5in1Item> logBuffer) {

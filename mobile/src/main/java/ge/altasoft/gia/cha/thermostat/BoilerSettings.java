@@ -2,7 +2,7 @@ package ge.altasoft.gia.cha.thermostat;
 
 import ge.altasoft.gia.cha.Utils;
 
-public class BoilerSettings {
+class BoilerSettings {
 
     final static char BOILER_MODE_OFF = 'N';
     final static char BOILER_MODE_SUMMER = 'S';

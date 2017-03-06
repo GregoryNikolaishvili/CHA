@@ -57,7 +57,7 @@ class RoomSensorRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder>
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        ThermostatControllerData.Instance.reorderRoomSensorMapping(fromPosition, toPosition);
+        ThermostatControllerData.Instance.setWidgetOrderChanged(true);
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }
