@@ -42,7 +42,7 @@ public class FragmentOtherSensors extends ChaFragment implements OnStartDragList
     }
 
     @Override
-    public void rebuildUI() {
+    public void rebuildUI(boolean isStart) {
         if ((rootView == null) || (OtherControllerData.Instance == null))
             return;
 

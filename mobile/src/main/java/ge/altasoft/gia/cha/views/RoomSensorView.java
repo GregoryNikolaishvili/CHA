@@ -65,7 +65,7 @@ public class RoomSensorView extends ChaWidget {
 
     @Override
     protected int getPopupMenuResId() {
-        return R.menu.sensor_popup_menu;
+        return R.menu.th_sensor_popup_menu;
     }
 
     private void initializeViews(Context context) {

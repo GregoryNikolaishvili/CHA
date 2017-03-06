@@ -1,7 +1,6 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.TextView;
@@ -15,7 +14,6 @@ import ge.altasoft.gia.cha.classes.ChaWidget;
 import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.other.OtherControllerData;
 import ge.altasoft.gia.cha.other.Sensor5in1Data;
-import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 
 public class OutsideSensorView extends ChaWidget {
 
@@ -62,7 +60,7 @@ public class OutsideSensorView extends ChaWidget {
 
     @Override
     protected int getPopupMenuResId() {
-        return R.menu.sensor_popup_menu;
+        return R.menu.th_sensor_popup_menu;
     }
 
     private void initializeViews(Context context) {

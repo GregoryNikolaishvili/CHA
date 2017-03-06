@@ -32,7 +32,7 @@ public abstract class ChaFragment extends Fragment implements OnStartDragListene
 
     protected abstract RecyclerView.Adapter<ItemViewHolder> getRecycleAdapter();
 
-    public abstract void rebuildUI();
+    public abstract void rebuildUI(boolean isStart);
 
     public abstract void checkSensors();
 
@@ -83,7 +83,7 @@ public abstract class ChaFragment extends Fragment implements OnStartDragListene
                 mItemTouchHelper.attachToRecyclerView(recyclerView);
             }
         }
-        rebuildUI();
+        rebuildUI(false);
     }
 
     @Override

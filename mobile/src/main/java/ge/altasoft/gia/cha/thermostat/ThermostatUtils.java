@@ -22,6 +22,7 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
+import ge.altasoft.gia.cha.classes.Log5in1Item;
 import ge.altasoft.gia.cha.classes.LogRelayItem;
 import ge.altasoft.gia.cha.classes.LogTHItem;
 import ge.altasoft.gia.cha.classes.WidgetType;
@@ -30,7 +31,51 @@ public final class ThermostatUtils {
 
     public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 3;
 
-    public static XYMultipleSeriesRenderer getChartRenderer(Context context, boolean isSmall, int rendererCount, int[] colors) {
+    public static void FillRelayLog(int relayId, WidgetType scope, String log, ArrayList<LogRelayItem> logBuffer) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
+        String date0 = sdf.format(new Date());
+        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+
+        logBuffer.clear();
+
+        int id;
+        Date XX;
+        int state;
+
+
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == 8) {
+                try {
+                    XX = sdf.parse(date0 + logEntry.substring(0, 6));
+                } catch (ParseException ex) {
+                    Log.e("Log", "Invalid X", ex);
+                    continue;
+                }
+
+                try {
+                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid id", ex);
+                    continue;
+                }
+
+                if (id != relayId)
+                    continue;
+
+                try {
+                    state = Integer.parseInt(logEntry.substring(7, 8), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid Y", ex);
+                    continue;
+                }
+
+                logBuffer.add(new LogRelayItem(XX, state));
+            }
+        }
+    }
+
+    public static XYMultipleSeriesRenderer getSensorChartRenderer(Context context, boolean isSmall, int rendererCount, int[] colors) {
 
         XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 
@@ -85,14 +130,13 @@ public final class ThermostatUtils {
         return renderer;
     }
 
-    public static Date[] DrawSensorChart(int sensorId, WidgetType scope, String log, Date startDt, int dateLabelIntervalMinutes, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+    public static Date[] DrawBoilerSensorChart(String log, Date startDt, int dateLabelIntervalMinutes, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        boolean isRoomSensorLog = scope == WidgetType.RoomSensor;
-        int logEntryLen = isRoomSensorLog ? 18 : 11;
+        int logEntryLen = 11;
 
         for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
             xyDataSet.getSeriesAt(i).clear();
@@ -124,24 +168,14 @@ public final class ThermostatUtils {
                 }
 
                 try {
-                    if (isRoomSensorLog)
-                        id = Integer.parseInt(logEntry.substring(6, 10), 16);
-                    else
-                        id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
                 } catch (NumberFormatException ex) {
                     Log.e("Chart", "Invalid id", ex);
                     continue;
                 }
 
-                if ((sensorId >= 0) && (sensorId != id))
-                    continue;
-
                 try {
-                    if (isRoomSensorLog) {
-                        T = Utils.decodeT(logEntry.substring(10, 14));
-                    } else {
-                        T = Utils.decodeT(logEntry.substring(7, 11));
-                    }
+                    T = Utils.decodeT(logEntry.substring(7, 11));
                 } catch (NumberFormatException ex) {
                     Log.e("Chart", "Invalid Y", ex);
                     continue;
@@ -152,7 +186,7 @@ public final class ThermostatUtils {
                     continue;
                 }
 
-                XYSeries series = xyDataSet.getSeriesAt(sensorId < 0 ? id : 0);
+                XYSeries series = xyDataSet.getSeriesAt(id);
                 if ((startDt != null) && (series.getItemCount() == 0) && (startValues.get(id) != null))
                     series.add(startDt.getTime(), startValues.get(id));
                 series.add(XX.getTime(), T);
@@ -164,6 +198,7 @@ public final class ThermostatUtils {
             }
         }
 
+        // add current values (last one)
         for (int i = 0; i < xyDataSet.getSeriesCount(); i++) {
             XYSeries series = xyDataSet.getSeriesAt(i);
             if (series.getItemCount() > 0)
@@ -194,13 +229,12 @@ public final class ThermostatUtils {
         return new Date[]{minXX, maxXX};
     }
 
-    public static void FillSensorLog(int sensorId, WidgetType scope, String log, ArrayList<LogTHItem> logBuffer) {
+    public static void FillTHSensorLog(int sensorId, WidgetType scope, String log, ArrayList<LogTHItem> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        boolean isRoomSensorLog = scope == WidgetType.RoomSensor;
-        int logEntryLen = isRoomSensorLog ? 18 : 11;
+        int logEntryLen = scope == WidgetType.BoilerSensor ? 11 : 18;
 
         logBuffer.clear();
 
@@ -220,10 +254,11 @@ public final class ThermostatUtils {
                 }
 
                 try {
-                    if (isRoomSensorLog)
-                        id = Integer.parseInt(logEntry.substring(6, 10), 16);
-                    else
+                    if (scope == WidgetType.BoilerSensor)
                         id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                    else
+                        id = Integer.parseInt(logEntry.substring(6, 10), 16);
+
                 } catch (NumberFormatException ex) {
                     Log.e("Log", "Invalid id", ex);
                     continue;
@@ -233,11 +268,11 @@ public final class ThermostatUtils {
                     continue;
 
                 try {
-                    if (isRoomSensorLog) {
+                    if (scope == WidgetType.BoilerSensor) {
+                        T = Utils.decodeT(logEntry.substring(7, 11));
+                    } else {
                         T = Utils.decodeT(logEntry.substring(10, 14));
                         H = Integer.parseInt(logEntry.substring(14, 18), 16);
-                    } else {
-                        T = Utils.decodeT(logEntry.substring(7, 11));
                     }
                 } catch (NumberFormatException ex) {
                     Log.e("Log", "Invalid Y", ex);
@@ -249,21 +284,130 @@ public final class ThermostatUtils {
         }
     }
 
-    public static void FillRelayLog(int relayId, WidgetType scope, String log, ArrayList<LogRelayItem> logBuffer) {
+    public static Date[] DrawTHSensorChart(ArrayList<LogTHItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+
+        for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
+            xyDataSet.getSeriesAt(i).clear();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, 1);
+        Date minXX = calendar.getTime();
+        calendar.add(Calendar.YEAR, -2);
+        Date maxXX = calendar.getTime();
+
+        Date XX;
+        XYSeries series = xyDataSet.getSeriesAt(0);
+
+        for (LogTHItem item : logBuffer) {
+            XX = item.date;
+
+            series.add(XX.getTime(), item.T);
+
+            if (XX.before(minXX))
+                minXX = XX;
+            if (XX.after(maxXX))
+                maxXX = XX;
+        }
+
+        // add current value (last one)
+        if (series.getItemCount() > 0)
+            series.add(new Date().getTime(), series.getY(series.getItemCount() - 1));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
+
+        calendar.setTime(minXX);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        minXX = calendar.getTime();
+
+        calendar.setTime(maxXX);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.add(Calendar.MINUTE, 120);
+        maxXX = calendar.getTime();
+
+        calendar.setTime(minXX);
+        while (calendar.getTime().getTime() <= maxXX.getTime()) {
+            renderer.addXTextLabel(calendar.getTime().getTime(), sdf.format(calendar.getTime()));
+            calendar.add(Calendar.MINUTE, 120);
+        }
+
+        chartView.repaint();
+
+        return new Date[]{minXX, maxXX};
+    }
+
+
+    public static XYMultipleSeriesRenderer get5in1ChartRenderer(Context context, int rendererCount, int[] colors) {
+
+        XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer(3);
+
+        // We want to avoid black border
+        // transparent margins
+        renderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
+        //renderer.setMargins(new int[] { 60, 60, 60, 60 });
+        renderer.setMargins(new int[]{30, 70, 10, 0});
+
+        renderer.setClickEnabled(true);
+        renderer.setShowGrid(true); // we show the grid
+        renderer.setShowLegend(false);
+        renderer.setShowLabels(true, true);
+        renderer.setShowTickMarks(true);
+        renderer.setShowCustomTextGrid(true);
+
+        renderer.setPointSize(5f);
+        renderer.setAxesColor(Color.DKGRAY);
+        renderer.setLabelsColor(Color.BLACK);
+
+        renderer.setXLabels(0);
+        renderer.setXLabelsAlign(Paint.Align.CENTER);
+        renderer.setYLabelsAlign(Paint.Align.RIGHT);
+
+
+        renderer.setShowGridY(true);
+        //renderer.setYLabelsVerticalPadding(30);
+        renderer.setXLabelsPadding(5);
+        renderer.setYLabelsPadding(5);
+
+        renderer.setYLabelsAngle(-90);
+        renderer.setLabelsTextSize(context.getResources().getDimension(R.dimen.chart_label_size));
+
+        //DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        //float sz = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, metrics);
+        //renderer.setLabelsTextSize(sz);
+
+        for (int i = 0; i < rendererCount; i++) {
+            XYSeriesRenderer r = new XYSeriesRenderer();
+            r.setPointStyle(PointStyle.POINT);
+            if (i < colors.length)
+                r.setColor(colors[i]);
+            //r.setFillPoints(true);
+            r.setLineWidth(2);
+            // Include low and max value
+            r.setDisplayBoundingPoints(true);
+            r.setPointStrokeWidth(1);
+            renderer.addSeriesRenderer(r);
+        }
+
+        return renderer;
+    }
+
+    public static void Fill5in1SensorLog(WidgetType scope, String log, ArrayList<Log5in1Item> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
+        int logEntryLen = 27;
+
         logBuffer.clear();
 
-        int id;
         Date XX;
-        int state;
+        int value1 = 0, value2 = 0;
 
 
         String[] logEntries = log.split(":");
         for (String logEntry : logEntries) {
-            if (logEntry.length() == 8) {
+            if (logEntry.length() == logEntryLen) {
                 try {
                     XX = sdf.parse(date0 + logEntry.substring(0, 6));
                 } catch (ParseException ex) {
@@ -272,24 +416,78 @@ public final class ThermostatUtils {
                 }
 
                 try {
-                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
-                } catch (NumberFormatException ex) {
-                    Log.e("Log", "Invalid id", ex);
-                    continue;
-                }
-
-                if (id != relayId)
-                    continue;
-
-                try {
-                    state = Integer.parseInt(logEntry.substring(7, 8), 16);
+                    switch (scope) {
+                        case WindSensor:
+                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
+                            value2 = Integer.parseInt(logEntry.substring(15, 19), 16);
+                            break;
+                        case PressureSensor:
+                            value1 = Integer.parseInt(logEntry.substring(23, 27), 16);
+                            break;
+                        case RainSensor:
+                            value1 = Integer.parseInt(logEntry.substring(19, 24), 16);
+                            break;
+                    }
                 } catch (NumberFormatException ex) {
                     Log.e("Log", "Invalid Y", ex);
                     continue;
                 }
 
-                logBuffer.add(new LogRelayItem(XX, state));
+                logBuffer.add(new Log5in1Item(XX, value1, value2));
             }
         }
+    }
+
+    public static Date[] Draw5in1Chart(ArrayList<Log5in1Item> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+
+        for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
+            xyDataSet.getSeriesAt(i).clear();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, 1);
+        Date minXX = calendar.getTime();
+        calendar.add(Calendar.YEAR, -2);
+        Date maxXX = calendar.getTime();
+
+        Date XX;
+        XYSeries series = xyDataSet.getSeriesAt(0);
+
+        for (Log5in1Item item : logBuffer) {
+            XX = item.date;
+
+            series.add(XX.getTime(), item.Value1);
+
+            if (XX.before(minXX))
+                minXX = XX;
+            if (XX.after(maxXX))
+                maxXX = XX;
+        }
+
+        // add current value (last one)
+        if (series.getItemCount() > 0)
+            series.add(new Date().getTime(), series.getY(series.getItemCount() - 1));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
+
+        calendar.setTime(minXX);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        minXX = calendar.getTime();
+
+        calendar.setTime(maxXX);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.add(Calendar.MINUTE, 120);
+        maxXX = calendar.getTime();
+
+        calendar.setTime(minXX);
+        while (calendar.getTime().getTime() <= maxXX.getTime()) {
+            renderer.addXTextLabel(calendar.getTime().getTime(), sdf.format(calendar.getTime()));
+            calendar.add(Calendar.MINUTE, 120);
+        }
+
+        chartView.repaint();
+
+        return new Date[]{minXX, maxXX};
     }
 }

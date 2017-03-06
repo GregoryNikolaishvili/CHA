@@ -1,11 +1,8 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -65,7 +62,7 @@ public class BoilerSensorView extends ChaWidget {
 
     @Override
     protected int getPopupMenuResId() {
-        return R.menu.sensor_popup_menu;
+        return R.menu.th_sensor_popup_menu;
     }
 
     private void initializeViews(Context context) {

@@ -40,6 +40,7 @@
             android:label="@string/title_activity_settings" />
         <activity android:name=".thermostat.BoilerChartActivity" />
         <activity android:name=".LogTHActivity" />
+        <activity android:name=".Log5in1Activity" />
         <activity android:name=".LogStateActivity" />
         <activity android:name=".WhoIsOnlineActivity" />
 

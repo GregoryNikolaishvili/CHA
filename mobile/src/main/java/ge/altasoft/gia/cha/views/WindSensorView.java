@@ -61,7 +61,7 @@ public class WindSensorView extends ChaWidget {
 
     @Override
     protected int getPopupMenuResId() {
-        return R.menu.sensor_popup_menu;
+        return R.menu._5in1_sensor_popup_menu;
     }
 
     private void initializeViews(Context context) {

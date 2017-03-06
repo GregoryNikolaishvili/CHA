@@ -49,7 +49,7 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
     }
 
     @Override
-    public void rebuildUI() {
+    public void rebuildUI(boolean isStart) {
         if (rootView == null) return;
 
         if ((LightControllerData.Instance == null) || !LightControllerData.Instance.haveSettings())

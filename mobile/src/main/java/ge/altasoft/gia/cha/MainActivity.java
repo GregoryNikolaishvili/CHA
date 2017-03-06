@@ -112,7 +112,7 @@ public class MainActivity extends ChaActivity {
                     LightControllerData.Instance.restoreWidgetOrders();
                     ThermostatControllerData.Instance.restoreWidgetOrders();
                     OtherControllerData.Instance.restoreWidgetOrders(this);
-                    rebuildUI();
+                    rebuildUI(false);
                 }
                 return true;
 
@@ -173,7 +173,7 @@ public class MainActivity extends ChaActivity {
     public void onResume() {
         super.onResume();
 
-        rebuildUI();
+        rebuildUI(true);
 
         timerHandler.postDelayed(timerRunnable, 60000);
     }
@@ -214,9 +214,9 @@ public class MainActivity extends ChaActivity {
         }
     }
 
-    private void rebuildUI() {
+    private void rebuildUI(boolean isStart) {
         for (int i = 0; i < pagerAdapter.getCount(); i++)
-            ((ChaFragment) pagerAdapter.getItem(i)).rebuildUI();
+            ((ChaFragment) pagerAdapter.getItem(i)).rebuildUI(isStart);
     }
 
     @Override
@@ -300,8 +300,8 @@ public class MainActivity extends ChaActivity {
 
             case LightSettings:
             case LightNameAndOrders:
-                pagerAdapter.fragmentLight.rebuildUI();
-                pagerAdapter.fragmentDashboard.rebuildUI();
+                pagerAdapter.fragmentLight.rebuildUI(false);
+                pagerAdapter.fragmentDashboard.rebuildUI(false);
                 break;
 
             case LightRelayState:
@@ -312,13 +312,13 @@ public class MainActivity extends ChaActivity {
 
             case ThermostatRoomSensorSettings:
             case ThermostatRoomSensorNameAndOrders:
-                pagerAdapter.fragmentRoomSensors.rebuildUI();
-                pagerAdapter.fragmentDashboard.rebuildUI();
+                pagerAdapter.fragmentRoomSensors.rebuildUI(false);
+                pagerAdapter.fragmentDashboard.rebuildUI(false);
                 break;
 
             case ThermostatBoilerSettings:
-                pagerAdapter.fragmentBoiler.rebuildUI();
-                pagerAdapter.fragmentDashboard.rebuildUI();
+                pagerAdapter.fragmentBoiler.rebuildUI(false);
+                pagerAdapter.fragmentDashboard.rebuildUI(false);
                 break;
 
             case Log:
@@ -330,7 +330,7 @@ public class MainActivity extends ChaActivity {
             case SensorRoomState:
                 id = intent.getIntExtra("id", -1);
                 if (intent.getBooleanExtra("new_sensor", false))
-                    pagerAdapter.fragmentRoomSensors.rebuildUI();
+                    pagerAdapter.fragmentRoomSensors.rebuildUI(false);
 
                 pagerAdapter.fragmentRoomSensors.drawState(id);
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.RoomSensor, id);

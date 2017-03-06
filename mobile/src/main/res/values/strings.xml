@@ -43,6 +43,9 @@
     <string name="wind">Wind</string>
     <string name="rain">Rain</string>
     <string name="outside">Outside</string>
+    <string name="log_and_chart">Log and chart</string>
+    <string name="pin_to_dashboard">Pin to dashboard</string>
+    <string name="log">Log</string>
 
     <string-array name="listArray">
         <item>Sunrise</item>

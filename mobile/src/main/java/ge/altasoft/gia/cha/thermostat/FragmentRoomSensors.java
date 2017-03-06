@@ -38,7 +38,7 @@ public class FragmentRoomSensors extends ChaFragment implements OnStartDragListe
     }
 
     @Override
-    public void rebuildUI() {
+    public void rebuildUI(boolean isStart) {
         if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveRoomSensorsSettings())
             return;
 

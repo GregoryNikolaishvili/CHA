@@ -27,22 +27,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.classes.Log5in1Item;
 import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.other.OtherControllerData;
-import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
-import ge.altasoft.gia.cha.classes.LogTHItem;
-import ge.altasoft.gia.cha.thermostat.RoomSensorData;
-import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
+import ge.altasoft.gia.cha.other.Sensor5in1Data;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
-public class LogTHActivity extends ChaActivity {
+public class Log5in1Activity extends ChaActivity {
 
     final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
     private WidgetType scope;
     private int sensorId;
 
-    private THLogAdapter adapter = null;
-    private ArrayList<LogTHItem> logBuffer;
+    private _5in1LogAdapter adapter = null;
+    private ArrayList<Log5in1Item> logBuffer;
 
     private GraphicalView mChartView;
     private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
@@ -55,16 +53,16 @@ public class LogTHActivity extends ChaActivity {
 
         Intent intent = getIntent();
         scope = (WidgetType) intent.getSerializableExtra("widget");
-        sensorId = intent.getIntExtra("id", -1);
+        sensorId = intent.getIntExtra("id", -1); // doesn't matter
 
         logBuffer = new ArrayList<>();
-        adapter = new THLogAdapter(this, logBuffer, scope == WidgetType.RoomSensor);
+        adapter = new _5in1LogAdapter(this, logBuffer, scope == WidgetType.WindSensor);
 
         ListView listView = (ListView) findViewById(R.id.lvLog);
         listView.setAdapter(adapter);
 
         LinearLayout chartLayout = (LinearLayout) findViewById(R.id.chartLogBig);
-        XYSeries seriesT = new XYSeries("T");
+        XYSeries series = new XYSeries(scope.name());
 
         mRenderer = ThermostatUtils.getSensorChartRenderer(this, false, 1, new int[]{Color.RED});
         mRenderer.setZoomEnabled(true, true);
@@ -75,7 +73,7 @@ public class LogTHActivity extends ChaActivity {
         //mRenderer.setPanLimits(new double[] { -10, 20, -10, 40 });
         //mRenderer.setZoomLimits(new double[] { -10, 20, -10, 40 });
 
-        xyDataSet.addSeries(seriesT);
+        xyDataSet.addSeries(series);
 
         mChartView = ChartFactory.getCubeLineChartView(this, xyDataSet, mRenderer, 0.1f);
         chartLayout.addView(mChartView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -86,12 +84,10 @@ public class LogTHActivity extends ChaActivity {
         super.ServiceConnected();
 
         switch (scope) {
-            case BoilerSensor:
-                publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
-                break;
-            case RoomSensor:
-            case OutsideSensor:
-                publish("cha/hub/getlog", "room_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+            case WindSensor:
+            case PressureSensor:
+            case RainSensor:
+                publish("cha/hub/getlog", "5in1_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
         }
     }
@@ -100,86 +96,48 @@ public class LogTHActivity extends ChaActivity {
     public void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
         super.processMqttData(dataType, intent);
 
-        int id;
-        float v;
+        Sensor5in1Data data = OtherControllerData.Instance.get5in1SensorData();
+        int value1 = 0, value2 = 0;
 
         switch (dataType) {
-            case ThermostatBoilerSensorState:
-                if (scope != WidgetType.BoilerSensor)
-                    return;
-                id = intent.getIntExtra("id", -1);
-                if (id != sensorId)
-                    return;
+            case Sensor5in1StateW:
+                switch (scope) {
+                    case WindSensor:
+                        value1 = data.getWindSpeed();
+                        value2 = data.getWindDirection();
+                        break;
 
-                BoilerSensorData bsdata = ThermostatControllerData.Instance.boilerSensors(id);
-                v = bsdata.getTemperature();
-                if (!Float.isNaN(v)) {
-                    LogTHItem point = new LogTHItem(new Date(bsdata.getLastSyncTime()), v, 0f);
-                    logBuffer.add(point);
-                    adapter.notifyDataSetChanged();
+                    case RainSensor:
+                        value1 = data.getRain();
+                        break;
 
-                    xyDataSet.getSeriesAt(0).add(bsdata.getLastSyncTime(), v);
-                    mChartView.repaint();
+                    case PressureSensor:
+                        value1 = data.getPressure();
+                        break;
+
+                    default:
+                        return;
                 }
-                break;
 
-            case SensorRoomState:
-                if (scope != WidgetType.RoomSensor)
-                    return;
-                id = intent.getIntExtra("id", -1);
-                if (id != sensorId)
-                    return;
 
-                RoomSensorData rsd = ThermostatControllerData.Instance.roomSensors(id, false);
+                Log5in1Item point = new Log5in1Item(new Date(data.getLastSyncTime()), value1, value2);
+                logBuffer.add(point);
+                adapter.notifyDataSetChanged();
 
-                v = rsd.getTemperature();
-                if (!Float.isNaN(v)) {
-                    LogTHItem point = new LogTHItem(new Date(rsd.getLastSyncTime()), v, 0f);
-                    logBuffer.add(point);
-                    adapter.notifyDataSetChanged();
-
-                    xyDataSet.getSeriesAt(0).add(rsd.getLastSyncTime(), v);
-                    mChartView.repaint();
-                }
-                break;
-
-            case Sensor5in1StateTH:
-                if (scope != WidgetType.OutsideSensor)
-                    return;
-                id = intent.getIntExtra("id", -1);
-                if (id != sensorId)
-                    return;
-
-                RoomSensorData wsd = OtherControllerData.Instance.get5in1SensorData();
-
-                v = wsd.getTemperature();
-                if (!Float.isNaN(v)) {
-                    LogTHItem point = new LogTHItem(new Date(wsd.getLastSyncTime()), v, 0f);
-                    logBuffer.add(point);
-                    adapter.notifyDataSetChanged();
-
-                    xyDataSet.getSeriesAt(0).add(wsd.getLastSyncTime(), v);
-                    mChartView.repaint();
-                }
+                xyDataSet.getSeriesAt(0).add(data.getLastSyncTime(), value1);
+                mChartView.repaint();
                 break;
 
             case Log:
                 switch (scope) {
-                    case BoilerSensor:
-                        if (intent.getStringExtra("type").startsWith("boiler")) {
+                    case WindSensor:
+                    case PressureSensor:
+                    case RainSensor:
+                        if (intent.getStringExtra("type").startsWith("5in1")) {
                             String log = intent.getStringExtra("log");
-                            ThermostatUtils.FillTHSensorLog(sensorId, scope, log, logBuffer);
+                            ThermostatUtils.Fill5in1SensorLog(scope, log, logBuffer);
                             adapter.notifyDataSetChanged();
-                            ThermostatUtils.DrawTHSensorChart(logBuffer, mChartView, mRenderer, xyDataSet);
-                        }
-                        break;
-                    case RoomSensor:
-                    case OutsideSensor:
-                        if (intent.getStringExtra("type").startsWith("room")) {
-                            String log = intent.getStringExtra("log");
-                            ThermostatUtils.FillTHSensorLog(sensorId, scope, log, logBuffer);
-                            adapter.notifyDataSetChanged();
-                            ThermostatUtils.DrawTHSensorChart(logBuffer, mChartView, mRenderer, xyDataSet);
+                            ThermostatUtils.Draw5in1Chart(logBuffer, mChartView, mRenderer, xyDataSet);
                         }
                         break;
                 }
@@ -187,32 +145,32 @@ public class LogTHActivity extends ChaActivity {
         }
     }
 
-    public class THLogAdapter extends ArrayAdapter<LogTHItem> {
+    public class _5in1LogAdapter extends ArrayAdapter<Log5in1Item> {
 
-        private boolean hasHumidity;
+        private boolean has2ndValue;
 
-        THLogAdapter(Context context, ArrayList<LogTHItem> points, boolean hasHumidity) {
+        _5in1LogAdapter(Context context, ArrayList<Log5in1Item> points, boolean has2ndValue) {
             super(context, 0, points);
 
-            this.hasHumidity = hasHumidity;
+            this.has2ndValue = has2ndValue;
         }
 
         @NonNull
         @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
+
             // Check if an existing view is being reused, otherwise inflate the view
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_item_key_value, parent, false);
             }
 
-            LogTHItem point = getItem(position);
+            Log5in1Item point = getItem(position);
             if (point != null) {
                 ((TextView) convertView.findViewById(R.id.tvListViewItemKey)).setText(sdf.format(point.date));
-                ((TextView) convertView.findViewById(R.id.tvListViewItemValue1)).setText(String.format(Locale.US, "%.1f°", point.T));
-
-                if (hasHumidity)
-                    ((TextView) convertView.findViewById(R.id.tvListViewItemValue2)).setText(String.format(Locale.US, "%.0f %%", point.H));
+                ((TextView) convertView.findViewById(R.id.tvListViewItemValue1)).setText(String.format(Locale.US, "%d", point.Value1));
+                if (has2ndValue)
+                    ((TextView) convertView.findViewById(R.id.tvListViewItemValue2)).setText(String.format(Locale.US, "%d °", point.Value2));
                 else
                     convertView.findViewById(R.id.tvListViewItemValue2).setVisibility(View.GONE);
             }
@@ -287,11 +245,10 @@ public class LogTHActivity extends ChaActivity {
 
         if (wd >= 0) {
             switch (scope) {
-                case BoilerSensor:
-                    publish("cha/hub/getlog", "boiler_".concat(String.valueOf(wd)), false);
-                    break;
-                case RoomSensor:
-                    publish("cha/hub/getlog", "room_".concat(String.valueOf(wd)), false);
+                case WindSensor:
+                case PressureSensor:
+                case RainSensor:
+                    publish("cha/hub/getlog", "5in1_".concat(String.valueOf(wd)), false);
                     break;
             }
             return true;

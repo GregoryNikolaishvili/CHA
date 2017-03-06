@@ -30,7 +30,6 @@ import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.ChaFragment;
 import ge.altasoft.gia.cha.classes.ItemViewHolder;
-import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.views.BoilerPumpView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
 
@@ -39,6 +38,8 @@ import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_P
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER;
 
 public class FragmentBoiler extends ChaFragment {
+
+    private boolean haveLogData = false;
 
     private GraphicalView mChartView;
     private XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
@@ -196,7 +197,7 @@ public class FragmentBoiler extends ChaFragment {
         XYSeries series3 = new XYSeries("T3");
         XYSeries series4 = new XYSeries("T4");
 
-        mRenderer = ThermostatUtils.getChartRenderer(this.getContext(), true, 4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
+        mRenderer = ThermostatUtils.getSensorChartRenderer(this.getContext(), true, 4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
         mRenderer.setPanEnabled(false, false);
 
         xyDataSet.addSeries(series1);
@@ -238,7 +239,7 @@ public class FragmentBoiler extends ChaFragment {
 
 
     @Override
-    public void rebuildUI() {
+    public void rebuildUI(boolean isStart) {
         if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveBoilerSettings())
             return;
 
@@ -248,11 +249,16 @@ public class FragmentBoiler extends ChaFragment {
         ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);
 
         drawSensorAndRelayStates();
+
+        if (isStart || !haveLogData) {
+            haveLogData = false;
+            ((ChaActivity) getActivity()).publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+        }
     }
 
     public void rebuildGraph(String log) {
-
-        Date[] dates = ThermostatUtils.DrawSensorChart(-1, WidgetType.BoilerSensor, log, getNowMinus4Hour(), 30, mChartView, mRenderer, xyDataSet);
+        haveLogData = true;
+        Date[] dates = ThermostatUtils.DrawBoilerSensorChart(log, getNowMinus4Hour(), 30, mChartView, mRenderer, xyDataSet);
         mMaxXX = dates[1];
     }
 
