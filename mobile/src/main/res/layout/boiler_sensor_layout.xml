@@ -33,7 +33,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="end|center_vertical"
-                android:text="@string/sample_temperature"
+                android:minWidth="@dimen/boiler_sensor_min_width"
+                android:text="@string/sample_temperature2"
                 android:textSize="@dimen/boiler_sensor_t_size" />
 
             <TextView
@@ -63,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/sample_temperature"
+                android:text="@string/sample_temperature3"
                 android:textSize="@dimen/boiler_sensor_target_size"
                 android:textStyle="bold"
                 android:visibility="visible" />

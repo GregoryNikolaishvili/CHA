@@ -25,24 +25,34 @@
             android:text="@string/pressure"
             android:textSize="@dimen/widget_caption" />
 
-        <TextView
-            android:id="@+id/pressure_value"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="50"
-            android:gravity="center|bottom"
-            android:text="@string/no_sensor_value"
-            android:textSize="@dimen/widget_t_size" />
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="100"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/sensor_margin_size"
-            android:layout_marginStart="@dimen/sensor_margin_size"
-            android:layout_weight="50"
-            android:gravity="center|top"
-            android:text="@string/mbar"
-            android:textSize="@dimen/widget_dimension_size" />
+            <TextView
+                android:id="@+id/pressure_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="120"
+                android:gravity="end"
+                android:text="@string/no_sensor_value"
+                android:textSize="@dimen/widget_t_size" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/sensor_margin_size"
+                android:layout_marginStart="@dimen/sensor_margin_size"
+                android:layout_weight="80"
+                android:gravity="center_vertical"
+                android:text="@string/mbar"
+                android:textSize="@dimen/widget_dimension_size" />
+        </LinearLayout>
+
 
         <TextView
             android:id="@+id/pressure2_value"

@@ -249,13 +249,28 @@ public class MainActivity extends ChaActivity {
                         sb.append("\n\r");
                     }
 
+                    if ((state & Utils.ERR_T1) != 0) {
+                        sb.append("Solar sensor fail (T1)");
+                        sb.append("\n\r");
+                    }
+                    if ((state & Utils.ERR_T2) != 0) {
+                        sb.append("Boiler sensor fail (T2)");
+                        sb.append("\n\r");
+                    }
+                    if ((state & Utils.ERR_T3) != 0) {
+                        sb.append("Boiler sensor fail (T3)");
+                        sb.append("\n\r");
+                    }
+
                     if (pagerAdapter.fragmentBoiler != null)
                         pagerAdapter.fragmentBoiler.drawThermostatState(sb);
 
                     Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
                     ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
                     toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
-                }
+                } else if (pagerAdapter.fragmentBoiler != null)
+                    pagerAdapter.fragmentBoiler.drawThermostatState(null);
+
                 break;
 
             case ClientConnected:

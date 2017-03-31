@@ -11,15 +11,16 @@
     <dimen name="sensor_footer_size">7sp</dimen>
     <dimen name="sensor_margin_size">2dp</dimen>
 
+    <dimen name="boiler_sensor_min_width">30dp</dimen>
     <dimen name="boiler_sensor_t_size">20sp</dimen>
     <dimen name="boiler_sensor_trend_size">14sp</dimen>
     <dimen name="boiler_sensor_target_size">10sp</dimen>
 
     <dimen name="chart_label_size">10sp</dimen>
 
-    <dimen name="widget_t_size">36sp</dimen>
-    <dimen name="widget_l_size">20sp</dimen>
-    <dimen name="widget_caption">16sp</dimen>
-    <dimen name="widget_dimension_size">16sp</dimen>
+    <dimen name="widget_t_size">20sp</dimen>
+    <dimen name="widget_l_size">10sp</dimen>
+    <dimen name="widget_caption">12sp</dimen>
+    <dimen name="widget_dimension_size">12sp</dimen>
 
 </resources>

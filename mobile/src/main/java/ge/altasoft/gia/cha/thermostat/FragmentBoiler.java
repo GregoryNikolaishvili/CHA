@@ -30,8 +30,9 @@ import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.ChaFragment;
 import ge.altasoft.gia.cha.classes.ItemViewHolder;
-import ge.altasoft.gia.cha.views.BoilerPumpView;
+import ge.altasoft.gia.cha.views.BoilerFurnaceView;
 import ge.altasoft.gia.cha.views.BoilerSensorView;
+import ge.altasoft.gia.cha.views.PumpView;
 
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
@@ -133,7 +134,7 @@ public class FragmentBoiler extends ChaFragment {
                                                   float scaleX = boilerLayout.getWidth() / (float) boilerImageWidth;
                                                   float scaleY = boilerLayout.getHeight() / (float) boilerImageHeight;
 
-                                                  BoilerPumpView pump = (BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel);
+                                                  PumpView pump = (PumpView) rootView.findViewById(R.id.boilerPumpSolarPanel);
                                                   RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) pump.getLayoutParams();
                                                   lp.setMargins(
                                                           Math.round(solarPipePositionX * scaleX - pump.getWidth() / 2f),
@@ -142,7 +143,7 @@ public class FragmentBoiler extends ChaFragment {
                                                           0);
                                                   pump.setLayoutParams(lp);
 
-                                                  pump = (BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating);
+                                                  pump = (PumpView) rootView.findViewById(R.id.boilerPumpHeating);
                                                   lp = (RelativeLayout.LayoutParams) pump.getLayoutParams();
                                                   lp.setMargins(
                                                           Math.round(heaterPipePositionX * scaleX - pump.getWidth() / 2f),
@@ -244,8 +245,10 @@ public class FragmentBoiler extends ChaFragment {
 
         hideWaitingScreen();
 
-        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setRelayId(ThermostatControllerData.BOILER_SOLAR_PUMP);
-        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);
+        ((PumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setRelayId(ThermostatControllerData.BOILER_SOLAR_PUMP);
+        ((PumpView) rootView.findViewById(R.id.boilerPumpHeating)).setRelayId(ThermostatControllerData.BOILER_HEATING_PUMP);
+
+        ((BoilerFurnaceView) rootView.findViewById(R.id.boilerFurnace)).setRelayId(ThermostatControllerData.BOILER_FURNACE);
 
         drawSensorAndRelayStates();
 
@@ -335,12 +338,18 @@ public class FragmentBoiler extends ChaFragment {
             case ThermostatControllerData.BOILER_HEATING_PUMP:
                 resId = R.id.boilerPumpHeating;
                 break;
+            case ThermostatControllerData.BOILER_FURNACE:
+                resId = R.id.boilerFurnace;
+                break;
+            //case ThermostatControllerData.BOILER_FURNACE_CIRC_PUMP:
+            //    //resId = R.id.boilerFurnace;
+            //    break;
             default:
                 resId = 0;
         }
 
         if (resId != 0)
-            ((BoilerPumpView) rootView.findViewById(resId)).setState(ThermostatControllerData.Instance.boilerPumps(id).getState());
+            ((PumpView) rootView.findViewById(resId)).setState(ThermostatControllerData.Instance.boilerPumps(id).getState());
 
     }
 
@@ -351,8 +360,9 @@ public class FragmentBoiler extends ChaFragment {
         ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorTankTop)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_TOP));
         ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorRoom)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_ROOM));
 
-        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_SOLAR_PUMP).getState());
-        ((BoilerPumpView) rootView.findViewById(R.id.boilerPumpHeating)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_HEATING_PUMP).getState());
+        ((PumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_SOLAR_PUMP).getState());
+        ((PumpView) rootView.findViewById(R.id.boilerPumpHeating)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_HEATING_PUMP).getState());
+        ((PumpView) rootView.findViewById(R.id.boilerFurnace)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_FURNACE).getState());
 
         drawFooter();
     }
@@ -367,6 +377,9 @@ public class FragmentBoiler extends ChaFragment {
         if (rootView == null)
             return;
 
-        ((TextView) rootView.findViewById(R.id.boilerStatus)).setText(sb.toString().replace('\r', ' ').replace('\n', ','));
+        if (sb == null)
+            ((TextView) rootView.findViewById(R.id.boilerStatus)).setText("");
+        else
+            ((TextView) rootView.findViewById(R.id.boilerStatus)).setText(sb.toString().replace('\r', ' ').replace('\n', ','));
     }
 }

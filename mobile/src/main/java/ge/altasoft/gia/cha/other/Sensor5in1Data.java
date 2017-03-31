@@ -79,7 +79,7 @@ public class Sensor5in1Data extends RoomSensorData {
             setWindSpeed(jMain.getInt("WS"));
             maxWindSpeed = jMain.getInt("WSM");
             maxWindSpeedTime = jMain.getString("WSMT");
-            maxWindSpeedTime = maxWindSpeedTime.substring(0, 2).concat(":").concat(maxWindSpeedTime.substring(2, 4)).concat(":").concat(maxWindSpeedTime.substring(4, 6));
+            maxWindSpeedTime = maxWindSpeedTime.substring(0, 2).concat(":").concat(maxWindSpeedTime.substring(2, 4));
             windDirection = jMain.getInt("WD");
             rain = jMain.getInt("RR");
             dailyRain = jMain.getInt("DR");

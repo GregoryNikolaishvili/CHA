@@ -92,7 +92,7 @@ public class BoilerSensorView extends ChaWidget {
         if (Float.isNaN(v))
             tvTemperature.setText("- - - -");
         else
-            tvTemperature.setText(String.format(Locale.US, "%.1f°", this.sensorData.getTemperature()));
+            tvTemperature.setText(String.format(Locale.US, "%.0f°", this.sensorData.getTemperature()));
         tvTemperature.setTextColor(this.sensorData.getTemperatureColor());
 
         switch (this.sensorData.getTemperatureTrend()) {
@@ -113,7 +113,7 @@ public class BoilerSensorView extends ChaWidget {
         if (Float.isNaN(v))
             llTargetTemperature.setVisibility(View.GONE);
         else {
-            tvTargetTemperature.setText(String.format(Locale.US, "%.1f°", this.sensorData.getTargetTemperature()));
+            tvTargetTemperature.setText(String.format(Locale.US, "%.0f°", this.sensorData.getTargetTemperature()));
             llTargetTemperature.setVisibility(View.VISIBLE);
         }
 
