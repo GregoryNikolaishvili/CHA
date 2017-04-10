@@ -6,6 +6,7 @@ import ge.altasoft.gia.cha.classes.ChaWidget;
 import ge.altasoft.gia.cha.views.OutsideSensorView;
 import ge.altasoft.gia.cha.views.PressureSensorView;
 import ge.altasoft.gia.cha.views.RainSensorView;
+import ge.altasoft.gia.cha.views.WindDirSensorView;
 import ge.altasoft.gia.cha.views.WindSensorView;
 
 public final class OtherControllerData {
@@ -14,8 +15,9 @@ public final class OtherControllerData {
     final static public int _5IN1_SENSOR_ID_WIND = 1;
     final static public int _5IN1_SENSOR_ID_PRESSURE = 2;
     final static public int _5IN1_SENSOR_ID_RAIN = 3;
+    final static public int _5IN1_SENSOR_ID_WIND_DIR = 4;
 
-    final static private int SENSOR_COUNT = 4;
+    final static private int SENSOR_COUNT = 5;
 
     final public static OtherControllerData Instance = new OtherControllerData();
 
@@ -26,11 +28,11 @@ public final class OtherControllerData {
         sensor5in1Data = new Sensor5in1Data(0); // 5 sensors
     }
 
-    public int sensorCount() {
+    int sensorCount() {
         return SENSOR_COUNT;
     }
 
-    public ChaWidget createWidget(Context context, int position, boolean fromDashboard) {
+    ChaWidget createWidget(Context context, int position, boolean fromDashboard) {
         switch (position) {
             case _5IN1_SENSOR_ID_TH:
                 return new OutsideSensorView(context, fromDashboard);
@@ -40,6 +42,8 @@ public final class OtherControllerData {
                 return new PressureSensorView(context, fromDashboard);
             case _5IN1_SENSOR_ID_RAIN:
                 return new RainSensorView(context, fromDashboard);
+            case _5IN1_SENSOR_ID_WIND_DIR:
+                return new WindDirSensorView(context, fromDashboard);
 
             default:
                 return null;

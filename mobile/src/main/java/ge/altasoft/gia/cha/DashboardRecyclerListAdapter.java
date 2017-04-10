@@ -27,6 +27,7 @@ import ge.altasoft.gia.cha.views.OutsideSensorView;
 import ge.altasoft.gia.cha.views.PressureSensorView;
 import ge.altasoft.gia.cha.views.RainSensorView;
 import ge.altasoft.gia.cha.views.RoomSensorView;
+import ge.altasoft.gia.cha.views.WindDirSensorView;
 import ge.altasoft.gia.cha.views.WindSensorView;
 
 class DashboardRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> implements ItemTouchHelperAdapter {
@@ -95,6 +96,10 @@ class DashboardRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> 
                 break;
             case RainSensor:
                 w = new RainSensorView(ll.getContext(), true);
+                w.refresh();
+                break;
+            case WindDirSensor:
+                w = new WindDirSensorView(ll.getContext(), true);
                 w.refresh();
                 break;
 

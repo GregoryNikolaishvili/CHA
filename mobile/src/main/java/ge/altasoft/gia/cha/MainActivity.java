@@ -346,10 +346,12 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_WIND);
                 pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_PRESSURE);
                 pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_RAIN);
+                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_WIND_DIR);
 
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.WindSensor, OtherControllerData._5IN1_SENSOR_ID_WIND);
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.PressureSensor, OtherControllerData._5IN1_SENSOR_ID_PRESSURE);
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.RainSensor, OtherControllerData._5IN1_SENSOR_ID_RAIN);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.WindDirSensor, OtherControllerData._5IN1_SENSOR_ID_WIND_DIR);
                 break;
 
             case ThermostatBoilerSensorState:
