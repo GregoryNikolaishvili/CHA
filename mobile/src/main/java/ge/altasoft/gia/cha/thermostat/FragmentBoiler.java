@@ -291,8 +291,8 @@ public class FragmentBoiler extends ChaFragment {
             case ThermostatControllerData.BOILER_SENSOR_TOP:
                 resId = R.id.boilerSensorTankTop;
                 break;
-            case ThermostatControllerData.BOILER_SENSOR_ROOM:
-                resId = R.id.boilerSensorRoom;
+            case ThermostatControllerData.BOILER_SENSOR_FURNACE:
+                resId = R.id.boilerSensorFurnace;
                 break;
             default:
                 resId = 0;
@@ -358,7 +358,7 @@ public class FragmentBoiler extends ChaFragment {
 
         ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorTankBottom)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_BOTTOM));
         ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorTankTop)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_TOP));
-        ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorRoom)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_ROOM));
+        ((BoilerSensorView) rootView.findViewById(R.id.boilerSensorFurnace)).setSensorData(ThermostatControllerData.Instance.boilerSensors(ThermostatControllerData.BOILER_SENSOR_FURNACE));
 
         ((PumpView) rootView.findViewById(R.id.boilerPumpSolarPanel)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_SOLAR_PUMP).getState());
         ((PumpView) rootView.findViewById(R.id.boilerPumpHeating)).setState(ThermostatControllerData.Instance.boilerPumps(ThermostatControllerData.BOILER_HEATING_PUMP).getState());
@@ -377,9 +377,11 @@ public class FragmentBoiler extends ChaFragment {
         if (rootView == null)
             return;
 
-        if (sb == null)
+        if ((sb == null) || (sb.length() == 0))
             ((TextView) rootView.findViewById(R.id.boilerStatus)).setText("");
-        else
-            ((TextView) rootView.findViewById(R.id.boilerStatus)).setText(sb.toString().replace('\r', ' ').replace('\n', ','));
+        else {
+            String msg = sb.toString().replace('\r', ',').replace('\n', ' ');
+            ((TextView) rootView.findViewById(R.id.boilerStatus)).setText(msg);
+        }
     }
 }

@@ -226,41 +226,49 @@ public class MainActivity extends ChaActivity {
                 if (state != 0) {
                     if ((state & Utils.ERR_GENERAL) != 0) {
                         sb.append("General error");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
                     if ((state & Utils.ERR_SENSOR) != 0) {
                         sb.append("Sensor error");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
                     if ((state & Utils.ERR_EMOF) != 0) {
                         sb.append("Emergency switch-off temperature of collector");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
                     if ((state & Utils.ERR_95_DEGREE) != 0) {
                         sb.append("Tank emergency temperature (95)");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
                     if ((state & Utils.ERR_CMX) != 0) {
                         sb.append("CMX Maximum limited collector temperature");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
                     if ((state & Utils.ERR_SMX) != 0) {
                         sb.append("SMX Maximum temperature of tank");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
 
                     if ((state & Utils.ERR_T1) != 0) {
                         sb.append("Solar sensor fail (T1)");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
                     if ((state & Utils.ERR_T2) != 0) {
                         sb.append("Boiler sensor fail (T2)");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
                     if ((state & Utils.ERR_T3) != 0) {
                         sb.append("Boiler sensor fail (T3)");
-                        sb.append("\n\r");
+                        sb.append("\r\n");
                     }
+
+                    if ((state & Utils.ERR_TF) != 0) {
+                        sb.append("Furnace sensor fail (TF)");
+                        sb.append("\r\n");
+                    }
+
+                    if (sb.length() >= 2) // delete last \r\n
+                        sb.setLength(sb.length() - 2);
 
                     if (pagerAdapter.fragmentBoiler != null)
                         pagerAdapter.fragmentBoiler.drawThermostatState(sb);

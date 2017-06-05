@@ -22,7 +22,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     final static int BOILER_SENSOR_SOLAR_PANEL = 0;
     final static int BOILER_SENSOR_BOTTOM = 1;
     final static int BOILER_SENSOR_TOP = 2;
-    final static int BOILER_SENSOR_ROOM = 3;
+    final static int BOILER_SENSOR_FURNACE = 3;
 
     final static int BOILER_SOLAR_PUMP = 0;
     final static int BOILER_HEATING_PUMP = 1;

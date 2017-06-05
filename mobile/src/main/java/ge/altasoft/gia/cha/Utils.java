@@ -41,6 +41,7 @@ public class Utils {
     final static int ERR_T1 = 64;
     final static int ERR_T2 = 128;
     final static int ERR_T3 = 256;
+    final static int ERR_TF = 512; // Furnace or burner
 
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
