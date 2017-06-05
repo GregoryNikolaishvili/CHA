@@ -9,6 +9,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import ge.altasoft.gia.cha.classes.ChaFragment;
 import ge.altasoft.gia.cha.classes.ChaWidget;
@@ -20,6 +25,8 @@ import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class FragmentDashboard extends ChaFragment implements OnStartDragListener {
+
+    private Map<String, String> controllerStates = new HashMap<String, String>();
 
     public FragmentDashboard() {
     }
@@ -135,4 +142,38 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
                 adapter.notifyDataSetChanged();
         }
     };
+
+    public void drawControllersState(String scope, StringBuilder sb) {
+        if (rootView == null)
+            return;
+
+        if ((sb == null) || (sb.length() == 0))
+            controllerStates.put(scope, "");
+        else {
+            String msg = sb.toString().replace('\r', ',').replace('\n', ' ');
+            controllerStates.put(scope, msg);
+        }
+
+        StringBuilder msgBuilder = new StringBuilder();
+
+        Iterator<Map.Entry<String, String>> iterator = controllerStates.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> pairs = iterator.next();
+            scope = pairs.getKey();
+            String value = pairs.getValue();
+
+            msgBuilder.append(scope);
+            msgBuilder.append(": ");
+            msgBuilder.append(value);
+
+            msgBuilder.append("\n");
+        }
+
+        if (msgBuilder.length() >= 1) // delete last "\n"
+            msgBuilder.setLength(msgBuilder.length() - 1);
+
+        ((TextView) rootView.findViewById(R.id.controllersStatus)).setText(msgBuilder.toString());
+    }
+
+
 }

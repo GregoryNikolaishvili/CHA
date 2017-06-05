@@ -59,10 +59,10 @@ public class FragmentLight extends ChaFragment implements OnStartDragListener {
 
                         switch (item.getItemId()) {
                             case R.id.item_auto:
-                                ((ChaActivity) getActivity()).publish("chac/light/mode", "A", false);
+                                ((ChaActivity) getActivity()).publish("chac/lc/mode", "A", false);
                                 break;
                             case R.id.item_manual:
-                                ((ChaActivity) getActivity()).publish("chac/light/mode", "M", false);
+                                ((ChaActivity) getActivity()).publish("chac/lc/mode", "M", false);
                                 break;
                         }
                         return false;
@@ -106,7 +106,7 @@ public class FragmentLight extends ChaFragment implements OnStartDragListener {
                     LightControllerData.Instance.relays(w.getWidgetId()).setOrder(i);
             }
 
-            ((ChaActivity) getActivity()).publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
+            ((ChaActivity) getActivity()).publish("chac/lc/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
 
             LightControllerData.Instance.setWidgetOrderChanged(false);
         }

@@ -121,8 +121,9 @@ public class MainActivity extends ChaActivity {
 
 
             case R.id.action_refresh:
-                //publish("chac/light/refresh", "1", false);
+                publish("chac/lc/refresh", "1", false);
                 publish("chac/ts/refresh", "1", false);
+                publish("chac/wl/refresh", "1", false);
                 return true;
 
             case R.id.action_show_info:
@@ -184,8 +185,8 @@ public class MainActivity extends ChaActivity {
 
             case Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
-                    publish("chac/light/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
-                    publish("chac/light/settings", LightControllerData.Instance.encodeSettings(), false);
+                    publish("chac/lc/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
+                    publish("chac/lc/settings", LightControllerData.Instance.encodeSettings(), false);
                 }
                 break;
 
@@ -210,6 +211,8 @@ public class MainActivity extends ChaActivity {
         super.processMqttData(dataType, intent);
 
         int id;
+        int state;
+        StringBuilder sb;
 
         switch (dataType) {
 //            case Alert:
@@ -219,9 +222,69 @@ public class MainActivity extends ChaActivity {
 //
 //                break;
 
-            case ThermostatState:
-                StringBuilder sb = new StringBuilder();
-                int state = intent.getIntExtra("state", 0);
+            case ClientConnected:
+                String clientId = intent.getStringExtra("id");
+                ImageView image;
+                boolean value;
+                switch (clientId) {
+                    case "LC controller":
+                        value = intent.getBooleanExtra("value", false);
+                        image = (ImageView) findViewById(R.id.lcControllerIsOnline);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        image = (ImageView) findViewById(R.id.lcControllerIsOnline2);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        break;
+                    case "TS controller":
+                        value = intent.getBooleanExtra("value", false);
+                        image = (ImageView) findViewById(R.id.tsControllerIsOnline);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        image = (ImageView) findViewById(R.id.tsControllerIsOnline2);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        break;
+                    case "WL controller":
+                        value = intent.getBooleanExtra("value", false);
+                        //image = (ImageView) findViewById(R.id.wlControllerIsOnline);
+                        //if (image != null)
+                        //    image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        image = (ImageView) findViewById(R.id.wlControllerIsOnline2);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        break;
+                }
+                break;
+
+            //region Controller states
+            case LightControllerState:
+                sb = new StringBuilder();
+                state = intent.getIntExtra("state", 0);
+
+                if (state != 0) {
+                    if ((state & Utils.ERR_GENERAL) != 0) {
+                        sb.append("General error");
+                        sb.append("\r\n");
+                    }
+
+                    if (sb.length() >= 2) // delete last \r\n
+                        sb.setLength(sb.length() - 2);
+
+                    if (pagerAdapter.fragmentDashboard != null)
+                        pagerAdapter.fragmentDashboard.drawControllersState("LC", sb);
+
+                    Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
+                    ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+                    toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
+                } else if (pagerAdapter.fragmentDashboard != null)
+                    pagerAdapter.fragmentDashboard.drawControllersState("LC", null);
+
+                break;
+
+            case ThermostatControllerState:
+                sb = new StringBuilder();
+                state = intent.getIntExtra("state", 0);
 
                 if (state != 0) {
                     if ((state & Utils.ERR_GENERAL) != 0) {
@@ -270,42 +333,53 @@ public class MainActivity extends ChaActivity {
                     if (sb.length() >= 2) // delete last \r\n
                         sb.setLength(sb.length() - 2);
 
-                    if (pagerAdapter.fragmentBoiler != null)
-                        pagerAdapter.fragmentBoiler.drawThermostatState(sb);
+                    if (pagerAdapter.fragmentDashboard != null)
+                        pagerAdapter.fragmentDashboard.drawControllersState("TS", sb);
 
                     Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
                     ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
                     toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
-                } else if (pagerAdapter.fragmentBoiler != null)
-                    pagerAdapter.fragmentBoiler.drawThermostatState(null);
+                } else if (pagerAdapter.fragmentDashboard != null)
+                    pagerAdapter.fragmentDashboard.drawControllersState("TS", null);
 
                 break;
 
-            case ClientConnected:
-                String clientId = intent.getStringExtra("id");
-                ImageView image;
-                boolean value;
-                switch (clientId) {
-                    case "Lights controller":
-                        value = intent.getBooleanExtra("value", false);
-                        image = (ImageView) findViewById(R.id.lightControllerIsOnline);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-                        image = (ImageView) findViewById(R.id.lightControllerIsOnline2);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-                        break;
-                    case "TS controller":
-                        value = intent.getBooleanExtra("value", false);
-                        image = (ImageView) findViewById(R.id.tsControllerIsOnline);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-                        image = (ImageView) findViewById(R.id.tsControllerIsOnline2);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-                        break;
-                }
+            case WaterLevelControllerState:
+                sb = new StringBuilder();
+                state = intent.getIntExtra("state", 0);
+
+                if (state != 0) {
+                    if ((state & Utils.ERR_GENERAL) != 0) {
+                        sb.append("General error");
+                        sb.append("\r\n");
+                    }
+                    if ((state & Utils.ERR_ULTRASONIC_1) != 0) {
+                        sb.append("Ultrasonic sensor #1 error");
+                        sb.append("\r\n");
+                    }
+                    if ((state & Utils.ERR_ULTRASONIC_2) != 0) {
+                        sb.append("Ultrasonic sensor #2 error");
+                        sb.append("\r\n");
+                    }
+                    if ((state & Utils.ERR_ULTRASONIC_3) != 0) {
+                        sb.append("Ultrasonic sensor #3 error");
+                        sb.append("\r\n");
+                    }
+
+                    if (sb.length() >= 2) // delete last \r\n
+                        sb.setLength(sb.length() - 2);
+
+                    if (pagerAdapter.fragmentDashboard != null)
+                        pagerAdapter.fragmentDashboard.drawControllersState("WL", sb);
+
+                    Toast.makeText(this, sb.toString(), Toast.LENGTH_LONG).show();
+                    ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+                    toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
+                } else if (pagerAdapter.fragmentDashboard != null)
+                    pagerAdapter.fragmentDashboard.drawControllersState("WL", null);
+
                 break;
+            //endregion
 
             case LightSettings:
             case LightNameAndOrders:
@@ -318,6 +392,7 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentLight.drawState(id);
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.LightRelay, id);
                 break;
+
 
             case ThermostatRoomSensorSettings:
             case ThermostatRoomSensorNameAndOrders:

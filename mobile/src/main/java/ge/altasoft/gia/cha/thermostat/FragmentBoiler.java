@@ -372,16 +372,4 @@ public class FragmentBoiler extends ChaFragment {
         ((TextView) cv.getChildAt(0)).setText(ThermostatControllerData.Instance.getBoilerModeText());
         cv.setEnabled(true);
     }
-
-    public void drawThermostatState(StringBuilder sb) {
-        if (rootView == null)
-            return;
-
-        if ((sb == null) || (sb.length() == 0))
-            ((TextView) rootView.findViewById(R.id.boilerStatus)).setText("");
-        else {
-            String msg = sb.toString().replace('\r', ',').replace('\n', ' ');
-            ((TextView) rootView.findViewById(R.id.boilerStatus)).setText(msg);
-        }
-    }
 }

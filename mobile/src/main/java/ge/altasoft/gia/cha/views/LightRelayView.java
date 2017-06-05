@@ -62,7 +62,7 @@ public class LightRelayView extends ChaWidget {
 
     @Override
     protected void onClick() {
-        ((ChaActivity) getContext()).publish(String.format(Locale.US, "chac/light/state/%01X", relayData.getId()), buttonState == ButtonState.OFF ? "1" : "0", false);
+        ((ChaActivity) getContext()).publish(String.format(Locale.US, "chac/lc/state/%01X", relayData.getId()), buttonState == ButtonState.OFF ? "1" : "0", false);
         setState(ButtonState.WAIT);
     }
 

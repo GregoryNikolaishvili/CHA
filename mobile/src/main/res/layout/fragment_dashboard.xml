@@ -18,7 +18,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/lightControllerIsOnline2"
+            android:id="@+id/lcControllerIsOnline2"
             android:layout_width="20dp"
             android:layout_height="match_parent"
             android:paddingEnd="4dp"
@@ -36,5 +36,27 @@
             android:paddingRight="4dp"
             android:paddingStart="4dp"
             android:src="@drawable/circle_red" />
+
+        <ImageView
+            android:id="@+id/wlControllerIsOnline2"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:paddingEnd="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingStart="4dp"
+            android:src="@drawable/circle_red" />
+
+
+        <TextView
+            android:id="@+id/controllersStatus"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingEnd="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingStart="4dp"
+            android:textColor="@android:color/holo_red_dark" />
     </LinearLayout>
 </LinearLayout>

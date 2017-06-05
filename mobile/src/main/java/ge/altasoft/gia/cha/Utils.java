@@ -33,6 +33,8 @@ public class Utils {
     public final static float F_UNDEFINED = 999.9f;
 
     final static int ERR_GENERAL = 1;
+
+    // Thermostat controller errors
     final static int ERR_SENSOR = 2;
     final static int ERR_EMOF = 4;
     final static int ERR_95_DEGREE = 8;
@@ -42,6 +44,11 @@ public class Utils {
     final static int ERR_T2 = 128;
     final static int ERR_T3 = 256;
     final static int ERR_TF = 512; // Furnace or burner
+
+    // Water level controller errors
+    final static int ERR_ULTRASONIC_1 = 2;
+    final static int ERR_ULTRASONIC_2 = 4;
+    final static int ERR_ULTRASONIC_3 = 8;
 
 
     static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;

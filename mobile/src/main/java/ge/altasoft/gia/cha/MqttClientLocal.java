@@ -33,26 +33,31 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/room_sensor/"; // last "/" is important
     private static final String TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH = "cha/ROOM_SENSOR/"; // last "/" is important
 
-    private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/light/state/"; // last "/" is important
+    // Light controller
+    private static final String TOPIC_CHA_LIGHT_CONTROLLER_STATE = "cha/lc/state";
 
-    private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/light/settings";
-    private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/light/names";
+    private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/lc/rs/"; // last "/" is important
+    private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/lc/settings";
+    private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/lc/names";
 
+    // ts. Thermostat controller
+    private static final String TOPIC_CHA_THERMOSTAT_CONTROLLER_STATE = "cha/ts/state";
 
-    private static final String TOPIC_CHA_BOILER_SENSOR_STATE = "cha/ts/bs/"; // last "/" is important
-    private static final String TOPIC_CHA_BOILER_SENSOR_STATE_REFRESH = "cha/ts/BS/"; // last "/" is important
-    private static final String TOPIC_CHA_BOILER_RELAY_STATE = "cha/ts/br/"; // last "/" is important
-    private static final String TOPIC_CHA_HEATER_RELAY_STATE = "cha/ts/hr/"; // last "/" is important
+    private static final String TOPIC_CHA_THERMOSTAT_BOILER_SENSOR_STATE = "cha/ts/bs/"; // last "/" is important
+    private static final String TOPIC_CHA_THERMOSTAT_BOILER_SENSOR_STATE_REFRESH = "cha/ts/BS/"; // last "/" is important
+    private static final String TOPIC_CHA_THERMOSTAT_BOILER_RELAY_STATE = "cha/ts/br/"; // last "/" is important
+    private static final String TOPIC_CHA_THERMOSTAT_HEATER_RELAY_STATE = "cha/ts/hr/"; // last "/" is important
 
-    private static final String TOPIC_CHA_THERMOSTAT_STATE = "cha/ts/state";
-
+    private static final String TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS = "cha/ts/settings/bl";
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_SETTINGS = "cha/ts/settings/rs";
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER = "cha/ts/names/rs";
-    private static final String TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS = "cha/ts/settings/bl";
 
-    //private static final String TOPIC_CHA_THERMOSTAT_HEATER_RELAY_SETTINGS = "cha/ts/hr/settings";
-    //private static final String TOPIC_CHA_THERMOSTAT_HEATER_RELAY_NAMES_AND_ORDER = "cha/ts/hr/names";
+    // wl. Water level controller
+    private static final String TOPIC_CHA_WATER_LEVEL_CONTROLLER_STATE = "cha/wl/state";
 
+    private static final String TOPIC_CHA_WATER_LEVEL_FLOAT_SWITCH_STATE = "cha/wl/fs/"; // last "/" is important
+    private static final String TOPIC_CHA_WATER_LEVEL_ULTRASOUND_STATE = "cha/wl/us/"; // last "/" is important
+    private static final String TOPIC_CHA_WATER_LEVEL_SOLENOID_STATE = "cha/wl/sd/"; // last "/" is important
 
     static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
 
@@ -65,17 +70,24 @@ public class MqttClientLocal {
         Sensor5in1StateW,
         SensorRoomState,
 
+        LightControllerState,
         LightRelayState,
         LightSettings,
         LightNameAndOrders,
 
-        ThermostatState,
+        ThermostatControllerState,
         ThermostatBoilerSensorState,
         ThermostatBoilerPumpState,
         ThermostatRoomSensorSettings,
         ThermostatRoomSensorNameAndOrders,
         ThermostatHeaterRelayState,
-        ThermostatBoilerSettings
+        ThermostatBoilerSettings,
+
+        WaterLevelControllerState,
+        WaterLevelFloatSwitchState,
+        WaterLevelFloatUltrasonicState,
+        WaterLevelSolenoidState
+
     }
 
     enum MQTTConnectionStatus {
@@ -359,8 +371,20 @@ public class MqttClientLocal {
                         context.sendBroadcast(broadcastDataIntent);
                         break;
 
-                    case TOPIC_CHA_THERMOSTAT_STATE:
-                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatState);
+                    case TOPIC_CHA_LIGHT_CONTROLLER_STATE:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerState);
+                        broadcastDataIntent.putExtra("state", Integer.parseInt(payload, 16));
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
+
+                    case TOPIC_CHA_THERMOSTAT_CONTROLLER_STATE:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatControllerState);
+                        broadcastDataIntent.putExtra("state", Integer.parseInt(payload, 16));
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
+
+                    case TOPIC_CHA_WATER_LEVEL_CONTROLLER_STATE:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelControllerState);
                         broadcastDataIntent.putExtra("state", Integer.parseInt(payload, 16));
                         context.sendBroadcast(broadcastDataIntent);
                         break;
@@ -403,24 +427,10 @@ public class MqttClientLocal {
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSettings);
                         context.sendBroadcast(broadcastDataIntent);
                         break;
-
-
-//                case TOPIC_CHA_THERMOSTAT_HEATER_RELAY_SETTINGS:
-//                    ThermostatControllerData.Instance.decodeHeaterRelaySettings(payload);
-//
-//                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatHeaterRelaySettings);
-//                    context.sendBroadcast(broadcastDataIntent);
-//                    break;
-//
-//                case TOPIC_CHA_THERMOSTAT_HEATER_RELAY_NAMES_AND_ORDER:
-//                    ThermostatControllerData.Instance.decodeHeaterRelayNamesAndOrder(payload);
-//
-//                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatHeaterRelayNameAndOrders);
-//                    context.sendBroadcast(broadcastDataIntent);
-//                    break;
-
                     //endregion
 
+                    //region Water level
+                    //endregion
                 }
 
                 if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE)) {
@@ -461,8 +471,8 @@ public class MqttClientLocal {
                     return;
                 }
 
-                if (topic.startsWith(TOPIC_CHA_HEATER_RELAY_STATE)) {
-                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_HEATER_RELAY_STATE.length()), 16);
+                if (topic.startsWith(TOPIC_CHA_THERMOSTAT_HEATER_RELAY_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_THERMOSTAT_HEATER_RELAY_STATE.length()), 16);
 
                     ArrayList<Integer> ids = ThermostatControllerData.Instance.setHeaterRelayIsOn(id, !payload.equals("0"));
                     for (int idx : ids) {
@@ -480,8 +490,8 @@ public class MqttClientLocal {
                     return;
                 }
 
-                if (topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_BOILER_SENSOR_STATE_REFRESH)) {
-                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_SENSOR_STATE.length()), 16);
+                if (topic.startsWith(TOPIC_CHA_THERMOSTAT_BOILER_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_THERMOSTAT_BOILER_SENSOR_STATE_REFRESH)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_THERMOSTAT_BOILER_SENSOR_STATE.length()), 16);
                     ThermostatControllerData.Instance.boilerSensors(id).decodeState(payload);
 
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSensorState);
@@ -490,8 +500,8 @@ public class MqttClientLocal {
                     return;
                 }
 
-                if (topic.startsWith(TOPIC_CHA_BOILER_RELAY_STATE)) {
-                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_BOILER_RELAY_STATE.length()), 16);
+                if (topic.startsWith(TOPIC_CHA_THERMOSTAT_BOILER_RELAY_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_THERMOSTAT_BOILER_RELAY_STATE.length()), 16);
                     ThermostatControllerData.Instance.boilerPumps(id).decodeState(payload);
 
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerPumpState);
@@ -500,6 +510,44 @@ public class MqttClientLocal {
 
                     return;
                 }
+
+                // TODO payload
+                if (topic.startsWith(TOPIC_CHA_WATER_LEVEL_FLOAT_SWITCH_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_WATER_LEVEL_FLOAT_SWITCH_STATE.length()), 16);
+                    //ThermostatControllerData.Instance.boilerPumps(id).decodeState(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelFloatSwitchState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+
+                    return;
+                }
+
+                // TODO payload
+                if (topic.startsWith(TOPIC_CHA_WATER_LEVEL_ULTRASOUND_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_WATER_LEVEL_ULTRASOUND_STATE.length()), 16);
+                    //ThermostatControllerData.Instance.boilerPumps(id).decodeState(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelFloatUltrasonicState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+
+                    return;
+                }
+
+                // TODO payload
+                if (topic.startsWith(TOPIC_CHA_WATER_LEVEL_SOLENOID_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_WATER_LEVEL_SOLENOID_STATE.length()), 16);
+                    //ThermostatControllerData.Instance.boilerPumps(id).decodeState(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelSolenoidState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+
+                    return;
+                }
+
+                ////////////////////
 
                 if (topic.startsWith(TOPIC_CHA_LOG)) {
                     String type = topic.substring(TOPIC_CHA_LOG.length());
