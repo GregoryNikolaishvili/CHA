@@ -12,7 +12,7 @@ import java.util.Locale;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.TempSensorData;
 
-public class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
+public class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData>{
 
     private float H;
     private int signalLevel;
@@ -119,16 +119,7 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
         editor.putBoolean("t_sensor_deleted_Sensor #".concat(suffix), false);
     }
 
-    @Override
-    public int compareTo(@NonNull RoomSensorData o) {
-        if (Integer.valueOf(this.order).equals(o.order)) {
-            return Integer.valueOf(this.id).compareTo(o.id);
-        } else {
-            return Integer.valueOf(this.order).compareTo(o.order);
-        }
-    }
-
-    public void decodeState(String payload, boolean isJson) {
+     public void decodeState(String payload, boolean isJson) {
 
         if (isJson) {
             JSONObject jMain;
@@ -147,6 +138,15 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
             setTemperatureTrend('=');
             setTemperature(Utils.decodeT(payload.substring(0, 4)));
             setLastSyncTime(Integer.parseInt(payload.substring(4, 8), 16));
+        }
+    }
+
+    @Override
+    public int compareTo(@NonNull RoomSensorData o) {
+        if (Integer.valueOf(this.order).equals(o.order)) {
+            return Integer.valueOf(this.id).compareTo(o.id);
+        } else {
+            return Integer.valueOf(this.order).compareTo(o.order);
         }
     }
 }

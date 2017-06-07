@@ -51,8 +51,11 @@ public class Utils {
     final static int ERR_ULTRASONIC_3 = 8;
 
 
-    static final int ACTIVITY_REQUEST_SETTINGS_CODE = 1;
+    static final int ACTIVITY_REQUEST_RESULT_SETTINGS = 1;
     static final int ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS = 2;
+    public final static int ACTIVITY_REQUEST_RESULT_THERMOSTAT_SETTINGS = 3;
+    public final static int ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS = 4;
+
 
     public static String shortToHex4(short value) {
         return String.format(Locale.US, "%04X", value);

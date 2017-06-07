@@ -66,6 +66,12 @@
                 android:title="@string/action_thermostat_settings"
                 app:showAsAction="never" />
 
+            <item
+                android:id="@+id/action_water_level_settings"
+                android:orderInCategory="110"
+                android:title="@string/action_water_level_settings"
+                app:showAsAction="never" />
+
         </menu>
     </item>
 </menu>

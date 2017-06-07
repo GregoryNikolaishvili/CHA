@@ -27,17 +27,9 @@ public abstract class RelayData implements Comparable<RelayData> {
         return this.lastSyncTime;
     }
 
-//    public void setLastSyncTime(int secondsPassed) {
-//        lastSyncTime = new Date().getTime() - secondsPassed * 1000;
-//    }
-
     public int getId() {
         return this.id;
     }
-
-//    public int getOrder() {
-//        return this.order;
-//    }
 
     public int getState() {
         return this.state;
@@ -47,9 +39,12 @@ public abstract class RelayData implements Comparable<RelayData> {
         return this.name;
     }
 
+    private void setLastSyncTime(int secondsPassed) {
+        lastSyncTime = new Date().getTime() - secondsPassed * 1000;
+    }
     private void setState(int value) {
         this.state = value;
-        this.lastSyncTime = new Date().getTime();
+        setLastSyncTime(0);
     }
 
     public void setName(String value) {
@@ -80,6 +75,10 @@ public abstract class RelayData implements Comparable<RelayData> {
         sb2.append(';');
     }
 
+    public void decodeState(String payload) {
+        setState(Integer.parseInt(payload));
+    }
+
     @Override
     public int compareTo(@NonNull RelayData o) {
         if (Integer.valueOf(this.order).equals(o.order)) {
@@ -87,9 +86,5 @@ public abstract class RelayData implements Comparable<RelayData> {
         } else {
             return Integer.valueOf(this.order).compareTo(o.order);
         }
-    }
-
-    public void decodeState(String payload) {
-        setState(Integer.parseInt(payload));
     }
 }

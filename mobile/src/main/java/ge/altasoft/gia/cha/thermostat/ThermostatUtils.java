@@ -22,16 +22,14 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.classes.Log5in1Item;
-import ge.altasoft.gia.cha.classes.LogRelayItem;
+import ge.altasoft.gia.cha.classes.LogTwoValueItem;
+import ge.altasoft.gia.cha.classes.LogOneValueItem;
 import ge.altasoft.gia.cha.classes.LogTHItem;
 import ge.altasoft.gia.cha.classes.WidgetType;
 
 public final class ThermostatUtils {
 
-    public final static int ACTIVITY_REQUEST_SETTINGS_CODE = 3;
-
-    public static void FillRelayLog(int relayId, WidgetType scope, String log, ArrayList<LogRelayItem> logBuffer) {
+    public static void FillRelayLog(int relayId, WidgetType scope, String log, ArrayList<LogOneValueItem> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
@@ -70,7 +68,7 @@ public final class ThermostatUtils {
                     continue;
                 }
 
-                logBuffer.add(new LogRelayItem(XX, state));
+                logBuffer.add(new LogOneValueItem(XX, state));
             }
         }
     }
@@ -337,7 +335,7 @@ public final class ThermostatUtils {
         return new Date[]{minXX, maxXX};
     }
 
-    public static void Fill5in1SensorLog(WidgetType scope, String log, ArrayList<Log5in1Item> logBuffer) {
+    public static void Fill5in1SensorLog(WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
@@ -347,7 +345,8 @@ public final class ThermostatUtils {
         logBuffer.clear();
 
         Date XX;
-        int value1 = 0, value2 = 0;
+        int value1 = 0;
+        String value2 = "";
 
 
         String[] logEntries = log.split(":");
@@ -364,7 +363,7 @@ public final class ThermostatUtils {
                     switch (scope) {
                         case WindSensor:
                             value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
-                            value2 = Integer.parseInt(logEntry.substring(15, 19), 16);
+                            value2 = String.format(Locale.US, "%d °", Integer.parseInt(logEntry.substring(15, 19), 16));
                             break;
                         case PressureSensor:
                             value1 = Integer.parseInt(logEntry.substring(23, 27), 16);
@@ -378,12 +377,52 @@ public final class ThermostatUtils {
                     continue;
                 }
 
-                logBuffer.add(new Log5in1Item(XX, value1, value2));
+                logBuffer.add(new LogTwoValueItem(XX, value1, value2));
             }
         }
     }
 
-    public static Date[] Draw5in1Chart(ArrayList<Log5in1Item> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+    public static void FillWaterLevelLog(WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
+        String date0 = sdf.format(new Date());
+        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+
+        int logEntryLen = 17;
+
+        logBuffer.clear();
+
+        Date XX;
+        int value1 = 0;
+        String value2 = "";
+
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == logEntryLen) {
+                try {
+                    XX = sdf.parse(date0 + logEntry.substring(0, 6));
+                } catch (ParseException ex) {
+                    Log.e("Log", "Invalid X", ex);
+                    continue;
+                }
+
+                try {
+                    switch (scope) {
+                        case WaterLevelSensor:
+                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
+                            value2 = String.format(Locale.US, "%d cm %s %s", Integer.parseInt(logEntry.substring(7, 11), 16), logEntry.charAt(15) == '0' ? "" : "F", logEntry.charAt(16) == '0' ? "" : "S");
+                            break;
+                    }
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid Y", ex);
+                    continue;
+                }
+
+                logBuffer.add(new LogTwoValueItem(XX, value1, value2));
+            }
+        }
+    }
+
+    public static Date[] DrawTwoValueChart(ArrayList<LogTwoValueItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
 
         for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
             xyDataSet.getSeriesAt(i).clear();
@@ -397,7 +436,7 @@ public final class ThermostatUtils {
         Date XX;
         XYSeries series = xyDataSet.getSeriesAt(0);
 
-        for (Log5in1Item item : logBuffer) {
+        for (LogTwoValueItem item : logBuffer) {
             XX = item.date;
 
             series.add(XX.getTime(), item.Value1);

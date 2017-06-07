@@ -27,19 +27,21 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.classes.Log5in1Item;
+import ge.altasoft.gia.cha.classes.LogTwoValueItem;
 import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.other.OtherControllerData;
 import ge.altasoft.gia.cha.other.Sensor5in1Data;
+import ge.altasoft.gia.cha.other.WaterLevelData;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class Log5in1Activity extends ChaActivity {
 
     final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
     private WidgetType scope;
+    private int widgetId;
 
     private _5in1LogAdapter adapter = null;
-    private ArrayList<Log5in1Item> logBuffer;
+    private ArrayList<LogTwoValueItem> logBuffer;
 
     private GraphicalView mChartView;
     private final XYMultipleSeriesDataset xyDataSet = new XYMultipleSeriesDataset();
@@ -52,10 +54,10 @@ public class Log5in1Activity extends ChaActivity {
 
         Intent intent = getIntent();
         scope = (WidgetType) intent.getSerializableExtra("widget");
-        //int sensorId = intent.getIntExtra("id", -1); // doesn't matter
+        widgetId = intent.getIntExtra("id", -1);
 
         logBuffer = new ArrayList<>();
-        adapter = new _5in1LogAdapter(this, logBuffer, scope == WidgetType.WindSensor);
+        adapter = new _5in1LogAdapter(this, logBuffer, (scope == WidgetType.WindSensor) || (scope == WidgetType.WaterLevelSensor));
 
         ListView listView = (ListView) findViewById(R.id.lvLog);
         listView.setAdapter(adapter);
@@ -88,6 +90,9 @@ public class Log5in1Activity extends ChaActivity {
             case RainSensor:
                 publish("cha/hub/getlog", "5in1_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
+            case WaterLevelSensor:
+                publish("cha/hub/getlog", "tank_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+                break;
         }
     }
 
@@ -95,35 +100,54 @@ public class Log5in1Activity extends ChaActivity {
     public void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
         super.processMqttData(dataType, intent);
 
-        Sensor5in1Data data = OtherControllerData.Instance.get5in1SensorData();
-        int value1, value2 = 0;
+        Sensor5in1Data data;
+        int value1 = 0;
+        String value2 = "";
+        int id;
+        long lastSync;
 
         switch (dataType) {
             case Sensor5in1StateW:
+                id = intent.getIntExtra("id", -1);
+                if (id != widgetId)
+                    return;
+
                 switch (scope) {
                     case WindSensor:
+                        data = OtherControllerData.Instance.get5in1SensorData();
                         value1 = data.getWindSpeed();
-                        value2 = data.getWindDirection();
+                        value2 = String.format(Locale.US, "%d °", data.getWindDirection());
+                        lastSync = data.getLastSyncTime();
                         break;
 
                     case RainSensor:
+                        data = OtherControllerData.Instance.get5in1SensorData();
                         value1 = data.getRain();
+                        lastSync = data.getLastSyncTime();
                         break;
 
                     case PressureSensor:
+                        data = OtherControllerData.Instance.get5in1SensorData();
                         value1 = data.getPressure();
+                        lastSync = data.getLastSyncTime();
+                        break;
+
+                    case WaterLevelSensor:
+                        WaterLevelData wd = OtherControllerData.Instance.getWaterLevelData(id);
+                        value1 = wd.getWaterPercent();
+                        value2 = String.format(Locale.US, "%d cm %s %s", wd.getWaterDistance(), wd.getFloatSwitchIsOn() ? "F" : "", wd.getSolenoidIsOn() ? "S" : "");
+                        lastSync = wd.getLastSyncTime();
                         break;
 
                     default:
                         return;
                 }
 
-
-                Log5in1Item point = new Log5in1Item(new Date(data.getLastSyncTime()), value1, value2);
+                LogTwoValueItem point = new LogTwoValueItem(new Date(lastSync), value1, value2);
                 logBuffer.add(point);
                 adapter.notifyDataSetChanged();
 
-                xyDataSet.getSeriesAt(0).add(data.getLastSyncTime(), value1);
+                xyDataSet.getSeriesAt(0).add(lastSync, value1);
                 mChartView.repaint();
                 break;
 
@@ -136,7 +160,16 @@ public class Log5in1Activity extends ChaActivity {
                             String log = intent.getStringExtra("log");
                             ThermostatUtils.Fill5in1SensorLog(scope, log, logBuffer);
                             adapter.notifyDataSetChanged();
-                            ThermostatUtils.Draw5in1Chart(logBuffer, mChartView, mRenderer, xyDataSet);
+                            ThermostatUtils.DrawTwoValueChart(logBuffer, mChartView, mRenderer, xyDataSet);
+                        }
+                        break;
+
+                    case WaterLevelSensor:
+                        if (intent.getStringExtra("type").startsWith("tank")) {
+                            String log = intent.getStringExtra("log");
+                            ThermostatUtils.FillWaterLevelLog(scope, log, logBuffer);
+                            adapter.notifyDataSetChanged();
+                            ThermostatUtils.DrawTwoValueChart(logBuffer, mChartView, mRenderer, xyDataSet);
                         }
                         break;
                 }
@@ -144,11 +177,11 @@ public class Log5in1Activity extends ChaActivity {
         }
     }
 
-    public class _5in1LogAdapter extends ArrayAdapter<Log5in1Item> {
+    public class _5in1LogAdapter extends ArrayAdapter<LogTwoValueItem> {
 
         private final boolean has2ndValue;
 
-        _5in1LogAdapter(Context context, ArrayList<Log5in1Item> points, boolean has2ndValue) {
+        _5in1LogAdapter(Context context, ArrayList<LogTwoValueItem> points, boolean has2ndValue) {
             super(context, 0, points);
 
             this.has2ndValue = has2ndValue;
@@ -164,12 +197,12 @@ public class Log5in1Activity extends ChaActivity {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_item_key_value, parent, false);
             }
 
-            Log5in1Item point = getItem(position);
+            LogTwoValueItem point = getItem(position);
             if (point != null) {
                 ((TextView) convertView.findViewById(R.id.tvListViewItemKey)).setText(sdf.format(point.date));
                 ((TextView) convertView.findViewById(R.id.tvListViewItemValue1)).setText(String.format(Locale.US, "%d", point.Value1));
                 if (has2ndValue)
-                    ((TextView) convertView.findViewById(R.id.tvListViewItemValue2)).setText(String.format(Locale.US, "%d °", point.Value2));
+                    ((TextView) convertView.findViewById(R.id.tvListViewItemValue2)).setText(point.Value2);
                 else
                     convertView.findViewById(R.id.tvListViewItemValue2).setVisibility(View.GONE);
             }

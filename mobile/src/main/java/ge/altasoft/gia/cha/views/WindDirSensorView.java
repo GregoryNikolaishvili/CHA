@@ -7,8 +7,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -99,7 +97,7 @@ public class WindDirSensorView extends ChaWidget {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
-        if (data.getWeatherLastSyncTime() < calendar.getTime().getTime())
+        if (data.getRainWindPressureSyncTime() < calendar.getTime().getTime())
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, true));
         else
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));

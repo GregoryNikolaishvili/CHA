@@ -19,7 +19,7 @@ public class Sensor5in1Data extends RoomSensorData {
     private int dailyRain;
     private int pressure;
 
-    private long lastWeatherSyncTime;
+    private long lastRainWindPressureSyncTime;
 
     Sensor5in1Data(int id) {
         super(id);
@@ -29,8 +29,8 @@ public class Sensor5in1Data extends RoomSensorData {
         this.pressure = 0;
     }
 
-    public long getWeatherLastSyncTime() {
-        return this.lastWeatherSyncTime;
+    public long getRainWindPressureSyncTime() {
+        return this.lastRainWindPressureSyncTime;
     }
 
     public int getWindSpeed() {
@@ -62,7 +62,7 @@ public class Sensor5in1Data extends RoomSensorData {
     }
 
     private void setWindSpeed(int value) {
-        this.lastWeatherSyncTime = new Date().getTime();
+        this.lastRainWindPressureSyncTime = new Date().getTime();
         this.windSpeed = value;
     }
 

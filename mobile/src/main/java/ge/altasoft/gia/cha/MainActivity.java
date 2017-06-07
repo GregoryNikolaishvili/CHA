@@ -25,11 +25,11 @@ import ge.altasoft.gia.cha.light.LightSettingsActivity;
 
 import ge.altasoft.gia.cha.other.FragmentOtherSensors;
 import ge.altasoft.gia.cha.other.OtherControllerData;
+import ge.altasoft.gia.cha.other.WaterLevelSettingsActivity;
 import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
 import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatSettingsActivity;
-import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class MainActivity extends ChaActivity {
 
@@ -137,20 +137,20 @@ public class MainActivity extends ChaActivity {
                 return true;
 
             case R.id.action_settings:
-                startActivityForResult(new Intent(this, SettingsActivity.class), Utils.ACTIVITY_REQUEST_SETTINGS_CODE);
+                startActivityForResult(new Intent(this, SettingsActivity.class), Utils.ACTIVITY_REQUEST_RESULT_SETTINGS);
                 return true;
 
-            //region Light
             case R.id.action_light_settings:
                 startActivityForResult(new Intent(this, LightSettingsActivity.class), Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS);
                 return true;
 
-            //region Thermostat
             case R.id.action_thermostat_settings:
-                startActivityForResult(new Intent(this, ThermostatSettingsActivity.class), ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE);
+                startActivityForResult(new Intent(this, ThermostatSettingsActivity.class), Utils.ACTIVITY_REQUEST_RESULT_THERMOSTAT_SETTINGS);
                 return true;
 
-            //endregion
+            case R.id.action_water_level_settings:
+                startActivityForResult(new Intent(this, WaterLevelSettingsActivity.class), Utils.ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -177,7 +177,7 @@ public class MainActivity extends ChaActivity {
         super.onActivityResult(requestCode, resultCode, intent);
 
         switch (requestCode) {
-//            case Utils.ACTIVITY_REQUEST_SETTINGS_CODE:
+//            case Utils.ACTIVITY_REQUEST_RESULT_SETTINGS:
 //                if (resultCode == Activity.RESULT_OK) {
 //
 //                }
@@ -190,12 +190,18 @@ public class MainActivity extends ChaActivity {
                 }
                 break;
 
-            case ThermostatUtils.ACTIVITY_REQUEST_SETTINGS_CODE:
+            case Utils.ACTIVITY_REQUEST_RESULT_THERMOSTAT_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
                     publish("chac/ts/settings/rs", ThermostatControllerData.Instance.encodeRoomSensorSettings(), false);
                     publish("chac/ts/settings/bl", ThermostatControllerData.Instance.encodeBoilerSettings(), false);
 
                     publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
+                }
+                break;
+
+            case Utils.ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS:
+                if (resultCode == Activity.RESULT_OK) {
+                    publish("chac/wl/settings", OtherControllerData.Instance.encodeWaterLevelSettings(), false);
                 }
                 break;
         }
@@ -244,12 +250,15 @@ public class MainActivity extends ChaActivity {
                         image = (ImageView) findViewById(R.id.tsControllerIsOnline2);
                         if (image != null)
                             image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        image = (ImageView) findViewById(R.id.tsControllerIsOnline3);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
                         break;
                     case "WL controller":
                         value = intent.getBooleanExtra("value", false);
-                        //image = (ImageView) findViewById(R.id.wlControllerIsOnline);
-                        //if (image != null)
-                        //    image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        image = (ImageView) findViewById(R.id.wlControllerIsOnline);
+                        if (image != null)
+                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
                         image = (ImageView) findViewById(R.id.wlControllerIsOnline2);
                         if (image != null)
                             image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
@@ -421,15 +430,15 @@ public class MainActivity extends ChaActivity {
                 break;
 
             case Sensor5in1StateTH:
-                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_TH);
+                pagerAdapter.fragmentOtherSensors.drawState(WidgetType.OutsideSensor, OtherControllerData._5IN1_SENSOR_ID_TH);
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.OutsideSensor, OtherControllerData._5IN1_SENSOR_ID_TH);
                 break;
 
             case Sensor5in1StateW:
-                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_WIND);
-                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_PRESSURE);
-                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_RAIN);
-                pagerAdapter.fragmentOtherSensors.drawState(OtherControllerData._5IN1_SENSOR_ID_WIND_DIR);
+                pagerAdapter.fragmentOtherSensors.drawState(WidgetType.WindSensor, OtherControllerData._5IN1_SENSOR_ID_WIND);
+                pagerAdapter.fragmentOtherSensors.drawState(WidgetType.PressureSensor, OtherControllerData._5IN1_SENSOR_ID_PRESSURE);
+                pagerAdapter.fragmentOtherSensors.drawState(WidgetType.RainSensor, OtherControllerData._5IN1_SENSOR_ID_RAIN);
+                pagerAdapter.fragmentOtherSensors.drawState(WidgetType.WindDirSensor, OtherControllerData._5IN1_SENSOR_ID_WIND_DIR);
 
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.WindSensor, OtherControllerData._5IN1_SENSOR_ID_WIND);
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.PressureSensor, OtherControllerData._5IN1_SENSOR_ID_PRESSURE);
@@ -449,6 +458,18 @@ public class MainActivity extends ChaActivity {
 
                 pagerAdapter.fragmentBoiler.drawPumpState(id);
                 break;
+
+            case WaterLevelState:
+                id = intent.getIntExtra("id", -1);
+
+                pagerAdapter.fragmentOtherSensors.drawState(WidgetType.WaterLevelSensor, id);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.WaterLevelSensor, id);
+                break;
+
+            case WaterLevelSettings:
+                // nothing to do
+                break;
+
         }
     }
 

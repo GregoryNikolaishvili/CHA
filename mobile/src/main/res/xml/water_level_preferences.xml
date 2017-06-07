@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings">
+
+    <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+        android:defaultValue="200"
+        android:key="wl_max_0"
+        android:summary="%s"
+        android:title="Tank 1 Max water level" />
+
+    <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+        android:defaultValue="15"
+        android:key="wl_min_0"
+        android:summary="%s"
+        android:title="Tank 1 Min water level" />
+
+    <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+        android:defaultValue="250"
+        android:key="wl_max_1"
+        android:summary="%s"
+        android:title="Tank 2 Max water level" />
+
+    <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+        android:defaultValue="20"
+        android:key="wl_min_1"
+        android:summary="%s"
+        android:title="Tank 2 Min water level" />
+
+    <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+        android:defaultValue="250"
+        android:key="wl_max_2"
+        android:summary="%s"
+        android:title="Tank 3 Max water level" />
+
+    <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+        android:defaultValue="20"
+        android:key="wl_min_2"
+        android:summary="%s"
+        android:title="Tank 3 Min water level" />
+
+</PreferenceScreen>
+

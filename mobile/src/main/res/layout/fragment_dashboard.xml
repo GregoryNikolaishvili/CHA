@@ -57,6 +57,7 @@
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
             android:paddingStart="4dp"
+            android:textSize="@dimen/dashboard_error_text_size"
             android:textColor="@android:color/holo_red_dark" />
     </LinearLayout>
 </LinearLayout>

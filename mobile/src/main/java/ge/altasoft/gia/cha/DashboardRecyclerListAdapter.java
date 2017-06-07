@@ -18,6 +18,8 @@ import ge.altasoft.gia.cha.classes.OnStartDragListener;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightRelayData;
+import ge.altasoft.gia.cha.other.OtherControllerData;
+import ge.altasoft.gia.cha.other.WaterLevelData;
 import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
@@ -27,6 +29,7 @@ import ge.altasoft.gia.cha.views.OutsideSensorView;
 import ge.altasoft.gia.cha.views.PressureSensorView;
 import ge.altasoft.gia.cha.views.RainSensorView;
 import ge.altasoft.gia.cha.views.RoomSensorView;
+import ge.altasoft.gia.cha.views.WaterLevelSensorView;
 import ge.altasoft.gia.cha.views.WindDirSensorView;
 import ge.altasoft.gia.cha.views.WindSensorView;
 
@@ -101,6 +104,11 @@ class DashboardRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> 
             case WindDirSensor:
                 w = new WindDirSensorView(ll.getContext(), true);
                 w.refresh();
+                break;
+            case WaterLevelSensor:
+                WaterLevelData sd2 = OtherControllerData.Instance.getWaterLevelData(item.id);
+                w = new WaterLevelSensorView(ll.getContext(), true);
+                ((WaterLevelSensorView) w).setWaterLevelData(sd2);
                 break;
 
             default:

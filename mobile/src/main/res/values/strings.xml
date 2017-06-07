@@ -7,6 +7,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_light_settings">Light settings</string>
     <string name="action_thermostat_settings">Thermostat settings</string>
+    <string name="action_water_level_settings">Water level settings</string>
 
     <string name="action_show_info">Info</string>
 
@@ -40,10 +41,12 @@
     <string name="mbar">mbar</string>
     <string name="km_h">km/h</string>
     <string name="millimeter">mm</string>
+    <string name="centimeter">cm</string>
     <string name="sample_sensor_name">Sensor name</string>
     <string name="pressure">Pressure</string>
     <string name="wind">Wind</string>
     <string name="rain">Rain</string>
+    <string name="water_level">Water level</string>
     <string name="outside">Outside</string>
     <string name="log_and_chart">Log and chart</string>
     <string name="pin_to_dashboard">Pin to dashboard</string>

@@ -38,6 +38,11 @@
         <activity
             android:name=".thermostat.ThermostatSettingsActivity"
             android:label="@string/title_activity_settings" />
+
+        <activity
+            android:name=".other.WaterLevelSettingsActivity"
+            android:label="@string/title_activity_settings" />
+
         <activity android:name=".thermostat.BoilerChartActivity" />
         <activity android:name=".LogTHActivity" />
         <activity android:name=".Log5in1Activity" />

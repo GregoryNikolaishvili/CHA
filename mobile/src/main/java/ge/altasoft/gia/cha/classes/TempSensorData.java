@@ -1,5 +1,7 @@
 package ge.altasoft.gia.cha.classes;
 
+import android.support.annotation.NonNull;
+
 import java.util.Date;
 
 import ge.altasoft.gia.cha.Utils;
@@ -42,7 +44,7 @@ public class TempSensorData {
     }
 
     protected void setTemperature(float value) {
-        this.lastSyncTime = new Date().getTime();
+        setLastSyncTime(0);
         if (value == Utils.F_UNDEFINED)
             this.T = Float.NaN;
         else
@@ -109,4 +111,5 @@ public class TempSensorData {
 //        }
 //        setTemperature(Utils.decodeT(payload));
 //    }
+
 }

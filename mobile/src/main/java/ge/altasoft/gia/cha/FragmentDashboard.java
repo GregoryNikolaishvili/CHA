@@ -161,12 +161,13 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
             Map.Entry<String, String> pairs = iterator.next();
             scope = pairs.getKey();
             String value = pairs.getValue();
+            if ((value != null) && (value.length() > 0)) {
+                msgBuilder.append(scope);
+                msgBuilder.append(": ");
+                msgBuilder.append(value);
 
-            msgBuilder.append(scope);
-            msgBuilder.append(": ");
-            msgBuilder.append(value);
-
-            msgBuilder.append("\n");
+                msgBuilder.append("\n");
+            }
         }
 
         if (msgBuilder.length() >= 1) // delete last "\n"
