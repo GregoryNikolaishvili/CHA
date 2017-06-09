@@ -20,6 +20,7 @@ public abstract class ChaActivity extends AppCompatActivity {
     private String lastStatusMessage = "";
     private String lastErrorMessage = "";
     private long lastErrorMessageTime = 0;
+    private String lastWrtStatusText = "";
 
     final private BroadcastReceiver broadcastStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -34,10 +35,10 @@ public abstract class ChaActivity extends AppCompatActivity {
                     status = MqttClientLocal.MQTTConnectionStatus.ERROR;
                     lastErrorMessage = statusMessage;
                     lastErrorMessageTime = System.currentTimeMillis();
-                    actionBar.setSubtitle(lastStatusMessage.concat(", ").concat(statusMessage));
+                    actionBar.setSubtitle(lastWrtStatusText.concat(lastStatusMessage.concat(", ").concat(statusMessage)));
                 } else {
                     lastStatusMessage = statusMessage;
-
+                    statusMessage = lastWrtStatusText.concat(statusMessage);
                     if ((status == MqttClientLocal.MQTTConnectionStatus.CONNECTED) || ((System.currentTimeMillis() - lastErrorMessageTime) > 120000))
                         actionBar.setSubtitle(statusMessage);
                     else
@@ -100,13 +101,25 @@ public abstract class ChaActivity extends AppCompatActivity {
     }
 
     protected void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
-        if (dataType == MqttClientLocal.MQTTReceivedDataType.Alert) {
-            String message = intent.getStringExtra("message");
-            if (message != null) {
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-                ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
-                toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
-            }
+        switch (dataType) {
+            case WrtState:
+                ActionBar actionBar = getSupportActionBar();
+                String s = actionBar.getSubtitle().toString();
+                if (s.startsWith("✅") || s.startsWith("✘"))
+                    s = s.substring(2);
+                Boolean isOnline = intent.getBooleanExtra("value", false);
+                s = (isOnline ? "✅ " : "✘ ").concat(s);
+                actionBar.setSubtitle(s);
+                break;
+
+            case Alert:
+                String message = intent.getStringExtra("message");
+                if (message != null) {
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                    ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+                    toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 3000);
+                }
+                break;
         }
     }
 

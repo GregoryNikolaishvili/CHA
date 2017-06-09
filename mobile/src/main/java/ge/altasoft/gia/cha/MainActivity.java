@@ -19,10 +19,9 @@ import android.widget.Toast;
 
 import ge.altasoft.gia.cha.classes.ChaFragment;
 import ge.altasoft.gia.cha.classes.WidgetType;
-import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.FragmentLight;
+import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightSettingsActivity;
-
 import ge.altasoft.gia.cha.other.FragmentOtherSensors;
 import ge.altasoft.gia.cha.other.OtherControllerData;
 import ge.altasoft.gia.cha.other.WaterLevelSettingsActivity;
@@ -33,7 +32,18 @@ import ge.altasoft.gia.cha.thermostat.ThermostatSettingsActivity;
 
 public class MainActivity extends ChaActivity {
 
+    private final Handler timerHandler = new Handler();
     private SectionsPagerAdapter pagerAdapter;
+    private final Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            for (int i = 0; i < pagerAdapter.getCount(); i++)
+                ((ChaFragment) pagerAdapter.getItem(i)).checkSensors();
+
+            timerHandler.postDelayed(this, 60000);
+        }
+    };
     private Menu mainMenu;
 
     @Override
@@ -57,19 +67,6 @@ public class MainActivity extends ChaActivity {
         viewPager.setOffscreenPageLimit(8);
         viewPager.setAdapter(pagerAdapter);
     }
-
-    private final Handler timerHandler = new Handler();
-
-    private final Runnable timerRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            for (int i = 0; i < pagerAdapter.getCount(); i++)
-                ((ChaFragment) pagerAdapter.getItem(i)).checkSensors();
-
-            timerHandler.postDelayed(this, 60000);
-        }
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -221,13 +218,6 @@ public class MainActivity extends ChaActivity {
         StringBuilder sb;
 
         switch (dataType) {
-//            case Alert:
-//                String message = intent.getStringExtra("message");
-//                if (message == null) {
-//                }
-//
-//                break;
-
             case ClientConnected:
                 String clientId = intent.getStringExtra("id");
                 ImageView image;
@@ -489,7 +479,7 @@ public class MainActivity extends ChaActivity {
         Toast.makeText(this, sb.toString(), Toast.LENGTH_SHORT).show();
     }
 
-    public static class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private static class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         final private boolean isLandscape;
 

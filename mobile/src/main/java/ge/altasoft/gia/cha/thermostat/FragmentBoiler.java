@@ -79,7 +79,7 @@ public class FragmentBoiler extends ChaFragment {
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        ((TextView) cv.getChildAt(0)).setText("⌛");
+                        ((TextView) cv.getChildAt(0)).setText("⏱"); // ⌛
                         cv.setEnabled(false);
 
                         switch (item.getItemId()) {

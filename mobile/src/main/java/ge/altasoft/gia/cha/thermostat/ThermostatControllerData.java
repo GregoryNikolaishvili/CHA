@@ -27,7 +27,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     final static int BOILER_SOLAR_PUMP = 0;
     final static int BOILER_HEATING_PUMP = 1;
     final static int BOILER_FURNACE = 2;
-    final static int BOILER_FURNACE_CIRC_PUMP = 3;
+    //final static int BOILER_FURNACE_CIRC_PUMP = 3;
 
     final static private int HEATING_RELAY_COUNT = 15;
 

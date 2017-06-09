@@ -54,7 +54,7 @@ public class FragmentLight extends ChaFragment implements OnStartDragListener {
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        ((TextView) cv.getChildAt(0)).setText("⌛");
+                        ((TextView) cv.getChildAt(0)).setText("⏱"); // ⌛
                         cv.setEnabled(false);
 
                         switch (item.getItemId()) {
@@ -132,5 +132,6 @@ public class FragmentLight extends ChaFragment implements OnStartDragListener {
     private void drawFooter() {
         CardView cv = ((CardView) rootView.findViewById(R.id.lightsAutoMode));
         ((TextView) cv.getChildAt(0)).setText(LightControllerData.Instance.isActive() ? "Auto" : "Manual");
+        cv.setEnabled(true);
     }
 }

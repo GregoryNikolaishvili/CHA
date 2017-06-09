@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -146,5 +148,85 @@ public class LogStateActivity extends ChaActivity {
             }
             return convertView;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_graph, menu);
+
+        int id = 0;
+        int logSuffix = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+        switch (logSuffix) {
+            case 0:
+                id = R.id.action_sunday;
+                break;
+            case 1:
+                id = R.id.action_monday;
+                break;
+            case 2:
+                id = R.id.action_tuesday;
+                break;
+            case 3:
+                id = R.id.action_wednesday;
+                break;
+            case 4:
+                id = R.id.action_thursday;
+                break;
+            case 5:
+                id = R.id.action_friday;
+                break;
+            case 6:
+                id = R.id.action_saturday;
+                break;
+        }
+        if (id > 0)
+            menu.findItem(id).setChecked(true);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        item.setChecked(!item.isChecked());
+
+        int wd = -1;
+        switch (id) {
+            case R.id.action_sunday:
+                wd = 0;
+                break;
+            case R.id.action_monday:
+                wd = 1;
+                break;
+            case R.id.action_tuesday:
+                wd = 2;
+                break;
+            case R.id.action_wednesday:
+                wd = 3;
+                break;
+            case R.id.action_thursday:
+                wd = 4;
+                break;
+            case R.id.action_friday:
+                wd = 5;
+                break;
+            case R.id.action_saturday:
+                wd = 6;
+                break;
+        }
+
+        if (wd >= 0) {
+            switch (scope) {
+                case BoilerPump:
+                    publish("cha/hub/getlog", "brelay_".concat(String.valueOf(wd)), false);
+                    break;
+                case LightRelay:
+                    publish("cha/hub/getlog", "light_".concat(String.valueOf(wd)), false);
+                    break;
+            }
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

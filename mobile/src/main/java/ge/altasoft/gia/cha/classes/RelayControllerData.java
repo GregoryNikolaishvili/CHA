@@ -89,6 +89,7 @@ public abstract class RelayControllerData {
     public String encodeSettings() {
         StringBuilder sb = new StringBuilder();
 
+        sb.append(isActive ? 'T' : 'F');
         for (int i = 0; i < relayDatas.length; i++)
             relays(i).encodeSettings(sb);
 

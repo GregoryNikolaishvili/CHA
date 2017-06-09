@@ -79,19 +79,21 @@ public class WindDirSensorView extends ChaWidget {
 
         tvWindDirValue.setText(String.format(Locale.US, "%d°", data.getWindDirection()));
 
-        if (prevRotation != data.getWindDirection()) {
-            RelativeLayout arrow_layout = (RelativeLayout) findViewById(R.id.arrow_layout);
-            int arrow_sz = arrow_layout.getHeight() * 9 / 10;
-            if (arrow_sz > 0) {
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(arrow_sz, arrow_sz);
-                lp.setMargins(
-                        (arrow_layout.getWidth() - arrow_sz) / 2,
-                        (arrow_layout.getHeight() - arrow_sz) / 3,
-                        0,
-                        0);
-                tvWindDirection.setLayoutParams(lp);
-                tvWindDirection.setRotation(data.getWindDirection());
-                prevRotation = data.getWindDirection();
+        if (tvWindDirection != null) {
+            if (prevRotation != data.getWindDirection()) {
+                RelativeLayout arrow_layout = (RelativeLayout) findViewById(R.id.arrow_layout);
+                int arrow_sz = arrow_layout.getHeight() * 9 / 10;
+                if (arrow_sz > 0) {
+                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(arrow_sz, arrow_sz);
+                    lp.setMargins(
+                            (arrow_layout.getWidth() - arrow_sz) / 2,
+                            (arrow_layout.getHeight() - arrow_sz) / 3,
+                            0,
+                            0);
+                    tvWindDirection.setLayoutParams(lp);
+                    tvWindDirection.setRotation(data.getWindDirection());
+                    prevRotation = data.getWindDirection();
+                }
             }
         }
 

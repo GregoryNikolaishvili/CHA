@@ -1,6 +1,7 @@
 package ge.altasoft.gia.cha.light;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 

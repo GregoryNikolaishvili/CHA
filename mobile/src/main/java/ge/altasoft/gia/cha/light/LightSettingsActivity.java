@@ -100,7 +100,7 @@ public class LightSettingsActivity extends ChaPreferenceActivity {
 
                     TimePreference p3 = new TimePreference(prefContext);
                     p3.setKey("l_on_offset_" + Integer.toString(id));
-                    p3.setTitle("On (offset to sunrise)");
+                    p3.setTitle("On (offset to sunset)");
                     screen.addPreference(p3);
 
                     ListPreference p4 = new ListPreference(prefContext);

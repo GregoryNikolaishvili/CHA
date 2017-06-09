@@ -4,7 +4,7 @@ import ge.altasoft.gia.cha.Utils;
 
 class BoilerSettings {
 
-    final static char BOILER_MODE_OFF = 'N';
+    final private static char BOILER_MODE_OFF = 'N';
     final static char BOILER_MODE_SUMMER = 'S';
     final static char BOILER_MODE_SUMMER_POOL = 'P';
     final static char BOILER_MODE_WINTER = 'W';

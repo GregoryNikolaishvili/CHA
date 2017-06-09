@@ -26,6 +26,8 @@ import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class MqttClientLocal {
 
+    private static final String TOPIC_CHA_NOTIFICATION = "$SYS/broker/connection/cha_wrt_remote/state";
+
     private static final String TOPIC_CHA_SYS = "cha/sys/";
     private static final String TOPIC_CHA_ALERT = "cha/alert";
     private static final String TOPIC_CHA_LOG = "cha/log/"; // last "/" is important
@@ -67,6 +69,7 @@ public class MqttClientLocal {
     static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
 
     public enum MQTTReceivedDataType {
+        WrtState,
         Alert,
         Log,
         ClientConnected,
@@ -280,7 +283,7 @@ public class MqttClientLocal {
             subToken.setActionCallback(new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d("mqtt", "subscribe.onSuccess");
+                    Log.d("mqtt", "subscribe.onSuccess (cha/#)");
                     broadcastServiceStatus("connect.subscribed", false);
                     broadcastServiceStatus(brokerUrl, false);
                 }
@@ -291,6 +294,21 @@ public class MqttClientLocal {
                     broadcastServiceStatus("subscribe failed: " + exception.getMessage(), true);
                 }
             });
+
+            subToken = mqttClient.subscribe("$SYS/broker/connection/cha_wrt_remote/state", 1);
+            subToken.setActionCallback(new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Log.d("mqtt", "subscribe.onSuccess (sys)");
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    // The subscription could not be performed, maybe the user was not authorized to subscribe on the specified topic e.g. using wildcards
+                }
+            });
+
+
         } catch (IllegalArgumentException e) {
             Log.e("mqtt", "subscribe failed - illegal argument", e);
             broadcastServiceStatus("subscribe failed - illegal argument: " + e.getMessage(), true);
@@ -350,23 +368,11 @@ public class MqttClientLocal {
             try {
                 switch (topic) {
 
-                    //region SYS
-//                case TOPIC_CHA_SYS_OLD: // TODO: 1/24/2017  obsolete
-//                    switch (payload) {
-//                        case "light controller connected":
-//                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
-//                            broadcastDataIntent.putExtra("value", true);
-//                            context.sendBroadcast(broadcastDataIntent);
-//                            break;
-//
-//                        case "light controller disconnected":
-//                            broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerConnected);
-//                            broadcastDataIntent.putExtra("value", false);
-//                            context.sendBroadcast(broadcastDataIntent);
-//                            break;
-//                    }
-//                    break;
-                    //endregion
+                    case TOPIC_CHA_NOTIFICATION:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WrtState);
+                        broadcastDataIntent.putExtra("value", payload.equals("1"));
+                        context.sendBroadcast(broadcastDataIntent);
+                        break;
 
                     case TOPIC_CHA_ALERT:
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.Alert);
