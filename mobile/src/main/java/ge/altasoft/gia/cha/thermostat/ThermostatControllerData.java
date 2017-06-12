@@ -156,6 +156,8 @@ public final class ThermostatControllerData extends RelayControllerData {
 //        for (BoilerSensorData bs : boilerSensorsData)
 //            bs.encodeSettings(editor);
 
+        boilerSettings.encodeSettings(editor);
+
         editor.apply();
     }
 
@@ -275,11 +277,10 @@ public final class ThermostatControllerData extends RelayControllerData {
         for (int id : roomSensorsMap.keySet())
             roomSensors(id, false).decodeSettings(prefs);
 
-        for (int id : roomSensorsMap.keySet())
-            roomSensors(id, false).decodeSettings(prefs);
-
 //        for (BoilerSensorData bs : boilerSensorsData)
 //            bs.decodeSettings(prefs);
+
+        boilerSettings.decodeSettings(prefs);
 
         Iterator<Integer> it = roomSensorsMap.keySet().iterator();
         while (it.hasNext()) {

@@ -9,7 +9,9 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,53 +19,65 @@ import android.widget.Toast;
 
 public abstract class ChaActivity extends AppCompatActivity {
 
-    private String lastStatusMessage = "";
-    private String lastErrorMessage = "";
-    private long lastErrorMessageTime = 0;
-    private String lastWrtStatusText = "";
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        drawStatus();
+    }
+
+    private void drawStatus() {
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null)
+            return;
+
+        String msg = (Utils.lastMqttConnectionWrtIsOnline ? "✅ " : "✘ ").concat(Utils.lastMqttConnectionStatusMessage);
+        if (!Utils.lastMqttConnectionErrorMessage.equals(""))
+            msg = msg.concat(", ").concat(Utils.lastMqttConnectionErrorMessage);
+
+        actionBar.setSubtitle(msg);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            switch (Utils.mqttConnectionStatus) {
+                case INITIAL:
+                    toolbar.setSubtitleTextColor(Color.DKGRAY);
+                    break;
+                case CONNECTING:
+                    toolbar.setSubtitleTextColor(Color.LTGRAY);
+                    break;
+                case CONNECTED:
+                    toolbar.setSubtitleTextColor(Color.WHITE);
+                    break;
+                case ERROR:
+                case NOTCONNECTED_UNKNOWNREASON:
+                case NOTCONNECTED_USERDISCONNECT:
+                    toolbar.setSubtitleTextColor(Color.RED);
+                    break;
+            }
+        }
+    }
 
     final private BroadcastReceiver broadcastStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String statusMessage = intent.getStringExtra(MqttClientLocal.MQTT_MSG);
+            String msg = intent.getStringExtra(MqttClientLocal.MQTT_MSG);
             boolean isError = intent.getBooleanExtra(MqttClientLocal.MQTT_MSG_IS_ERROR, false);
 
-            MqttClientLocal.MQTTConnectionStatus status = (MqttClientLocal.MQTTConnectionStatus) intent.getSerializableExtra(MqttClientLocal.MQTT_CONN_STATUS);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                if (isError) {
-                    status = MqttClientLocal.MQTTConnectionStatus.ERROR;
-                    lastErrorMessage = statusMessage;
-                    lastErrorMessageTime = System.currentTimeMillis();
-                    actionBar.setSubtitle(lastWrtStatusText.concat(lastStatusMessage.concat(", ").concat(statusMessage)));
-                } else {
-                    lastStatusMessage = statusMessage;
-                    statusMessage = lastWrtStatusText.concat(statusMessage);
-                    if ((status == MqttClientLocal.MQTTConnectionStatus.CONNECTED) || ((System.currentTimeMillis() - lastErrorMessageTime) > 120000))
-                        actionBar.setSubtitle(statusMessage);
-                    else
-                        actionBar.setSubtitle(statusMessage.concat(", ").concat(lastErrorMessage));
-                }
-                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                if (toolbar != null) {
-                    switch (status) {
-                        case INITIAL:
-                            toolbar.setSubtitleTextColor(Color.DKGRAY);
-                            break;
-                        case CONNECTING:
-                            toolbar.setSubtitleTextColor(Color.LTGRAY);
-                            break;
-                        case CONNECTED:
-                            toolbar.setSubtitleTextColor(Color.WHITE);
-                            break;
-                        case ERROR:
-                        case NOTCONNECTED_UNKNOWNREASON:
-                        case NOTCONNECTED_USERDISCONNECT:
-                            toolbar.setSubtitleTextColor(Color.RED);
-                            break;
-                    }
-                }
+            Utils.mqttConnectionStatus = (MqttClientLocal.MQTTConnectionStatus) intent.getSerializableExtra(MqttClientLocal.MQTT_CONN_STATUS);
+
+            if (isError) {
+                Utils.mqttConnectionStatus = MqttClientLocal.MQTTConnectionStatus.ERROR;
+                Utils.lastMqttConnectionErrorMessage = msg;
+                Utils.lastMqttConnectionErrorMessageTime = System.currentTimeMillis();
+            } else {
+                Utils.lastMqttConnectionStatusMessage = msg;
+                if ((Utils.mqttConnectionStatus == MqttClientLocal.MQTTConnectionStatus.CONNECTED) || ((System.currentTimeMillis() - Utils.lastMqttConnectionErrorMessageTime) > 120000))
+                    Utils.lastMqttConnectionErrorMessage = "";
             }
+
+            drawStatus();
         }
     };
 
@@ -103,13 +117,8 @@ public abstract class ChaActivity extends AppCompatActivity {
     protected void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
         switch (dataType) {
             case WrtState:
-                ActionBar actionBar = getSupportActionBar();
-                String s = actionBar.getSubtitle().toString();
-                if (s.startsWith("✅") || s.startsWith("✘"))
-                    s = s.substring(2);
-                Boolean isOnline = intent.getBooleanExtra("value", false);
-                s = (isOnline ? "✅ " : "✘ ").concat(s);
-                actionBar.setSubtitle(s);
+                Utils.lastMqttConnectionWrtIsOnline = intent.getBooleanExtra("value", false);
+                drawStatus();
                 break;
 
             case Alert:

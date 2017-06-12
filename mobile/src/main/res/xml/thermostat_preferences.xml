@@ -14,7 +14,55 @@
             android:title="Sensors" />
     </PreferenceScreen>
 
-    <PreferenceScreen android:title="Solar"></PreferenceScreen>
+    <PreferenceScreen android:title="Solar">
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="8"
+            android:key="CollectorSwitchOnTempDiff"
+            android:summary="%s °"
+            android:title="Collector Switch On Temp Diff" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="4"
+            android:key="CollectorSwitchOffTempDiff"
+            android:summary="%s °"
+            android:title="Collector Switch Off Temp Diff" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="130"
+            android:key="EmergencyCollectorSwitchOffT"
+            android:summary="%s °"
+            android:title="EMOF - Emergency Collector Switch Off" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="120"
+            android:key="EmergencyCollectorSwitchOnT"
+            android:summary="%s °"
+            android:title="EMON - Emergency Collector Switch On" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="110"
+            android:key="CollectorCoolingT"
+            android:summary="%s °"
+            android:title="CMX - Collector Cooling" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="70"
+            android:key="MaxTankT"
+            android:summary="%s °"
+            android:title="SMX - MaxTankT" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="55"
+            android:key="PoolSwitchOnT"
+            android:summary="%s °"
+            android:title="Pool Switch On" />
+
+        <ge.altasoft.gia.cha.views.FriendlyEditTextPreference
+            android:defaultValue="50"
+            android:key="PoolSwitchOffT"
+            android:summary="%s °"
+            android:title="Pool Switch Off" />
+    </PreferenceScreen>
 
 </PreferenceScreen>
 

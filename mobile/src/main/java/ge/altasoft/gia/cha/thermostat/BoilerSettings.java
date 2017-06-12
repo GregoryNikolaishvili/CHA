@@ -1,5 +1,7 @@
 package ge.altasoft.gia.cha.thermostat;
 
+import android.content.SharedPreferences;
+
 import ge.altasoft.gia.cha.Utils;
 
 class BoilerSettings {
@@ -9,34 +11,33 @@ class BoilerSettings {
     final static char BOILER_MODE_SUMMER_POOL = 'P';
     final static char BOILER_MODE_WINTER = 'W';
 
-
     char Mode;
 
-    float CollectorSwitchOnTempDiff;
-    float CollectorSwitchOffTempDiff;
+    private float CollectorSwitchOnTempDiff;
+    private float CollectorSwitchOffTempDiff;
 
-    float EmergencyCollectorSwitchOffT;
-    float EmergencyCollectorSwitchOnT;
+    private float EmergencyCollectorSwitchOffT;
+    private float EmergencyCollectorSwitchOnT;
     float CollectorCoolingT;
-    float MaxTankT;
+    private float MaxTankT;
 
-    float PoolSwitchOnT;
-    float PoolSwitchOffT;
+    private float PoolSwitchOnT;
+    private float PoolSwitchOffT;
 
-    int BackupHeatingTS1_Start;
-    int BackupHeatingTS1_End;
-    float BackupHeatingTS1_SwitchOnT;
+    private int BackupHeatingTS1_Start;
+    private int BackupHeatingTS1_End;
+    private float BackupHeatingTS1_SwitchOnT;
     float BackupHeatingTS1_SwitchOffT;
 
-    int BackupHeatingTS2_Start;
-    int BackupHeatingTS2_End;
-    float BackupHeatingTS2_SwitchOnT;
-    float BackupHeatingTS2_SwitchOffT;
+    private int BackupHeatingTS2_Start;
+    private int BackupHeatingTS2_End;
+    private float BackupHeatingTS2_SwitchOnT;
+    private float BackupHeatingTS2_SwitchOffT;
 
-    int BackupHeatingTS3_Start;
-    int BackupHeatingTS3_End;
-    float BackupHeatingTS3_SwitchOnT;
-    float BackupHeatingTS3_SwitchOffT;
+    private int BackupHeatingTS3_Start;
+    private int BackupHeatingTS3_End;
+    private float BackupHeatingTS3_SwitchOnT;
+    private float BackupHeatingTS3_SwitchOffT;
 
     BoilerSettings() {
         Mode = BOILER_MODE_OFF;
@@ -67,12 +68,24 @@ class BoilerSettings {
         Utils.encodeT(sb, BackupHeatingTS2_SwitchOnT);
         Utils.encodeT(sb, BackupHeatingTS2_SwitchOffT);
 
-        Utils.encodeTime(sb, BackupHeatingTS2_Start);
-        Utils.encodeTime(sb, BackupHeatingTS2_End);
-        Utils.encodeT(sb, BackupHeatingTS2_SwitchOnT);
-        Utils.encodeT(sb, BackupHeatingTS2_SwitchOffT);
+        Utils.encodeTime(sb, BackupHeatingTS3_Start);
+        Utils.encodeTime(sb, BackupHeatingTS3_End);
+        Utils.encodeT(sb, BackupHeatingTS3_SwitchOnT);
+        Utils.encodeT(sb, BackupHeatingTS3_SwitchOffT);
 
         return sb.toString();
+    }
+
+    void encodeSettings(SharedPreferences.Editor editor) {
+        editor.putString("CollectorSwitchOnTempDiff", Float.toString(CollectorSwitchOnTempDiff));
+        editor.putString("CollectorSwitchOffTempDiff", Float.toString(CollectorSwitchOffTempDiff));
+
+        editor.putString("EmergencyCollectorSwitchOffT", Float.toString(EmergencyCollectorSwitchOffT));
+        editor.putString("EmergencyCollectorSwitchOnT", Float.toString(EmergencyCollectorSwitchOnT));
+        editor.putString("CollectorCoolingT", Float.toString(CollectorCoolingT));
+        editor.putString("MaxTankT", Float.toString(MaxTankT));
+        editor.putString("PoolSwitchOnT", Float.toString(PoolSwitchOnT));
+        editor.putString("PoolSwitchOffT", Float.toString(PoolSwitchOffT));
     }
 
     public void decodeSettings(String response) {
@@ -125,4 +138,17 @@ class BoilerSettings {
         BackupHeatingTS3_SwitchOffT = Utils.decodeT(response.substring(idx, idx + 4));
         //idx += 4;
     }
+
+    void decodeSettings(SharedPreferences prefs) {
+        CollectorSwitchOnTempDiff = Float.parseFloat(prefs.getString("CollectorSwitchOnTempDiff", "0"));
+        CollectorSwitchOffTempDiff = Float.parseFloat(prefs.getString("CollectorSwitchOffTempDiff", "0"));
+
+        EmergencyCollectorSwitchOffT = Float.parseFloat(prefs.getString("EmergencyCollectorSwitchOffT", "0"));
+        EmergencyCollectorSwitchOnT= Float.parseFloat(prefs.getString("EmergencyCollectorSwitchOnT", "0"));
+        CollectorCoolingT= Float.parseFloat(prefs.getString("CollectorCoolingT", "0"));
+        MaxTankT= Float.parseFloat(prefs.getString("MaxTankT", "0"));
+        PoolSwitchOnT= Float.parseFloat(prefs.getString("PoolSwitchOnT", "0"));
+        PoolSwitchOffT= Float.parseFloat(prefs.getString("PoolSwitchOffT", "0"));
+    }
+
 }

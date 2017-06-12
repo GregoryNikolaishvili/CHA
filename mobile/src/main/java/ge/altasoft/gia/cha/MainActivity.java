@@ -218,6 +218,16 @@ public class MainActivity extends ChaActivity {
         StringBuilder sb;
 
         switch (dataType) {
+            case WrtState:
+                redrawControllerStatus(R.id.lcControllerIsOnline);
+                redrawControllerStatus(R.id.lcControllerIsOnline2);
+                redrawControllerStatus(R.id.tsControllerIsOnline);
+                redrawControllerStatus(R.id.tsControllerIsOnline2);
+                redrawControllerStatus(R.id.tsControllerIsOnline3);
+                redrawControllerStatus(R.id.wlControllerIsOnline);
+                redrawControllerStatus(R.id.wlControllerIsOnline2);
+                break;
+
             case ClientConnected:
                 String clientId = intent.getStringExtra("id");
                 ImageView image;
@@ -225,33 +235,19 @@ public class MainActivity extends ChaActivity {
                 switch (clientId) {
                     case "LC controller":
                         value = intent.getBooleanExtra("value", false);
-                        image = (ImageView) findViewById(R.id.lcControllerIsOnline);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-                        image = (ImageView) findViewById(R.id.lcControllerIsOnline2);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        drawControllerStatus(value, R.id.lcControllerIsOnline);
+                        drawControllerStatus(value, R.id.lcControllerIsOnline2);
                         break;
                     case "TS controller":
                         value = intent.getBooleanExtra("value", false);
-                        image = (ImageView) findViewById(R.id.tsControllerIsOnline);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-                        image = (ImageView) findViewById(R.id.tsControllerIsOnline2);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-                        image = (ImageView) findViewById(R.id.tsControllerIsOnline3);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        drawControllerStatus(value, R.id.tsControllerIsOnline);
+                        drawControllerStatus(value, R.id.tsControllerIsOnline2);
+                        drawControllerStatus(value, R.id.tsControllerIsOnline3);
                         break;
                     case "WL controller":
                         value = intent.getBooleanExtra("value", false);
-                        image = (ImageView) findViewById(R.id.wlControllerIsOnline);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-                        image = (ImageView) findViewById(R.id.wlControllerIsOnline2);
-                        if (image != null)
-                            image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+                        drawControllerStatus(value, R.id.wlControllerIsOnline);
+                        drawControllerStatus(value, R.id.wlControllerIsOnline2);
                         break;
                 }
                 break;
@@ -462,6 +458,26 @@ public class MainActivity extends ChaActivity {
 
         }
     }
+
+    private void drawControllerStatus(boolean value, int resId) {
+        ImageView image = (ImageView) findViewById(resId);
+        if (image != null) {
+            image.setTag(value);
+            if (Utils.lastMqttConnectionWrtIsOnline)
+                image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
+            else
+                image.setImageResource(value ? R.drawable.circle_yellow : R.drawable.circle_grey);
+        }
+    }
+
+    private void redrawControllerStatus(int resId) {
+        ImageView image = (ImageView) findViewById(resId);
+        if (image != null) {
+            boolean value = (boolean)image.getTag();
+            drawControllerStatus(value, resId);
+        }
+    }
+
 
     private void showNetworkInfo() {
         StringBuilder sb = new StringBuilder();

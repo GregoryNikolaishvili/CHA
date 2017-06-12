@@ -23,6 +23,12 @@ public class Utils {
     static String mqttBrokerLocalUrl = "192.168.3.1:1883";
     static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
 
+    static MqttClientLocal.MQTTConnectionStatus mqttConnectionStatus;
+    static String lastMqttConnectionStatusMessage = "";
+    static String lastMqttConnectionErrorMessage = "";
+    static long lastMqttConnectionErrorMessageTime = 0;
+    static boolean lastMqttConnectionWrtIsOnline = false;
+
     public final static int COLOR_TEMP_HIGH = 0xFFFF3000;
     public final static int COLOR_TEMP_LOW = 0xFF00DDFF;
     public final static int COLOR_TEMP_NORMAL = Color.WHITE;
@@ -53,8 +59,8 @@ public class Utils {
 
     static final int ACTIVITY_REQUEST_RESULT_SETTINGS = 1;
     static final int ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS = 2;
-    public final static int ACTIVITY_REQUEST_RESULT_THERMOSTAT_SETTINGS = 3;
-    public final static int ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS = 4;
+    final static int ACTIVITY_REQUEST_RESULT_THERMOSTAT_SETTINGS = 3;
+    final static int ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS = 4;
 
 
     public static String shortToHex4(short value) {
