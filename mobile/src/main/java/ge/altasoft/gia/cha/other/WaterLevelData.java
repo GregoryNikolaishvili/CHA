@@ -44,7 +44,7 @@ public class WaterLevelData extends TempSensorData {
 
     private void setWaterPercent(int value) {
         this.waterPercent = value;
-        setLastSyncTime(0);
+        setLastSyncTime();
     }
 
     public void decodeState(String payload) {

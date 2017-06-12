@@ -16,7 +16,10 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class Utils {
 
@@ -37,6 +40,7 @@ public class Utils {
     private final static int COLOR_CARD_BK_PRESSED = Color.GRAY;
 
     public final static float F_UNDEFINED = 999.9f;
+    public final static float I_UNDEFINED = 32767;
 
     final static int ERR_GENERAL = 1;
 
@@ -280,6 +284,27 @@ public class Utils {
             color = COLOR_CARD_BK;
 
         return color;
+    }
+
+    public static long DecodeTime(String time) {
+
+        int yr, month, day;
+        int hr, min, sec;
+
+        int idx = 0;
+        yr = 2000 + (time.charAt(idx++) - '0') * 10 + (time.charAt(idx++) - '0');
+        month = (time.charAt(idx++) - '0') * 10 + (time.charAt(idx++) - '0');
+        day = (time.charAt(idx++) - '0') * 10 + (time.charAt(idx++) - '0');
+        idx++;
+        hr = (time.charAt(idx++) - '0') * 10 + (time.charAt(idx++) - '0');
+        min = (time.charAt(idx++) - '0') * 10 + (time.charAt(idx++) - '0');
+        sec = (time.charAt(idx++) - '0') * 10 + (time.charAt(idx++) - '0');
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getDefault());
+        calendar.set(yr, month - 1, day, hr, min, sec);
+
+        return calendar.getTimeInMillis();
     }
 
 //    public static int getColorFromResource(Context context, int resId) {

@@ -109,4 +109,11 @@ public class LightRelayView extends ChaWidget {
         tvRelayName.setText(this.relayData.getName()); // + ", order=" + String.valueOf(value.getOrder()));
         setState(this.relayData.getState() != 0 ? ButtonState.ON : ButtonState.OFF);
     }
+
+    @Override
+    protected long getLastSyncTime()
+    {
+        return 0;
+    }
+
 }

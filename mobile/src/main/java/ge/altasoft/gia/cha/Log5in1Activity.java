@@ -135,7 +135,11 @@ public class Log5in1Activity extends ChaActivity {
                     case WaterLevelSensor:
                         WaterLevelData wd = OtherControllerData.Instance.getWaterLevelData(id);
                         value1 = wd.getWaterPercent();
-                        value2 = String.format(Locale.US, "%d cm %s %s", wd.getWaterDistance(), wd.getFloatSwitchIsOn() ? "F" : "", wd.getSolenoidIsOn() ? "S" : "");
+                        int x = wd.getWaterDistance();
+                        if (x == Utils.I_UNDEFINED)
+                            value2 = String.format(Locale.US, "-- cm %s %s", wd.getFloatSwitchIsOn() ? "F" : "", wd.getSolenoidIsOn() ? "S" : "");
+                        else
+                            value2 = String.format(Locale.US, "%d cm %s %s", x, wd.getFloatSwitchIsOn() ? "F" : "", wd.getSolenoidIsOn() ? "S" : "");
                         lastSync = wd.getLastSyncTime();
                         break;
 

@@ -217,8 +217,8 @@ public final class ThermostatUtils {
         maxXX = calendar.getTime();
 
         calendar.setTime(minXX);
-        while (calendar.getTime().getTime() <= maxXX.getTime()) {
-            renderer.addXTextLabel(calendar.getTime().getTime(), sdf.format(calendar.getTime()));
+        while (calendar.getTimeInMillis() <= maxXX.getTime()) {
+            renderer.addXTextLabel(calendar.getTimeInMillis(), sdf.format(calendar.getTime()));
             calendar.add(Calendar.MINUTE, dateLabelIntervalMinutes);
         }
 
@@ -325,8 +325,8 @@ public final class ThermostatUtils {
         maxXX = calendar.getTime();
 
         calendar.setTime(minXX);
-        while (calendar.getTime().getTime() <= maxXX.getTime()) {
-            renderer.addXTextLabel(calendar.getTime().getTime(), sdf.format(calendar.getTime()));
+        while (calendar.getTimeInMillis() <= maxXX.getTime()) {
+            renderer.addXTextLabel(calendar.getTimeInMillis(), sdf.format(calendar.getTime()));
             calendar.add(Calendar.MINUTE, 120);
         }
 
@@ -465,8 +465,8 @@ public final class ThermostatUtils {
         maxXX = calendar.getTime();
 
         calendar.setTime(minXX);
-        while (calendar.getTime().getTime() <= maxXX.getTime()) {
-            renderer.addXTextLabel(calendar.getTime().getTime(), sdf.format(calendar.getTime()));
+        while (calendar.getTimeInMillis() <= maxXX.getTime()) {
+            renderer.addXTextLabel(calendar.getTimeInMillis(), sdf.format(calendar.getTime()));
             calendar.add(Calendar.MINUTE, 120);
         }
 

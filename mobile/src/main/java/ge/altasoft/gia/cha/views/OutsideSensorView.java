@@ -112,9 +112,15 @@ public class OutsideSensorView extends ChaWidget {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
-        if (data.getLastSyncTime() < calendar.getTime().getTime())
+        if (data.getLastSyncTime() < calendar.getTimeInMillis())
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, true));
         else
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
+    }
+
+    @Override
+    protected long getLastSyncTime()
+    {
+        return OtherControllerData.Instance.get5in1SensorData().getLastSyncTime();
     }
 }

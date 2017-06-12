@@ -35,8 +35,12 @@ public class TempSensorData {
         return this.lastSyncTime;
     }
 
-    protected void setLastSyncTime(int secondsPassed) {
-        lastSyncTime = new Date().getTime() - secondsPassed * 1000;
+    protected void setLastSyncTime(long value) {
+        lastSyncTime = value;
+    }
+
+    protected void setLastSyncTime() {
+        lastSyncTime = new Date().getTime();
     }
 
     public float getTemperature() {
@@ -44,7 +48,7 @@ public class TempSensorData {
     }
 
     protected void setTemperature(float value) {
-        setLastSyncTime(0);
+        //setLastSyncTime(0);
         if (value == Utils.F_UNDEFINED)
             this.T = Float.NaN;
         else

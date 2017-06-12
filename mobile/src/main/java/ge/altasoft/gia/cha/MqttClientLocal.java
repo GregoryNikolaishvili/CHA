@@ -34,7 +34,7 @@ public class MqttClientLocal {
 
     private static final String TOPIC_CHA_5IN1 = "cha/5in1_sensor/"; // last "/" is important
     private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/room_sensor/"; // last "/" is important
-    private static final String TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH = "cha/ROOM_SENSOR/"; // last "/" is important
+    //private static final String TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH = "cha/ROOM_SENSOR/"; // last "/" is important
 
     // Light controller
     private static final String TOPIC_CHA_LIGHT_CONTROLLER_STATE = "cha/lc/state";
@@ -460,12 +460,12 @@ public class MqttClientLocal {
                     return;
                 }
 
-                if (topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH)) {
+                if (topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE)) {
                     int id = Integer.parseInt(topic.substring(TOPIC_CHA_ROOM_SENSOR_STATE.length()), 16);
                     RoomSensorData rs = ThermostatControllerData.Instance.roomSensors(id, false);
                     if (rs == null)
                         broadcastDataIntent.putExtra("new_sensor", true);
-                    ThermostatControllerData.Instance.roomSensors(id, true).decodeState(payload, topic.startsWith(TOPIC_CHA_ROOM_SENSOR_STATE));
+                    ThermostatControllerData.Instance.roomSensors(id, true).decodeState(payload);
 
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.SensorRoomState);
                     broadcastDataIntent.putExtra("id", id);

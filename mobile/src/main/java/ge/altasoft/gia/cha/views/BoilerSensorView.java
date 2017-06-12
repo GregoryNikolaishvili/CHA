@@ -119,7 +119,7 @@ public class BoilerSensorView extends ChaWidget {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
-        if (this.sensorData.getLastSyncTime() < calendar.getTime().getTime())
+        if (this.sensorData.getLastSyncTime() < calendar.getTimeInMillis())
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, true));
         else
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
@@ -127,4 +127,11 @@ public class BoilerSensorView extends ChaWidget {
         if (getIsFromDashboard())
             ((TextView) findViewById(R.id.boiler_sensor_caption)).setText("T".concat(String.valueOf(this.sensorData.getId() + 1)));
     }
+
+    @Override
+    protected long getLastSyncTime()
+    {
+        return this.sensorData.getLastSyncTime();
+    }
+
 }

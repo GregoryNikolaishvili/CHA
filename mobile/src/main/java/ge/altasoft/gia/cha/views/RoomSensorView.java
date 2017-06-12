@@ -141,9 +141,16 @@ public class RoomSensorView extends ChaWidget {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
-        if (this.sensorData.getLastSyncTime() < calendar.getTime().getTime())
+        if (this.sensorData.getLastSyncTime() < calendar.getTimeInMillis())
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, true));
         else
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
+    }
+
+
+    @Override
+    protected long getLastSyncTime()
+    {
+        return this.sensorData.getLastSyncTime();
     }
 }

@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
+import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 
 public class Sensor5in1Data extends RoomSensorData {
@@ -61,22 +62,17 @@ public class Sensor5in1Data extends RoomSensorData {
         return dailyRain;
     }
 
-    private void setWindSpeed(int value) {
-        this.lastRainWindPressureSyncTime = new Date().getTime();
-        this.windSpeed = value;
-    }
-
     public void decodeState(String payload, boolean isWeatherData) {
 
         if (!isWeatherData) {
-            super.decodeState(payload, true);
+            super.decodeState(payload);
             return;
         }
 
         JSONObject jMain;
         try {
             jMain = new JSONObject(payload);
-            setWindSpeed(jMain.getInt("WS"));
+            this.windSpeed = jMain.getInt("WS");
             maxWindSpeed = jMain.getInt("WSM");
             maxWindSpeedTime = jMain.getString("WSMT");
             maxWindSpeedTime = maxWindSpeedTime.substring(0, 2).concat(":").concat(maxWindSpeedTime.substring(2, 4));
@@ -84,6 +80,9 @@ public class Sensor5in1Data extends RoomSensorData {
             rain = jMain.getInt("RR");
             dailyRain = jMain.getInt("DR");
             pressure = jMain.getInt("PR");
+
+            lastRainWindPressureSyncTime = Utils.DecodeTime(jMain.getString("TIME"));
+
         } catch (JSONException e) {
             Log.e("JSON", e.getMessage());
         }

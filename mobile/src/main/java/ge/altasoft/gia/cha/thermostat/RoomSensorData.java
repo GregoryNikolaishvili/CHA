@@ -12,7 +12,7 @@ import java.util.Locale;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.TempSensorData;
 
-public class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData>{
+public class RoomSensorData extends TempSensorData implements Comparable<RoomSensorData> {
 
     private float H;
     private int signalLevel;
@@ -119,25 +119,21 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
         editor.putBoolean("t_sensor_deleted_Sensor #".concat(suffix), false);
     }
 
-     public void decodeState(String payload, boolean isJson) {
+    public void decodeState(String payload) {
 
-        if (isJson) {
-            JSONObject jMain;
-            try {
-                jMain = new JSONObject(payload);
-                setTemperature(jMain.getInt("T") / 10f);
-                setTemperatureTrend(jMain.getString("TT").charAt(0));
+        JSONObject jMain;
+        try {
+            jMain = new JSONObject(payload);
+            setTemperature(jMain.getInt("T") / 10f);
+            setTemperatureTrend(jMain.getString("TT").charAt(0));
 
-                setHumidity(jMain.getInt("H"));
-                signalLevel = jMain.getInt("S");
-                batteryLevel = jMain.getString("B");
-            } catch (JSONException e) {
-                Log.e("JSON", e.getMessage());
-            }
-        } else {
-            setTemperatureTrend('=');
-            setTemperature(Utils.decodeT(payload.substring(0, 4)));
-            setLastSyncTime(Integer.parseInt(payload.substring(4, 8), 16));
+            setHumidity(jMain.getInt("H"));
+            signalLevel = jMain.getInt("S");
+            batteryLevel = jMain.getString("B");
+
+            setLastSyncTime(Utils.DecodeTime(jMain.getString("TIME")));
+        } catch (JSONException e) {
+            Log.e("JSON", e.getMessage());
         }
     }
 

@@ -6,12 +6,18 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
+import android.text.format.DateUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import ge.altasoft.gia.cha.Log5in1Activity;
 import ge.altasoft.gia.cha.LogStateActivity;
@@ -64,6 +70,8 @@ public abstract class ChaWidget extends LinearLayout {
 
     public abstract void refresh();
 
+    protected abstract long getLastSyncTime();
+
     protected void afterInflate() {
         setTag(false);
 
@@ -100,6 +108,10 @@ public abstract class ChaWidget extends LinearLayout {
                 popupMenu.inflate(getPopupMenuResId());
                 if (popupMenu.getMenu().findItem(R.id.item_pin_to_dashboard) != null)
                     popupMenu.getMenu().findItem(R.id.item_pin_to_dashboard).setChecked(DashboardItems.hasItem(getWidgetType(), getWidgetId()));
+
+                if (popupMenu.getMenu().findItem(R.id.item_log_last_sync) != null)
+                    popupMenu.getMenu().findItem(R.id.item_log_last_sync).setTitle(DateUtils.getRelativeTimeSpanString(getLastSyncTime(), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
+
                 popupMenu.show();
 
                 return true;

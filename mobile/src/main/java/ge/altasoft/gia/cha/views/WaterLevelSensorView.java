@@ -85,13 +85,22 @@ public class WaterLevelSensorView extends ChaWidget {
 
     @Override
     public void refresh() {
-        tvPercent.setText(String.format(Locale.US, "%d %%", this.waterLevelData.getWaterPercent()));
+        int x = this.waterLevelData.getWaterPercent();
+        if (x == 255)
+            tvPercent.setText("- - - - %");
+        else
+            tvPercent.setText(String.format(Locale.US, "%d %%", x));
+
         if (this.waterLevelData.getFloatSwitchIsOn())
             tvPercent.setTextColor(Color.CYAN);
         else
             tvPercent.setTextColor(defaultTextColor);
 
-        tvDistance.setText(String.format(Locale.US, "%d cm", this.waterLevelData.getWaterDistance()));
+        x = this.waterLevelData.getWaterDistance();
+        if (x == Utils.I_UNDEFINED)
+            tvDistance.setText("- - cm");
+        else
+            tvDistance.setText(String.format(Locale.US, "%d cm", x));
 
         if (this.waterLevelData.getSolenoidIsOn()) {
             tvSolenoid.setText("On");
@@ -103,9 +112,15 @@ public class WaterLevelSensorView extends ChaWidget {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);
-        if (this.waterLevelData.getLastSyncTime() < calendar.getTime().getTime())
+        if (this.waterLevelData.getLastSyncTime() < calendar.getTimeInMillis())
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, true));
         else
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
+    }
+
+    @Override
+    protected long getLastSyncTime()
+    {
+        return this.waterLevelData.getLastSyncTime();
     }
 }

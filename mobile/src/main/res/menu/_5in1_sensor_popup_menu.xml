@@ -11,4 +11,9 @@
         android:title="@string/log_and_chart"
         android:visible="true" />
 
+    <item
+        android:id="@+id/item_log_last_sync"
+        android:title=""
+        android:visible="true" />
+
 </menu>
