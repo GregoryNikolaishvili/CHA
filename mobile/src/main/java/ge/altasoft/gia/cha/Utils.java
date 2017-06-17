@@ -224,7 +224,7 @@ public class Utils {
     }
 
     private static boolean isGiaWifi(WifiInfo wifiInfo) {
-        return wifiInfo.getSSID().trim().equals("\"GIA\"") || wifiInfo.getSSID().trim().equals("\"GIA2\"");
+        return wifiInfo.getSSID().trim().equals("\"GIA2\"");
     }
 
 //    public static int random(int min, int max) {
