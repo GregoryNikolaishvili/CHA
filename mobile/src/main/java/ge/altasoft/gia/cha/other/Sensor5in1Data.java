@@ -5,8 +5,6 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
-
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 

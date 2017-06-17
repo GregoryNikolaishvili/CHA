@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.InputType;
 import android.util.AttributeSet;
 
-public class IntegerPreference extends FriendlyEditTextPreference {
+class IntegerPreference extends FriendlyEditTextPreference {
 
     private Integer mInteger;
 

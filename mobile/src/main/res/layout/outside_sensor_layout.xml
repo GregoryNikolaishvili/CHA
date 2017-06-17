@@ -22,32 +22,31 @@
             android:text="@string/outside"
             android:textSize="@dimen/widget_caption" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center_vertical"
             android:layout_weight="100"
-            android:gravity="center_vertical"
+            android:gravity="center_horizontal"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/temperature_value"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="50"
-                android:gravity="end"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
                 android:text="@string/no_sensor_value"
                 android:textSize="@dimen/sensor_t_size" />
 
             <TextView
                 android:id="@+id/temperature_trend"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="50"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@+id/temperature_value"
+                android:layout_toRightOf="@+id/temperature_value"
                 android:gravity="center_vertical"
                 android:text="↑"
                 android:textSize="@dimen/sensor_trend_size" />
-        </LinearLayout>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/humidity_value"

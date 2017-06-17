@@ -230,7 +230,6 @@ public class MainActivity extends ChaActivity {
 
             case ClientConnected:
                 String clientId = intent.getStringExtra("id");
-                ImageView image;
                 boolean value;
                 switch (clientId) {
                     case "LC controller":

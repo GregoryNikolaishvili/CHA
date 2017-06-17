@@ -18,9 +18,9 @@ public final class OtherControllerData {
     final static public int _5IN1_SENSOR_ID_PRESSURE = 2;
     final static public int _5IN1_SENSOR_ID_RAIN = 3;
     final static public int _5IN1_SENSOR_ID_WIND_DIR = 4;
-    final static public int _WATER_LEVEL_SENSOR1 = 5;
-    final static public int _WATER_LEVEL_SENSOR2 = 6;
-    final static public int _WATER_LEVEL_SENSOR3 = 7;
+    final static private int _WATER_LEVEL_SENSOR1 = 5;
+    final static private int _WATER_LEVEL_SENSOR2 = 6;
+    final static private int _WATER_LEVEL_SENSOR3 = 7;
 
     final static private int SENSOR_COUNT = 5 + 3;
 

@@ -101,7 +101,7 @@ public class Log5in1Activity extends ChaActivity {
         super.processMqttData(dataType, intent);
 
         Sensor5in1Data data;
-        int value1 = 0;
+        int value1;
         String value2 = "";
         int id;
         long lastSync;
@@ -134,6 +134,7 @@ public class Log5in1Activity extends ChaActivity {
 
                     case WaterLevelSensor:
                         WaterLevelData wd = OtherControllerData.Instance.getWaterLevelData(id);
+                        if (wd == null) return;
                         value1 = wd.getWaterPercent();
                         int x = wd.getWaterDistance();
                         if (x == Utils.I_UNDEFINED)

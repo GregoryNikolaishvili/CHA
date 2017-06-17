@@ -13,11 +13,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
-import android.text.format.DateUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import ge.altasoft.gia.cha.Log5in1Activity;
 import ge.altasoft.gia.cha.LogStateActivity;

@@ -1,7 +1,5 @@
 package ge.altasoft.gia.cha.classes;
 
-import android.support.annotation.NonNull;
-
 import java.util.Date;
 
 import ge.altasoft.gia.cha.Utils;

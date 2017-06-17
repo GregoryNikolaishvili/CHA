@@ -167,13 +167,12 @@ class MqttConnection implements MqttCallbackExtended {
 		this.persistence = persistence;
 		this.clientHandle = clientHandle;
 
-		StringBuilder stringBuilder = new StringBuilder(this.getClass().getCanonicalName());
-		stringBuilder.append(" ");
-		stringBuilder.append(clientId);
-		stringBuilder.append(" ");
-		stringBuilder.append("on host ");
-		stringBuilder.append(serverURI);
-		wakeLockTag = stringBuilder.toString();
+		String stringBuilder = this.getClass().getCanonicalName() + " " +
+				clientId +
+				" " +
+				"on host " +
+				serverURI;
+		wakeLockTag = stringBuilder;
 	}
 
 	// The major API implementation follows

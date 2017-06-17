@@ -15,24 +15,13 @@
     <string name="action_reorder">Reorder</string>
 
     <string name="title_activity_settings">Settings</string>
-    <string name="set">Set</string>
-    <string name="cancel">Cancel</string>
 
-    <string name="light">Light</string>
     <string name="auto">Auto</string>
     <string name="manual">Manual</string>
-    <string name="active">Active</string>
-    <string name="on">On</string>
-    <string name="off">Off</string>
-    <string name="thermostat">Thermostat</string>
 
-
-    <string name="sample_date">Feb 02 2016, 22:10</string>
     <string name="sample_temperature">25.5°</string>
     <string name="sample_temperature2">1°</string>
     <string name="sample_temperature3">110°</string>
-    <string name="centigrade">°</string>
-    <string name="sample_humidity">80 %</string>
     <string name="loading">Loading&#8230;</string>
     <string name="sample_normal">normal</string>
     <string name="sample_4">4</string>
@@ -41,7 +30,6 @@
     <string name="mbar">mbar</string>
     <string name="km_h">km/h</string>
     <string name="millimeter">mm</string>
-    <string name="centimeter">cm</string>
     <string name="sample_sensor_name">Sensor name</string>
     <string name="pressure">Pressure</string>
     <string name="wind">Wind</string>
@@ -79,18 +67,6 @@
         <item>S</item>
         <item>P</item>
         <item>W</item>
-    </string-array>
-
-    <string-array name="speedTestRangeValues">
-        <item>0</item>
-        <item>100</item>
-        <item>200</item>
-        <item>300</item>
-        <item>500</item>
-        <item>1000</item>
-        <item>2000</item>
-        <item>3000</item>
-        <item>5000</item>
     </string-array>
 
 </resources>

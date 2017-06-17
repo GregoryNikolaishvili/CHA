@@ -39,12 +39,12 @@ public abstract class RelayData implements Comparable<RelayData> {
         return this.name;
     }
 
-    private void setLastSyncTime(int secondsPassed) {
-        lastSyncTime = new Date().getTime() - secondsPassed * 1000;
+    private void setLastSyncTime() {
+        lastSyncTime = new Date().getTime();
     }
     private void setState(int value) {
         this.state = value;
-        setLastSyncTime(0);
+        setLastSyncTime();
     }
 
     public void setName(String value) {

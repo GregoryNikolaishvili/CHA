@@ -282,7 +282,7 @@ public final class ThermostatUtils {
         }
     }
 
-    public static Date[] DrawTHSensorChart(ArrayList<LogTHItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+    public static void DrawTHSensorChart(ArrayList<LogTHItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
 
         for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
             xyDataSet.getSeriesAt(i).clear();
@@ -331,8 +331,6 @@ public final class ThermostatUtils {
         }
 
         chartView.repaint();
-
-        return new Date[]{minXX, maxXX};
     }
 
     public static void Fill5in1SensorLog(WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
@@ -422,7 +420,7 @@ public final class ThermostatUtils {
         }
     }
 
-    public static Date[] DrawTwoValueChart(ArrayList<LogTwoValueItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+    public static void DrawTwoValueChart(ArrayList<LogTwoValueItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
 
         for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
             xyDataSet.getSeriesAt(i).clear();
@@ -471,7 +469,5 @@ public final class ThermostatUtils {
         }
 
         chartView.repaint();
-
-        return new Date[]{minXX, maxXX};
     }
 }

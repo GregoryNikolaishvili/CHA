@@ -2,8 +2,6 @@ package ge.altasoft.gia.cha.other;
 
 import android.content.SharedPreferences;
 
-import java.util.Date;
-
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.TempSensorData;
 

@@ -9,11 +9,11 @@ import java.util.Locale;
 
 public class FriendlyEditTextPreference extends EditTextPreference {
 
-    public FriendlyEditTextPreference(Context context, AttributeSet attrs, int defStyle) {
+    FriendlyEditTextPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
-    public FriendlyEditTextPreference(Context context, AttributeSet attrs) {
+    FriendlyEditTextPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

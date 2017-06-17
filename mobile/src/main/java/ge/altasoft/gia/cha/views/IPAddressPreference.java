@@ -17,7 +17,7 @@ import android.util.AttributeSet;
 // pattern would have made more sense, rather than inheritance. However, this
 // pattern is consistent with how other android Widgets are invoked, so I went
 // with this to prevent confusion
-public class IPAddressPreference extends FriendlyEditTextPreference {
+class IPAddressPreference extends FriendlyEditTextPreference {
 
     public IPAddressPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);

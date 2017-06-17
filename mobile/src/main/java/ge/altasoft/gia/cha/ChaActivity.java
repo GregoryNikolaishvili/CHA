@@ -161,7 +161,7 @@ public abstract class ChaActivity extends AppCompatActivity {
 //        }
 //    }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private final ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             MqttServiceLocal.LocalBinder binder = (MqttServiceLocal.LocalBinder) service;
             mService = binder.getService();

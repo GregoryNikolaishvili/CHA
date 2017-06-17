@@ -33,7 +33,7 @@ class MqttTokenAndroid implements IMqttToken {
 
   private volatile MqttException lastException;
 
-  private Object waitObject = new Object();
+  private final Object waitObject = new Object();
 
   private MqttAndroidClient client;
 

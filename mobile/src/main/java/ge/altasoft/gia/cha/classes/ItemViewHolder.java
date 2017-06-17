@@ -14,11 +14,11 @@ public class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouch
 
     public ItemViewHolder(View itemView) {
         super(itemView);
-        mainLayout = (ViewGroup)itemView.findViewById(R.id.main_layout);
+        mainLayout = (ViewGroup) itemView.findViewById(R.id.main_layout);
     }
 
     private CardView getWidgetCard() {
-        View v = ((ViewGroup)itemView).getChildAt(0);
+        View v = ((ViewGroup) itemView).getChildAt(0);
         if (v instanceof CardView)
             return (CardView) v;
 
@@ -33,11 +33,15 @@ public class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouch
 
     @Override
     public void onItemSelected() {
-        getWidgetCard().setCardBackgroundColor(Utils.getCardBackgroundColor(true, false));
+        CardView v = getWidgetCard();
+        if (v != null)
+            v.setCardBackgroundColor(Utils.getCardBackgroundColor(true, false));
     }
 
     @Override
     public void onItemClear() {
-        getWidgetCard().setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
+        CardView v = getWidgetCard();
+        if (v != null)
+            v.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
     }
 }

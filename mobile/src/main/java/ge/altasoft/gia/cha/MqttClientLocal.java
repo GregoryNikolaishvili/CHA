@@ -116,10 +116,10 @@ public class MqttClientLocal {
 
     private MqttAndroidClient mqttClient = null;
 
-    private String clientId;
+    private final String clientId;
     private String brokerUrl;
 
-    private ArrayList<String> connectedClients = new ArrayList<>();
+    private final ArrayList<String> connectedClients = new ArrayList<>();
 
     private MQTTConnectionStatus connectionStatus = MQTTConnectionStatus.INITIAL;
 
@@ -490,7 +490,8 @@ public class MqttClientLocal {
                 if (topic.startsWith(TOPIC_CHA_WATER_LEVEL_SENSOR_STATE) || topic.startsWith(TOPIC_CHA_WATER_LEVEL_SENSOR_STATE_REFRESH)) {
                     int id = Integer.parseInt(topic.substring(TOPIC_CHA_WATER_LEVEL_SENSOR_STATE.length()), 16);
                     WaterLevelData wl = OtherControllerData.Instance.getWaterLevelData(id);
-                    wl.decodeState(payload);
+                    if (wl != null)
+                        wl.decodeState(payload);
 
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelState);
                     broadcastDataIntent.putExtra("id", id);

@@ -101,23 +101,22 @@ public abstract class ChaPreferenceActivity extends AppCompatActivity {
 
     // service
 
-    private MqttClientLocal getMqttClient() {
-        return mService.mqttClient();
-    }
+//    private MqttClientLocal getMqttClient() {
+//        return mService.mqttClient();
+//    }
 
-    public void publish(String topic, String message, boolean retained) {
-        MqttClientLocal client = getMqttClient();
-        if (client == null)
-            return;
-
-        client.publish(topic, message, retained);
-    }
+//    public void publish(String topic, String message, boolean retained) {
+//        MqttClientLocal client = getMqttClient();
+//        if (client == null)
+//            return;
+//
+//        client.publish(topic, message, retained);
+//    }
 
     private boolean mBound;
     private MqttServiceLocal mService = null;
 
     private void ServiceConnected() {
-
     }
 
 //    private void StartServiceIfStopped() {

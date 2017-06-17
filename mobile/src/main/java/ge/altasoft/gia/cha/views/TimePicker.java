@@ -26,8 +26,8 @@ public class TimePicker extends LinearLayout {
 
     private void init(Context mContext) {
         LayoutInflater inflator = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        myPickerView = inflator.inflate(R.layout.time_value_picker, null);
-        this.addView(myPickerView);
+        myPickerView = inflator.inflate(R.layout.time_value_picker, this);
+        //this.addView(myPickerView);
 
         initializeReference();
     }

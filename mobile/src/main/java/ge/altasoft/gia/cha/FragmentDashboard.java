@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import ge.altasoft.gia.cha.classes.ChaFragment;
@@ -26,7 +25,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class FragmentDashboard extends ChaFragment implements OnStartDragListener {
 
-    private Map<String, String> controllerStates = new HashMap<String, String>();
+    private final Map<String, String> controllerStates = new HashMap<>();
 
     public FragmentDashboard() {
     }
@@ -156,9 +155,7 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
 
         StringBuilder msgBuilder = new StringBuilder();
 
-        Iterator<Map.Entry<String, String>> iterator = controllerStates.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, String> pairs = iterator.next();
+        for (Map.Entry<String, String> pairs : controllerStates.entrySet()) {
             scope = pairs.getKey();
             String value = pairs.getValue();
             if ((value != null) && (value.length() > 0)) {
