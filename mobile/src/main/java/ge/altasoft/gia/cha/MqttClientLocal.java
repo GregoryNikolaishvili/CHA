@@ -125,7 +125,8 @@ public class MqttClientLocal {
 
     MqttClientLocal(Context context) {
         this.context = context;
-        clientId = Utils.getDeviceName().concat("-").concat(Utils.getDeviceUniqueId(context));
+        //clientId = Utils.getDeviceName().concat("-").concat(Utils.getDeviceUniqueId(context));
+        clientId = Utils.getDeviceName(); //
     }
 
     ArrayList<String> getConnectedClientList() {

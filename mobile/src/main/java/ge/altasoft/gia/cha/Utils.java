@@ -1,6 +1,7 @@
 package ge.altasoft.gia.cha;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -96,8 +97,21 @@ public class Utils {
     static void readUrlSettings(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        mqttBrokerLocalUrl = prefs.getString("mtqq_url_local", mqttBrokerLocalUrl);
-        mqttBrokerGlobalUrl = prefs.getString("mtqq_url_global", mqttBrokerGlobalUrl);
+        String url = prefs.getString("mtqq_url_local", "");
+        if (url.equals("")) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("mtqq_url_local", mqttBrokerLocalUrl);
+            editor.apply();
+        } else
+            mqttBrokerLocalUrl = url;
+
+        url = prefs.getString("mtqq_url_global", "");
+        if (url.equals("")) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("mtqq_url_global", mqttBrokerGlobalUrl);
+            editor.apply();
+        } else
+            mqttBrokerGlobalUrl = url;
     }
 
 //    public static String millisToTimeString(String format, double x) {
@@ -220,11 +234,18 @@ public class Utils {
     static String getDeviceName() {
         String manufacturer = Build.MANUFACTURER;
         String model = Build.MODEL;
-        if (model.startsWith(manufacturer)) {
-            return capitalize(model);
-        } else {
-            return capitalize(manufacturer) + " " + model;
-        }
+        String device = Build.SERIAL;
+
+        BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
+        if (ba != null)
+            device = ba.getName();
+
+        if (model.startsWith(manufacturer))
+            model = capitalize(model);
+        else
+            model = capitalize(manufacturer) + " " + model;
+
+        return model.concat(" - ").concat(device);
     }
 
     private static String capitalize(String s) {
@@ -239,9 +260,9 @@ public class Utils {
         }
     }
 
-    static String getDeviceUniqueId(Context context) {
-        return Build.SERIAL.concat(".").concat(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
-    }
+//    static String getDeviceUniqueId(Context context) {
+//        return Build.SERIAL.concat(".").concat(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
+//    }
 
     public static void ConfirmDialog(Context context, String title, String message, final Runnable positiveAction, final Runnable negativeAction) {
 
