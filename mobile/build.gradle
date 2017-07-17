@@ -13,6 +13,14 @@ repositories {
 }
 
 android {
+    signingConfigs {
+        release {
+            keyAlias '{dd6a115a-1f4c-4d2e-a187-f2170ffe6e4e}'
+            keyPassword 'Rangda02@'
+            storeFile file('D:/GitProjects/CHA/GiaTmp.pfx')
+            storePassword 'Rangda02@'
+        }
+    }
     compileSdkVersion 24
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -22,6 +30,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
     buildTypes {
         debug {
@@ -34,6 +43,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
@@ -41,8 +52,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     compile 'com.android.support:cardview-v7:24.2.1'
-//    compile 'com.android.support:percent:24.2.1'
-
+    //    compile 'com.android.support:percent:24.2.1'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
-    compile group: 'org.achartengine', name: 'achartengine', version: '1.2.0'
+    compile 'org.achartengine:achartengine:1.2.0'
 }
