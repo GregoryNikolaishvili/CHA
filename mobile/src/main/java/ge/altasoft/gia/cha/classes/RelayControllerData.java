@@ -119,7 +119,7 @@ public abstract class RelayControllerData {
     }
 
     public void decodeNamesAndOrder(String response) {
-        Log.d("decode relay names", response);
+        //Log.d("decode relay names", response);
 
         response = response.substring(4); // first 4 digits is length in hex
 

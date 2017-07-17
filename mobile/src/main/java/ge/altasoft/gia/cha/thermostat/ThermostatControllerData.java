@@ -225,7 +225,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
     public void decodeRoomSensorSettings(String response) {
-        Log.d("decode sensor settings", response);
+        //Log.d("decode sensor settings", response);
 
         int count = Integer.parseInt(response.substring(0, 2), 16);
 
@@ -241,7 +241,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
     public void decodeRoomSensorNamesAndOrder(String response) {
-        Log.d("decode sensor names", response);
+        //Log.d("decode sensor names", response);
 
         response = response.substring(4); // first 4 digits is length in hex
 
@@ -256,7 +256,7 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
     public void decodeBoilerSettings(String response) {
-        Log.d("decode boiler settings", response);
+        //Log.d("decode boiler settings", response);
 
         boilerSettings.decodeSettings(response);
 

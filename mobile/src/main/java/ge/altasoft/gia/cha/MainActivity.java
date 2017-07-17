@@ -493,7 +493,7 @@ public class MainActivity extends ChaActivity {
 
     private void redrawControllerStatus(int resId) {
         ImageView image = (ImageView) findViewById(resId);
-        if (image != null) {
+        if ((image != null) && (image.getTag() != null)) {
             boolean value = (boolean) image.getTag();
             drawControllerStatus(value, resId);
         }
