@@ -16,14 +16,16 @@ import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class Utils {
 
-    static String mqttBrokerLocalUrl = "192.168.3.1:1883";
+    static String mqttBrokerLocalUrl = "192.168.1.23:1883";
     static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
 
     static MqttClientLocal.MQTTConnectionStatus mqttConnectionStatus;
@@ -327,6 +329,32 @@ public class Utils {
         return calendar.getTimeInMillis();
     }
 
+    public static void analyseStorage(Context context) {
+        long totalSize = 0;
+        File appBaseFolder = context.getFilesDir().getParentFile();
+        for (File f: appBaseFolder.listFiles()) {
+            if (f.isDirectory()) {
+                long dirSize = browseFiles(f);
+                totalSize += dirSize;
+                Log.d("CHA", f.getPath() + " uses " + dirSize + " bytes");
+            } else {
+                totalSize += f.length();
+            }
+        }
+        Log.d("CHA", "App uses " + totalSize + " total bytes");
+    }
+
+    private static long browseFiles(File dir) {
+        long dirSize = 0;
+        for (File f: dir.listFiles()) {
+            dirSize += f.length();
+            //Log.d(STORAGE_TAG, dir.getAbsolutePath() + "/" + f.getName() + " weighs " + f.length());
+            if (f.isDirectory()) {
+                dirSize += browseFiles(f);
+            }
+        }
+        return dirSize;
+    }
 //    public static int getColorFromResource(Context context, int resId) {
 //        return ContextCompat.getColor(context, resId);
 //    }

@@ -2,11 +2,13 @@ package ge.altasoft.gia.cha;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -16,6 +18,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import java.util.Map;
 
 import ge.altasoft.gia.cha.classes.ChaFragment;
 import ge.altasoft.gia.cha.classes.WidgetType;
@@ -160,6 +164,8 @@ public class MainActivity extends ChaActivity {
         rebuildUI(true);
 
         timerHandler.postDelayed(timerRunnable, 60000);
+
+        Utils.analyseStorage(this);
     }
 
     @Override
@@ -185,6 +191,7 @@ public class MainActivity extends ChaActivity {
                     publish("chac/lc/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
                     publish("chac/lc/settings", LightControllerData.Instance.encodeSettings(), false);
                 }
+                clearUnnededPreferences();
                 break;
 
             case Utils.ACTIVITY_REQUEST_RESULT_THERMOSTAT_SETTINGS:
@@ -194,14 +201,29 @@ public class MainActivity extends ChaActivity {
 
                     publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
                 }
+                clearUnnededPreferences();
                 break;
 
             case Utils.ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
                     publish("chac/wl/settings", OtherControllerData.Instance.encodeWaterLevelSettings(), false);
                 }
+                clearUnnededPreferences();
                 break;
         }
+    }
+
+    private void clearUnnededPreferences() {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        Map<String, ?> allEntries = prefs.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            String key = entry.getKey();
+            if (!(key.equals("mtqq_url_local") || key.equals("mtqq_url_global") || key.equals("dashboard_items")))
+                editor.remove(key);
+        }
+        editor.apply();
     }
 
     private void rebuildUI(boolean isStart) {
@@ -472,7 +494,7 @@ public class MainActivity extends ChaActivity {
     private void redrawControllerStatus(int resId) {
         ImageView image = (ImageView) findViewById(resId);
         if (image != null) {
-            boolean value = (boolean)image.getTag();
+            boolean value = (boolean) image.getTag();
             drawControllerStatus(value, resId);
         }
     }

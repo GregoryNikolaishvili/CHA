@@ -66,7 +66,10 @@ public final class LightRelayData extends RelayData {
     @Override
     public int decodeSettings(String response, int idx) {
         isActive = response.charAt(idx) != 'F';
-        onOffset = Short.parseShort(response.substring(idx + 1, idx + 5), 16);
+        int value = Integer.parseInt(response.substring(idx + 1, idx + 5), 16);
+        if (value > Short.MAX_VALUE)
+            onOffset = (short)(0x10000 - value);
+        else onOffset = (short)value;
         offMode = response.substring(idx + 5, idx + 6);
         offValue = Short.parseShort(response.substring(idx + 6, idx + 10), 16);
 
