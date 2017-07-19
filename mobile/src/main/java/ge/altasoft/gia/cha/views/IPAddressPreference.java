@@ -1,6 +1,7 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
+import android.support.annotation.Keep;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -19,25 +20,28 @@ import android.util.AttributeSet;
 // with this to prevent confusion
 class IPAddressPreference extends FriendlyEditTextPreference {
 
+    @Keep
     public IPAddressPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         init();
     }
 
+    @Keep
     public IPAddressPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         init();
     }
 
-
+    @Keep
     public IPAddressPreference(Context context) {
         super(context);
 
         init();
     }
 
+    @Keep
     private void init() {
         getEditText().setInputType(InputType.TYPE_CLASS_PHONE);
         getEditText().setFilters(new InputFilter[]{new InputFilter() {

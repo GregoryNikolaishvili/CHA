@@ -1,6 +1,7 @@
 package ge.altasoft.gia.cha.views;
 
 import android.content.Context;
+import android.support.annotation.Keep;
 import android.text.InputType;
 import android.util.AttributeSet;
 
@@ -10,21 +11,25 @@ public class TemperaturePreference extends FriendlyEditTextPreference {
 
     private Float mTemperature;
 
+    @Keep
     public TemperaturePreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
 
+    @Keep
     public TemperaturePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
+    @Keep
     public TemperaturePreference(Context context) {
         super(context);
         init();
     }
 
+    @Keep
     private void init() {
         getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
     }

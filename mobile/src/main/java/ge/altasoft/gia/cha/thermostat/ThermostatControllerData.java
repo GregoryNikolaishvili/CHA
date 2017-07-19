@@ -3,7 +3,6 @@ package ge.altasoft.gia.cha.thermostat;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -260,8 +259,8 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         boilerSettings.decodeSettings(response);
 
-        boilerSensors(BOILER_SENSOR_SOLAR_PANEL).setTargetTemperature(boilerSettings.CollectorCoolingT);
-        boilerSensors(BOILER_SENSOR_TOP).setTargetTemperature(boilerSettings.BackupHeatingTS1_SwitchOffT); // TODO: 2/5/2017
+        //boilerSensors(BOILER_SENSOR_SOLAR_PANEL).setTargetTemperature(boilerSettings.CollectorCoolingT);
+        //boilerSensors(BOILER_SENSOR_TOP).setTargetTemperature(boilerSettings.BackupHeatingTS1_SwitchOffT); // TODO: 2/5/2017
 
         haveBoilerSettings = true;
     }
