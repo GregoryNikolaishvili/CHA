@@ -25,7 +25,7 @@ import java.util.TimeZone;
 public class Utils {
 
     static String mqttBrokerLocalUrl = "192.168.1.23:1883";
-    static String mqttBrokerGlobalUrl = "test.mosquitto.org:1883";
+    static String mqttBrokerGlobalUrl = "212.72.150.154:1883";
 
     static MqttClientLocal.MQTTConnectionStatus mqttConnectionStatus;
     static String lastMqttConnectionStatusMessage = "";

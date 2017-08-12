@@ -179,6 +179,9 @@ public final class ThermostatUtils {
                     continue;
                 }
 
+                if (T == Utils.F_UNDEFINED)
+                    continue;
+
                 if ((startDt != null) && XX.before(startDt)) {
                     startValues.put(id, T);
                     continue;

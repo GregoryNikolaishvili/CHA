@@ -129,6 +129,16 @@ public class FragmentLight extends ChaFragment implements OnStartDragListener {
         }
     }
 
+    public void drawAllStates() {
+        if (rootView == null)
+            return;
+
+        for (int i = 0; i < recyclerView.getChildCount(); i++) {
+            LightRelayView rv = (LightRelayView) recyclerView.getChildAt(i);
+            rv.refresh();
+        }
+    }
+
     private void drawFooter() {
         CardView cv = ((CardView) rootView.findViewById(R.id.lightsAutoMode));
         ((TextView) cv.getChildAt(0)).setText(LightControllerData.Instance.isActive() ? "Auto" : "Manual");

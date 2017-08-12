@@ -409,6 +409,10 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.LightRelay, id);
                 break;
 
+            case LightRelayStateRefresh:
+                pagerAdapter.fragmentLight.drawAllStates();
+                pagerAdapter.fragmentDashboard.drawAllWidgetStates(WidgetType.LightRelay);
+                break;
 
             case ThermostatRoomSensorSettings:
             case ThermostatRoomSensorNameAndOrders:

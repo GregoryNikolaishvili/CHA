@@ -34,13 +34,14 @@ public class MqttClientLocal {
 
     private static final String TOPIC_CHA_5IN1 = "cha/5in1_sensor/"; // last "/" is important
     private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/room_sensor/"; // last "/" is important
-    //private static final String TOPIC_CHA_ROOM_SENSOR_STATE_REFRESH = "cha/ROOM_SENSOR/"; // last "/" is important
+    //private static final String TOPIC_CHA_ROOM_SENSOR_STATE_REFREREFRESH = "cha/ROOM_SENSOR/"; // last "/" is important
 
     // Light controller
     private static final String TOPIC_CHA_LIGHT_CONTROLLER_STATE = "cha/lc/state";
 
     private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/lc/rs/"; // last "/" is important
-    private static final String TOPIC_CHA_LIGHT_RELAY_STATE_REFRESH = "cha/lc/Rs/"; // last "/" is important
+    //private static final String TOPIC_CHA_LIGHT_RELAY_STATE_REFRESH = "cha/lc/Rs/"; // last "/" is important
+    private static final String TOPIC_CHA_LIGHT_ALL_STATE_REFRESH = "cha/lc/refresh";
     private static final String TOPIC_CHA_LIGHTS_SETTINGS = "cha/lc/settings";
     private static final String TOPIC_CHA_LIGHTS_NAMES_AND_ORDER = "cha/lc/names";
 
@@ -80,6 +81,7 @@ public class MqttClientLocal {
 
         LightControllerState,
         LightRelayState,
+        LightRelayStateRefresh,
         LightSettings,
         LightNameAndOrders,
 
@@ -228,7 +230,6 @@ public class MqttClientLocal {
     private synchronized void connectToBroker() {
         Log.d("mqtt", "connecting");
         connectionStatus = MQTTConnectionStatus.CONNECTING;
-        connectionStatus = MQTTConnectionStatus.CONNECTING;
         broadcastServiceStatus("Connecting...", false);
 
         try {
@@ -373,31 +374,38 @@ public class MqttClientLocal {
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WrtState);
                         broadcastDataIntent.putExtra("value", payload.equals("1"));
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
 
                     case TOPIC_CHA_ALERT:
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.Alert);
                         broadcastDataIntent.putExtra("message", payload);
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
 
                     case TOPIC_CHA_LIGHT_CONTROLLER_STATE:
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerState);
                         broadcastDataIntent.putExtra("state", Integer.parseInt(payload, 16));
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
+
+                    case TOPIC_CHA_LIGHT_ALL_STATE_REFRESH:
+                        LightControllerData.Instance.decodeAllStates(payload);
+
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightRelayStateRefresh);
+                        context.sendBroadcast(broadcastDataIntent);
+                        return;
 
                     case TOPIC_CHA_THERMOSTAT_CONTROLLER_STATE:
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatControllerState);
                         broadcastDataIntent.putExtra("state", Integer.parseInt(payload, 16));
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
 
                     case TOPIC_CHA_WATER_LEVEL_CONTROLLER_STATE:
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelControllerState);
                         broadcastDataIntent.putExtra("state", Integer.parseInt(payload, 16));
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
 
 
                     //region Lights
@@ -406,14 +414,14 @@ public class MqttClientLocal {
 
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightSettings);
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
 
                     case TOPIC_CHA_LIGHTS_NAMES_AND_ORDER:
                         LightControllerData.Instance.decodeNamesAndOrder(payload);
 
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightNameAndOrders);
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
                     //endregion
 
                     //region Thermostat
@@ -422,21 +430,21 @@ public class MqttClientLocal {
 
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorSettings);
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
 
                     case TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER:
                         ThermostatControllerData.Instance.decodeRoomSensorNamesAndOrder(payload);
 
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatRoomSensorNameAndOrders);
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
 
                     case TOPIC_CHA_THERMOSTAT_BOILER_SETTINGS:
                         ThermostatControllerData.Instance.decodeBoilerSettings(payload);
 
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerSettings);
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
+                        return;
                     //endregion
 
                     //region Water level
@@ -445,16 +453,15 @@ public class MqttClientLocal {
 
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelSettings);
                         context.sendBroadcast(broadcastDataIntent);
-                        break;
-
+                        return;
                     //endregion
                 }
 
-                if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE) || topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE_REFRESH)) {
+                if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE)) {
                     int id = Integer.parseInt(topic.substring(TOPIC_CHA_LIGHT_RELAY_STATE.length()), 16);
                     LightControllerData.Instance.relays(id).decodeState(payload);
 
-                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MqttClientLocal.MQTTReceivedDataType.LightRelayState);
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightRelayState);
                     broadcastDataIntent.putExtra("id", id);
                     context.sendBroadcast(broadcastDataIntent);
 
@@ -530,7 +537,13 @@ public class MqttClientLocal {
                 }
 
                 if (topic.startsWith(TOPIC_CHA_THERMOSTAT_BOILER_RELAY_STATE) || topic.startsWith(TOPIC_CHA_THERMOSTAT_BOILER_RELAY_STATE_REFRESH)) {
-                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_THERMOSTAT_BOILER_RELAY_STATE.length()), 16);
+                    int id;
+                    try {
+                        id = Integer.parseInt(topic.substring(TOPIC_CHA_THERMOSTAT_BOILER_RELAY_STATE.length()), 16);
+                    } catch (NumberFormatException ex) {
+                        return;
+                    }
+
                     ThermostatControllerData.Instance.boilerPumps(id).decodeState(payload);
 
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ThermostatBoilerPumpState);

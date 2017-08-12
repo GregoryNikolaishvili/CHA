@@ -66,6 +66,9 @@ public abstract class ChaActivity extends AppCompatActivity {
             boolean isError = intent.getBooleanExtra(MqttClientLocal.MQTT_MSG_IS_ERROR, false);
 
             Utils.mqttConnectionStatus = (MqttClientLocal.MQTTConnectionStatus) intent.getSerializableExtra(MqttClientLocal.MQTT_CONN_STATUS);
+            if (Utils.mqttConnectionStatus == MqttClientLocal.MQTTConnectionStatus.CONNECTING) {
+                Utils.lastMqttConnectionWrtIsOnline = false;
+            }
 
             if (isError) {
                 Utils.mqttConnectionStatus = MqttClientLocal.MQTTConnectionStatus.ERROR;
