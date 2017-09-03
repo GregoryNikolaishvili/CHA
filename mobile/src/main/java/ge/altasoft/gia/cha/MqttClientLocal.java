@@ -234,6 +234,7 @@ public class MqttClientLocal {
 
         try {
             MqttConnectOptions options = new MqttConnectOptions();
+            options.setCleanSession(true);
             options.setWill(TOPIC_CHA_SYS.concat(clientId), new byte[0], 1, true);
 
             IMqttToken token = mqttClient.connect(options);
