@@ -22,7 +22,7 @@ android {
         }
     }
     compileSdkVersion 24
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "ge.altasoft.gia.cha"
         minSdkVersion 15
