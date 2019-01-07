@@ -63,13 +63,13 @@ public abstract class ChaPreferenceActivity extends AppCompatActivity {
         }
     };
 
-    final private BroadcastReceiver broadcastDataReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //MqttClientLocal.MQTTReceivedDataType dataType = (MqttClientLocal.MQTTReceivedDataType) intent.getSerializableExtra(MqttClientLocal.MQTT_DATA_TYPE);
-            //processMqttData(dataType, intent);
-        }
-    };
+//    final private BroadcastReceiver broadcastDataReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            //MqttClientLocal.MQTTReceivedDataType dataType = (MqttClientLocal.MQTTReceivedDataType) intent.getSerializableExtra(MqttClientLocal.MQTT_DATA_TYPE);
+//            //processMqttData(dataType, intent);
+//        }
+//    };
 
 
     @Override
@@ -77,7 +77,7 @@ public abstract class ChaPreferenceActivity extends AppCompatActivity {
         super.onStart();
 
         registerReceiver(broadcastStatusReceiver, new IntentFilter(MqttClientLocal.MQTT_STATUS_INTENT));
-        registerReceiver(broadcastDataReceiver, new IntentFilter(MqttClientLocal.MQTT_DATA_INTENT));
+        //registerReceiver(broadcastDataReceiver, new IntentFilter(MqttClientLocal.MQTT_DATA_INTENT));
 
         //StartServiceIfStopped();
         bindService(new Intent(this, MqttServiceLocal.class), mConnection, Context.BIND_AUTO_CREATE);
@@ -87,7 +87,7 @@ public abstract class ChaPreferenceActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        unregisterReceiver(broadcastDataReceiver);
+        //unregisterReceiver(broadcastDataReceiver);
         unregisterReceiver(broadcastStatusReceiver);
 
         if (mBound) {

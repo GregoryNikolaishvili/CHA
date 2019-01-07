@@ -16,10 +16,12 @@ class BoilerSettings {
     private float CollectorSwitchOnTempDiff;
     private float CollectorSwitchOffTempDiff;
 
-    private float EmergencyCollectorSwitchOffT;
-    private float EmergencyCollectorSwitchOnT;
-    float CollectorCoolingT;
+    private float CollectorEmergencySwitchOffT;
+    private float CollectorEmergencySwitchOnT;
+    float CollectorMinimumSwitchOnT;
+    float CollectorAntifreezeT;
     private float MaxTankT;
+    private float AbsoluteMaxTankT;
 
     private float PoolSwitchOnT;
     private float PoolSwitchOffT;
@@ -50,10 +52,12 @@ class BoilerSettings {
 
         Utils.encodeT(sb, CollectorSwitchOnTempDiff);
         Utils.encodeT(sb, CollectorSwitchOffTempDiff);
-        Utils.encodeT(sb, EmergencyCollectorSwitchOffT);
-        Utils.encodeT(sb, EmergencyCollectorSwitchOnT);
-        Utils.encodeT(sb, CollectorCoolingT);
+        Utils.encodeT(sb, CollectorEmergencySwitchOffT);
+        Utils.encodeT(sb, CollectorEmergencySwitchOnT);
+        Utils.encodeT(sb, CollectorMinimumSwitchOnT);
+        Utils.encodeT(sb, CollectorAntifreezeT);
         Utils.encodeT(sb, MaxTankT);
+        Utils.encodeT(sb, AbsoluteMaxTankT);
 
         Utils.encodeT(sb, PoolSwitchOnT);
         Utils.encodeT(sb, PoolSwitchOffT);
@@ -80,10 +84,12 @@ class BoilerSettings {
         editor.putString("CollectorSwitchOnTempDiff", Float.toString(CollectorSwitchOnTempDiff));
         editor.putString("CollectorSwitchOffTempDiff", Float.toString(CollectorSwitchOffTempDiff));
 
-        editor.putString("EmergencyCollectorSwitchOffT", Float.toString(EmergencyCollectorSwitchOffT));
-        editor.putString("EmergencyCollectorSwitchOnT", Float.toString(EmergencyCollectorSwitchOnT));
-        editor.putString("CollectorCoolingT", Float.toString(CollectorCoolingT));
+        editor.putString("CollectorEmergencySwitchOffT", Float.toString(CollectorEmergencySwitchOffT));
+        editor.putString("CollectorEmergencySwitchOnT", Float.toString(CollectorEmergencySwitchOnT));
+        editor.putString("CollectorMinimumSwitchOnT", Float.toString(CollectorMinimumSwitchOnT));
+        editor.putString("CollectorAntifreezeT", Float.toString(CollectorAntifreezeT));
         editor.putString("MaxTankT", Float.toString(MaxTankT));
+        editor.putString("AbsoluteMaxTankT", Float.toString(AbsoluteMaxTankT));
         editor.putString("PoolSwitchOnT", Float.toString(PoolSwitchOnT));
         editor.putString("PoolSwitchOffT", Float.toString(PoolSwitchOffT));
     }
@@ -97,13 +103,17 @@ class BoilerSettings {
         idx += 4;
         CollectorSwitchOffTempDiff = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        EmergencyCollectorSwitchOffT = Utils.decodeT(response.substring(idx, idx + 4));
+        CollectorEmergencySwitchOffT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        EmergencyCollectorSwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
+        CollectorEmergencySwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
-        CollectorCoolingT = Utils.decodeT(response.substring(idx, idx + 4));
+        CollectorMinimumSwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
+        idx += 4;
+        CollectorAntifreezeT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
         MaxTankT = Utils.decodeT(response.substring(idx, idx + 4));
+        idx += 4;
+        AbsoluteMaxTankT = Utils.decodeT(response.substring(idx, idx + 4));
         idx += 4;
 
         PoolSwitchOnT = Utils.decodeT(response.substring(idx, idx + 4));
@@ -143,12 +153,14 @@ class BoilerSettings {
         CollectorSwitchOnTempDiff = Float.parseFloat(prefs.getString("CollectorSwitchOnTempDiff", "0"));
         CollectorSwitchOffTempDiff = Float.parseFloat(prefs.getString("CollectorSwitchOffTempDiff", "0"));
 
-        EmergencyCollectorSwitchOffT = Float.parseFloat(prefs.getString("EmergencyCollectorSwitchOffT", "0"));
-        EmergencyCollectorSwitchOnT= Float.parseFloat(prefs.getString("EmergencyCollectorSwitchOnT", "0"));
-        CollectorCoolingT= Float.parseFloat(prefs.getString("CollectorCoolingT", "0"));
-        MaxTankT= Float.parseFloat(prefs.getString("MaxTankT", "0"));
-        PoolSwitchOnT= Float.parseFloat(prefs.getString("PoolSwitchOnT", "0"));
-        PoolSwitchOffT= Float.parseFloat(prefs.getString("PoolSwitchOffT", "0"));
+        CollectorEmergencySwitchOffT = Float.parseFloat(prefs.getString("CollectorEmergencySwitchOffT", "0"));
+        CollectorEmergencySwitchOnT = Float.parseFloat(prefs.getString("CollectorEmergencySwitchOnT", "0"));
+        CollectorMinimumSwitchOnT = Float.parseFloat(prefs.getString("CollectorMinimumSwitchOnT", "0"));
+        CollectorAntifreezeT = Float.parseFloat(prefs.getString("CollectorAntifreezeT", "0"));
+        MaxTankT = Float.parseFloat(prefs.getString("MaxTankT", "0"));
+        AbsoluteMaxTankT = Float.parseFloat(prefs.getString("AbsoluteMaxTankT", "0"));
+        PoolSwitchOnT = Float.parseFloat(prefs.getString("PoolSwitchOnT", "0"));
+        PoolSwitchOffT = Float.parseFloat(prefs.getString("PoolSwitchOffT", "0"));
     }
 
 }

@@ -49,7 +49,7 @@ public class Utils {
     final static int ERR_SENSOR = 2;
     final static int ERR_EMOF = 4;
     final static int ERR_95_DEGREE = 8;
-    final static int ERR_CMX = 16;
+    final static int ERR_CFR = 16;
     final static int ERR_SMX = 32;
     final static int ERR_T1 = 64;
     final static int ERR_T2 = 128;
@@ -166,7 +166,8 @@ public class Utils {
 
     static String getMtqqBrokerUrl(Context context) {
         if (Debug.isDebuggerConnected())
-            return mqttBrokerLocalUrl;
+            //return mqttBrokerLocalUrl;
+            return mqttBrokerGlobalUrl;
 
         final ConnectivityManager conMgr = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr == null)

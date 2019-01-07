@@ -319,8 +319,8 @@ public class MainActivity extends ChaActivity {
                         sb.append("Tank emergency temperature (95)");
                         sb.append("\r\n");
                     }
-                    if ((state & Utils.ERR_CMX) != 0) {
-                        sb.append("CMX Maximum limited collector temperature");
+                    if ((state & Utils.ERR_CFR) != 0) {
+                        sb.append("CFR Antifreeze function activated");
                         sb.append("\r\n");
                     }
                     if ((state & Utils.ERR_SMX) != 0) {

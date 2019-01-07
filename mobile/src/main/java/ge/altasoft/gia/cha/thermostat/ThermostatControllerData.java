@@ -259,9 +259,6 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         boilerSettings.decodeSettings(response);
 
-        //boilerSensors(BOILER_SENSOR_SOLAR_PANEL).setTargetTemperature(boilerSettings.CollectorCoolingT);
-        //boilerSensors(BOILER_SENSOR_TOP).setTargetTemperature(boilerSettings.BackupHeatingTS1_SwitchOffT); // TODO: 2/5/2017
-
         haveBoilerSettings = true;
     }
 
@@ -275,9 +272,6 @@ public final class ThermostatControllerData extends RelayControllerData {
 
         for (int id : roomSensorsMap.keySet())
             roomSensors(id, false).decodeSettings(prefs);
-
-//        for (BoilerSensorData bs : boilerSensorsData)
-//            bs.decodeSettings(prefs);
 
         boilerSettings.decodeSettings(prefs);
 
