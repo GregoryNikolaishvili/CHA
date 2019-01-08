@@ -366,6 +366,7 @@ public class MqttClientLocal {
 
             Log.i("mqtt", String.format("message arrived. topic='%s', payload='%s'", topic, payload));
 
+
             Intent broadcastDataIntent = new Intent();
             broadcastDataIntent.setAction(MQTT_DATA_INTENT);
             try {

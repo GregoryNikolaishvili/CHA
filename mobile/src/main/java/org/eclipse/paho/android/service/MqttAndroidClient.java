@@ -16,20 +16,16 @@
  */
 package org.eclipse.paho.android.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.SparseArray;
 
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -47,16 +43,20 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.MqttToken;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.SparseArray;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 /**
  * Enables an android application to communicate with an MQTT server using non-blocking methods.
@@ -372,12 +372,12 @@ public class MqttAndroidClient extends BroadcastReceiver implements
         connectOptions = options;
         connectToken = token;
 
-		/*
+        /*
          * The actual connection depends on the service, which we start and bind
-		 * to here, but which we can't actually use until the serviceConnection
-		 * onServiceConnected() method has run (asynchronously), so the
-		 * connection itself takes place in the onServiceConnected() method
-		 */
+         * to here, but which we can't actually use until the serviceConnection
+         * onServiceConnected() method has run (asynchronously), so the
+         * connection itself takes place in the onServiceConnected() method
+         */
         if (mqttService == null) { // First time - must bind to the service
             Intent serviceStartIntent = new Intent();
             serviceStartIntent.setClassName(myContext, SERVICE_NAME);
@@ -1431,10 +1431,8 @@ public class MqttAndroidClient extends BroadcastReceiver implements
      */
     private void messageArrivedAction(Bundle data) {
         if (callback != null) {
-            String messageId = data
-                    .getString(MqttServiceConstants.CALLBACK_MESSAGE_ID);
-            String destinationName = data
-                    .getString(MqttServiceConstants.CALLBACK_DESTINATION_NAME);
+            String messageId = data.getString(MqttServiceConstants.CALLBACK_MESSAGE_ID);
+            String destinationName = data.getString(MqttServiceConstants.CALLBACK_DESTINATION_NAME);
 
             ParcelableMqttMessage message = data.getParcelable(MqttServiceConstants.CALLBACK_MESSAGE_PARCEL);
             try {

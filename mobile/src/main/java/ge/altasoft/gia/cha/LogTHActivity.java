@@ -27,10 +27,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.classes.LogTHItem;
 import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.other.OtherControllerData;
 import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
-import ge.altasoft.gia.cha.classes.LogTHItem;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;

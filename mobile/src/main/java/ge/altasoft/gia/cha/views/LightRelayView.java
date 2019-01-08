@@ -9,10 +9,10 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.ChaActivity;
+import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.classes.ChaWidget;
 import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.light.LightRelayData;
-import ge.altasoft.gia.cha.R;
 
 public class LightRelayView extends ChaWidget {
 

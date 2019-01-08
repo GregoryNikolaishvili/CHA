@@ -4,8 +4,8 @@ import android.content.SharedPreferences;
 
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.Utils;
+import ge.altasoft.gia.cha.classes.RelayData;
 
 public final class LightRelayData extends RelayData {
 

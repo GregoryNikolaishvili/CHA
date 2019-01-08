@@ -22,9 +22,9 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
-import ge.altasoft.gia.cha.classes.LogTwoValueItem;
 import ge.altasoft.gia.cha.classes.LogOneValueItem;
 import ge.altasoft.gia.cha.classes.LogTHItem;
+import ge.altasoft.gia.cha.classes.LogTwoValueItem;
 import ge.altasoft.gia.cha.classes.WidgetType;
 
 public final class ThermostatUtils {
