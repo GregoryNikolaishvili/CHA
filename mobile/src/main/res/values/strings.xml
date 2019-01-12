@@ -40,8 +40,11 @@
     <string name="pin_to_dashboard">Pin to dashboard</string>
     <string name="log">Log</string>
     <string name="summer">Summer</string>
+    <string name="summer_away">Summer (away)</string>
     <string name="winter">Winter</string>
+    <string name="winter_away">Winter (away)</string>
     <string name="summer_and_pool"><![CDATA[Summer & Pool]]></string>
+    <string name="summer_and_pool_away"><![CDATA[Summer & Pool (away)]]></string>
 
     <string-array name="listArray">
         <item>Sunrise</item>

@@ -35,8 +35,11 @@ import ge.altasoft.gia.cha.views.BoilerSensorView;
 import ge.altasoft.gia.cha.views.PumpView;
 
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_AWAY;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL_AWAY;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER_AWAY;
 
 public class FragmentBoiler extends ChaFragment {
 
@@ -86,11 +89,20 @@ public class FragmentBoiler extends ChaFragment {
                             case R.id.item_summer:
                                 ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_SUMMER), false);
                                 break;
+                            case R.id.item_summer_away:
+                                ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_SUMMER_AWAY), false);
+                                break;
                             case R.id.item_summer_and_pool:
                                 ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_SUMMER_POOL), false);
                                 break;
+                            case R.id.item_summer_and_pool_away:
+                                ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_SUMMER_POOL_AWAY), false);
+                                break;
                             case R.id.item_winter:
                                 ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_WINTER), false);
+                                break;
+                            case R.id.item_winter_away:
+                                ((ChaActivity) getActivity()).publish("chac/ts/mode", String.valueOf(BOILER_MODE_WINTER_AWAY), false);
                                 break;
                         }
                         return false;

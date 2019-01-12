@@ -18,6 +18,16 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/wrtIsOnlineLC"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:paddingEnd="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingStart="4dp"
+            android:src="@drawable/wifi_off" />
+
+        <ImageView
             android:id="@+id/lcControllerIsOnline"
             android:layout_width="20dp"
             android:layout_height="match_parent"

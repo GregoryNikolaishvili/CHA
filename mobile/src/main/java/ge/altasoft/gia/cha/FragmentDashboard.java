@@ -103,18 +103,18 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
         }
     }
 
-    public void drawAllWidgetStates(WidgetType wt) {
-        if (rootView == null)
-            return;
-
-        for (int i = 0; i < recyclerView.getChildCount(); i++) {
-            ChaWidget w = getWidgetAt(recyclerView, i);
-            if (w != null) {
-                if (w.getWidgetType() == wt)
-                    w.refresh();
-            }
-        }
-    }
+//    public void drawAllWidgetStates(WidgetType wt) {
+//        if (rootView == null)
+//            return;
+//
+//        for (int i = 0; i < recyclerView.getChildCount(); i++) {
+//            ChaWidget w = getWidgetAt(recyclerView, i);
+//            if (w != null) {
+//                if (w.getWidgetType() == wt)
+//                    w.refresh();
+//            }
+//        }
+//    }
 
     @Override
     public void saveWidgetOrders() {

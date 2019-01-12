@@ -28,6 +28,7 @@ import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightSettingsActivity;
 import ge.altasoft.gia.cha.other.FragmentOtherSensors;
 import ge.altasoft.gia.cha.other.OtherControllerData;
+import ge.altasoft.gia.cha.other.WaterLevelData;
 import ge.altasoft.gia.cha.other.WaterLevelSettingsActivity;
 import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
 import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;
@@ -191,7 +192,7 @@ public class MainActivity extends ChaActivity {
                     publish("chac/lc/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
                     publish("chac/lc/settings", LightControllerData.Instance.encodeSettings(), false);
                 }
-                clearUnnededPreferences();
+                clearUnneededPreferences();
                 break;
 
             case Utils.ACTIVITY_REQUEST_RESULT_THERMOSTAT_SETTINGS:
@@ -201,19 +202,19 @@ public class MainActivity extends ChaActivity {
 
                     publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
                 }
-                clearUnnededPreferences();
+                clearUnneededPreferences();
                 break;
 
             case Utils.ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
                     publish("chac/wl/settings", OtherControllerData.Instance.encodeWaterLevelSettings(), false);
                 }
-                clearUnnededPreferences();
+                clearUnneededPreferences();
                 break;
         }
     }
 
-    private void clearUnnededPreferences() {
+    private void clearUnneededPreferences() {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
@@ -241,13 +242,10 @@ public class MainActivity extends ChaActivity {
 
         switch (dataType) {
             case WrtState:
-                redrawControllerStatus(R.id.lcControllerIsOnline);
-                redrawControllerStatus(R.id.lcControllerIsOnline2);
-                redrawControllerStatus(R.id.tsControllerIsOnline);
-                redrawControllerStatus(R.id.tsControllerIsOnline2);
-                redrawControllerStatus(R.id.tsControllerIsOnline3);
-                redrawControllerStatus(R.id.wlControllerIsOnline);
-                redrawControllerStatus(R.id.wlControllerIsOnline2);
+                drawWrtStatus(Utils.lastMqttConnectionWrtIsOnline, R.id.wrtIsOnlineDash);
+                drawWrtStatus(Utils.lastMqttConnectionWrtIsOnline, R.id.wrtIsOnlineLC);
+                drawWrtStatus(Utils.lastMqttConnectionWrtIsOnline, R.id.wrtIsOnlineTS);
+                drawWrtStatus(Utils.lastMqttConnectionWrtIsOnline, R.id.wrtIsOnlineOther);
                 break;
 
             case ClientConnected:
@@ -256,19 +254,21 @@ public class MainActivity extends ChaActivity {
                 switch (clientId) {
                     case "LC controller":
                         value = intent.getBooleanExtra("value", false);
-                        drawControllerStatus(value, R.id.lcControllerIsOnline);
-                        drawControllerStatus(value, R.id.lcControllerIsOnline2);
+                        drawControllerStatus(LightControllerData.Instance.isAlive(), R.id.lcControllerIsOnline);
+                        drawControllerStatus(LightControllerData.Instance.isAlive(), R.id.lcControllerIsOnline2);
                         break;
                     case "TS controller":
                         value = intent.getBooleanExtra("value", false);
-                        drawControllerStatus(value, R.id.tsControllerIsOnline);
-                        drawControllerStatus(value, R.id.tsControllerIsOnline2);
-                        drawControllerStatus(value, R.id.tsControllerIsOnline3);
+                        drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline);
+                        drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline2);
+                        drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline3);
                         break;
                     case "WL controller":
                         value = intent.getBooleanExtra("value", false);
-                        drawControllerStatus(value, R.id.wlControllerIsOnline);
-                        drawControllerStatus(value, R.id.wlControllerIsOnline2);
+//                        drawControllerStatus(WaterLevelData.Instance.isAlive(), R.id.wlControllerIsOnline);
+//                        drawControllerStatus(WaterLevelData.Instance.isAlive(), R.id.wlControllerIsOnline2);
+                        drawControllerStatus(false, R.id.wlControllerIsOnline);
+                        drawControllerStatus(false, R.id.wlControllerIsOnline2);
                         break;
                 }
                 break;
@@ -296,6 +296,11 @@ public class MainActivity extends ChaActivity {
                 } else if (pagerAdapter.fragmentDashboard != null)
                     pagerAdapter.fragmentDashboard.drawControllersState("LC", null);
 
+                break;
+
+            case ThermostatControllerAlive:
+                long boardTimeInSec = intent.getLongExtra("BoardTimeInSec", 0);
+                ThermostatControllerData.Instance.SetAlive(boardTimeInSec);
                 break;
 
             case ThermostatControllerState:
@@ -409,10 +414,10 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.LightRelay, id);
                 break;
 
-            case LightRelayStateRefresh:
-                pagerAdapter.fragmentLight.drawAllStates();
-                pagerAdapter.fragmentDashboard.drawAllWidgetStates(WidgetType.LightRelay);
-                break;
+//            case LightRelayStateRefresh:
+//                pagerAdapter.fragmentLight.drawAllStates();
+//                pagerAdapter.fragmentDashboard.drawAllWidgetStates(WidgetType.LightRelay);
+//                break;
 
             case ThermostatRoomSensorSettings:
             case ThermostatRoomSensorNameAndOrders:
@@ -484,24 +489,27 @@ public class MainActivity extends ChaActivity {
         }
     }
 
-    private void drawControllerStatus(boolean value, int resId) {
+    private void drawControllerStatus(boolean isOK, int resId) {
         ImageView image = (ImageView) findViewById(resId);
         if (image != null) {
-            image.setTag(value);
-            if (Utils.lastMqttConnectionWrtIsOnline)
-                image.setImageResource(value ? R.drawable.circle_green : R.drawable.circle_red);
-            else
-                image.setImageResource(value ? R.drawable.circle_yellow : R.drawable.circle_grey);
+                image.setImageResource(isOK ? R.drawable.circle_green : R.drawable.circle_red);
         }
     }
 
-    private void redrawControllerStatus(int resId) {
+    private void drawWrtStatus(boolean isOK, int resId) {
         ImageView image = (ImageView) findViewById(resId);
-        if ((image != null) && (image.getTag() != null)) {
-            boolean value = (boolean) image.getTag();
-            drawControllerStatus(value, resId);
+        if (image != null) {
+            image.setImageResource(isOK ? R.drawable.wifi_on: R.drawable.wifi_off);
         }
     }
+
+//    private void redrawControllerStatus(int resId) {
+//        ImageView image = (ImageView) findViewById(resId);
+//        if ((image != null) && (image.getTag() != null)) {
+//            boolean value = (boolean) image.getTag();
+//            drawControllerStatus(value, resId);
+//        }
+//    }
 
 
     private void showNetworkInfo() {

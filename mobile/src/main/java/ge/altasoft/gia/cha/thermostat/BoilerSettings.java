@@ -4,12 +4,16 @@ import android.content.SharedPreferences;
 
 import ge.altasoft.gia.cha.Utils;
 
-class BoilerSettings {
+public class BoilerSettings {
 
-    final private static char BOILER_MODE_OFF = 'N';
-    final static char BOILER_MODE_SUMMER = 'S';
-    final static char BOILER_MODE_SUMMER_POOL = 'P';
-    final static char BOILER_MODE_WINTER = 'W';
+    final public static char BOILER_MODE_OFF = 'N';
+    final public static char BOILER_MODE_SUMMER = 'S';
+    final public static char BOILER_MODE_SUMMER_POOL = 'P';
+    final public static char BOILER_MODE_WINTER = 'W';
+
+    final public static char BOILER_MODE_SUMMER_AWAY = 's';
+    final public static char BOILER_MODE_SUMMER_POOL_AWAY = 'p';
+    final public static char BOILER_MODE_WINTER_AWAY = 'w';
 
     char Mode;
 

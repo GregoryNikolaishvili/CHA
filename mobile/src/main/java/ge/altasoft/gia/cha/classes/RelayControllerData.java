@@ -12,6 +12,7 @@ public abstract class RelayControllerData {
 
     private boolean isActive;
     private boolean haveSettings;
+    private long boardTimeInSec = 0;
 
     final private RelayData[] relayDatas;
     private boolean widgetOrderChanged;
@@ -28,6 +29,8 @@ public abstract class RelayControllerData {
     public boolean haveSettings() {
         return haveSettings;
     }
+
+    public boolean isAlive() {return boardTimeInSec > 0;}
 
     protected RelayData relays(int index) {
         return relayDatas[index];
@@ -131,6 +134,11 @@ public abstract class RelayControllerData {
 
         for (int i = 0; i < relayDatas.length; i++)
             relays(i).decodeOrderAndName(arr[i]);
+    }
+
+    public void SetAlive(long boardTimeInSec)
+    {
+        this.boardTimeInSec = boardTimeInSec;
     }
     //endregion
 }

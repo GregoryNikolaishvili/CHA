@@ -62,13 +62,13 @@ public final class LightControllerData extends RelayControllerData {
         editor.apply();
     }
 
-    public void decodeAllStates(String payload) {
-        if (payload.length() != (RELAY_COUNT + 1))
-            return;
-
-        for (int i = 0; i < RELAY_COUNT; i++)
-            relays(i).decodeState(Character.toString(payload.charAt(i)));
-    }
+//    public void decodeAllStates(String payload) {
+//        if (payload.length() != (RELAY_COUNT + 1))
+//            return;
+//
+//        for (int i = 0; i < RELAY_COUNT; i++)
+//            relays(i).decodeState(Character.toString(payload.charAt(i)));
+//    }
     //endregion
 }
 

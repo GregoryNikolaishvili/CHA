@@ -18,7 +18,7 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
     private int signalLevel;
     private String batteryLevel;
     private String name;
-    private boolean isOn;
+    private int value;
     private int responsibleRelayId;
     private boolean isDeleted;
 
@@ -27,7 +27,7 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
 
         H = Float.NaN;
         setDeltaTargetT(1.0f);
-        this.isOn = false;
+        this.value = 100;
         responsibleRelayId = 0; // no responsible
         signalLevel = 0;
         batteryLevel = "unknown";
@@ -35,8 +35,8 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
         isDeleted = false;
     }
 
-    public boolean isOn() {
-        return this.isOn;
+    public int Value() {
+        return this.value;
     }
 
     public boolean hasRelay() {
@@ -47,8 +47,8 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
         return this.isDeleted;
     }
 
-    void setIsOn(boolean value) {
-        this.isOn = value;
+    void setValue(int value) {
+        this.value = value;
     }
 
     public String getName() {

@@ -13,8 +13,11 @@ import java.util.Map;
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_AWAY;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL_AWAY;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER;
+import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER_AWAY;
 
 public final class ThermostatControllerData extends RelayControllerData {
 
@@ -90,11 +93,11 @@ public final class ThermostatControllerData extends RelayControllerData {
     }
 
 
-    public ArrayList<Integer> setHeaterRelayIsOn(int relayId, boolean isOn) {
+    public ArrayList<Integer> setHeaterRelayValue(int relayId, int value) {
         ArrayList<Integer> ids = new ArrayList<>();
         for (RoomSensorData ss : roomSensorsMap.values()) {
             if (ss.getResponsibleRelayId() == relayId) {
-                ss.setIsOn(isOn);
+                ss.setValue(value);
                 ids.add(ss.getId());
             }
         }
@@ -160,7 +163,7 @@ public final class ThermostatControllerData extends RelayControllerData {
         editor.apply();
     }
 
-    private char getBoilerMode() {
+    public char getBoilerMode() {
         return boilerSettings.Mode;
     }
 
@@ -172,10 +175,16 @@ public final class ThermostatControllerData extends RelayControllerData {
         switch (boilerSettings.Mode) {
             case BOILER_MODE_SUMMER:
                 return "Summer";
+            case BOILER_MODE_SUMMER_AWAY:
+                return "Summer (away)";
             case BOILER_MODE_SUMMER_POOL:
                 return "Summer & Pool";
+            case BOILER_MODE_SUMMER_POOL_AWAY:
+                return "Summer & Pool (away)";
             case BOILER_MODE_WINTER:
                 return "Winter";
+            case BOILER_MODE_WINTER_AWAY:
+                return "Winter (away)";
             default:
                 return "Off";
         }
