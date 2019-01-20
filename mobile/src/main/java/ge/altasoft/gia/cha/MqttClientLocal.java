@@ -36,6 +36,7 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/room_sensor/"; // last "/" is important
 
     // Light controller
+    private static final String TOPIC_CHA_LIGHT_CONTROLLER_ALIVE = "cha/lc/alive";
     private static final String TOPIC_CHA_LIGHT_CONTROLLER_STATE = "cha/lc/state";
 
     private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/lc/rs/"; // last "/" is important
@@ -77,6 +78,7 @@ public class MqttClientLocal {
         Sensor5in1StateW,
         SensorRoomState,
 
+        LightControllerAlive,
         LightControllerState,
         LightRelayState,
         //LightRelayStateRefresh,
@@ -248,7 +250,10 @@ public class MqttClientLocal {
                         broadcastServiceStatus("Connected", false);
 
                         publish(TOPIC_CHA_SYS.concat(clientId), "connected", true);
+
+                        publish("chac/lc/refresh", "1", false);
                         publish("chac/ts/refresh", "1", false);
+                        publish("chac/wl/refresh", "1", false);
 
                         new Thread(new Runnable() {
                             @Override
@@ -380,6 +385,13 @@ public class MqttClientLocal {
                     case TOPIC_CHA_ALERT:
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.Alert);
                         broadcastDataIntent.putExtra("message", payload);
+                        context.sendBroadcast(broadcastDataIntent);
+                        return;
+
+
+                    case TOPIC_CHA_LIGHT_CONTROLLER_ALIVE:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerAlive);
+                        broadcastDataIntent.putExtra("BoardTimeInSec", Long.parseLong(payload, 16));
                         context.sendBroadcast(broadcastDataIntent);
                         return;
 

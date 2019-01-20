@@ -145,4 +145,10 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
             return Integer.valueOf(this.order).compareTo(o.order);
         }
     }
+
+    @Override
+    public String toString()
+    {
+        return name;
+    }
 }

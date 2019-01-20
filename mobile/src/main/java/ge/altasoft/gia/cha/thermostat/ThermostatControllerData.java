@@ -229,6 +229,8 @@ public final class ThermostatControllerData extends RelayControllerData {
             roomSensorsMap.get(id).encodeOrderAndName(sb);
         sb.insert(0, String.format(Locale.US, "%04X", sb.length()));
 
+        if (sb.length() > 256)
+            sb.setLength(256);
         return sb.toString();
     }
 
