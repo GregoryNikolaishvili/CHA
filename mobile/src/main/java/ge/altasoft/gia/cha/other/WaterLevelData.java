@@ -10,7 +10,8 @@ public class WaterLevelData extends TempSensorData {
     private int waterDistanceCM;
     private int waterPercent;
     private boolean floatSwitchIsOn;
-    private boolean solenoidIsOn;
+    private int ballValveState;
+    private int ballValveSwitchState;
 
     private short maxDistance;
     private short minDistance;
@@ -20,7 +21,7 @@ public class WaterLevelData extends TempSensorData {
         this.waterDistanceCM = 0;
         this.waterPercent = 0;
         this.floatSwitchIsOn = false;
-        this.solenoidIsOn = false;
+        this.ballValveState = 0;
     }
 
     public int getWaterPercent() {
@@ -35,8 +36,11 @@ public class WaterLevelData extends TempSensorData {
         return floatSwitchIsOn;
     }
 
-    public boolean getSolenoidIsOn() {
-        return solenoidIsOn;
+    public int getBallValveState() {
+        return ballValveState;
+    }
+    public int getBallValveSwitchState() {
+        return ballValveSwitchState;
     }
 
 
@@ -49,7 +53,8 @@ public class WaterLevelData extends TempSensorData {
         waterDistanceCM = Integer.parseInt(payload.substring(0, 4), 16);
         setWaterPercent(Integer.parseInt(payload.substring(4, 8), 16));
         floatSwitchIsOn = payload.charAt(8) != '0';
-        solenoidIsOn = payload.charAt(9) != '0';
+        ballValveState = Integer.parseInt(payload.substring(9, 13), 16);
+        ballValveSwitchState = Integer.parseInt(payload.substring(13, 15), 16);
     }
 
     @Override

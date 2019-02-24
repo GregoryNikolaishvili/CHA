@@ -162,14 +162,6 @@ public class MainActivity extends ChaActivity {
     public void onResume() {
         super.onResume();
 
-        drawControllerStatus(false, R.id.lcControllerIsOnline);
-        drawControllerStatus(false, R.id.lcControllerIsOnline2);
-        drawControllerStatus(false, R.id.tsControllerIsOnline);
-        drawControllerStatus(false, R.id.tsControllerIsOnline2);
-        drawControllerStatus(false, R.id.tsControllerIsOnline3);
-        drawControllerStatus(false, R.id.wlControllerIsOnline);
-        drawControllerStatus(false, R.id.wlControllerIsOnline2);
-
         rebuildUI(true);
 
         timerHandler.postDelayed(timerRunnable, 60000);
@@ -183,6 +175,20 @@ public class MainActivity extends ChaActivity {
 
         timerHandler.removeCallbacks(timerRunnable);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        drawControllerStatus(false, R.id.lcControllerIsOnline);
+        drawControllerStatus(false, R.id.lcControllerIsOnline2);
+        drawControllerStatus(false, R.id.tsControllerIsOnline);
+        drawControllerStatus(false, R.id.tsControllerIsOnline2);
+        drawControllerStatus(false, R.id.tsControllerIsOnline3);
+        drawControllerStatus(false, R.id.wlControllerIsOnline);
+        drawControllerStatus(false, R.id.wlControllerIsOnline2);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -274,10 +280,8 @@ public class MainActivity extends ChaActivity {
                         break;
                     case "WL controller":
                         value = intent.getBooleanExtra("value", false);
-//                        drawControllerStatus(value && WaterLevelData.Instance.isAlive(), R.id.wlControllerIsOnline);
-//                        drawControllerStatus(value && WaterLevelData.Instance.isAlive(), R.id.wlControllerIsOnline2);
-                        drawControllerStatus(value && false, R.id.wlControllerIsOnline);
-                        drawControllerStatus(value && false, R.id.wlControllerIsOnline2);
+                        drawControllerStatus(value && OtherControllerData.Instance.isAlive(), R.id.wlControllerIsOnline);
+                        drawControllerStatus(value && OtherControllerData.Instance.isAlive(), R.id.wlControllerIsOnline2);
                         break;
                 }
                 break;
@@ -382,6 +386,13 @@ public class MainActivity extends ChaActivity {
                 } else if (pagerAdapter.fragmentDashboard != null)
                     pagerAdapter.fragmentDashboard.drawControllersState("TS", null);
 
+                break;
+
+            case WaterLevelControllerAlive:
+                boardTimeInSec = intent.getLongExtra("BoardTimeInSec", 0);
+                OtherControllerData.Instance.SetAlive(boardTimeInSec);
+                drawControllerStatus(OtherControllerData.Instance.isAlive(), R.id.wlControllerIsOnline);
+                drawControllerStatus(OtherControllerData.Instance.isAlive(), R.id.wlControllerIsOnline2);
                 break;
 
             case WaterLevelControllerState:

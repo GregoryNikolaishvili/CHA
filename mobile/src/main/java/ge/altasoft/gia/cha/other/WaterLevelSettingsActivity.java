@@ -18,7 +18,7 @@ public class WaterLevelSettingsActivity extends ChaPreferenceActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        OtherControllerData.Instance.saveWaterLevelToPreferences(prefs);
+        OtherControllerData.Instance.saveToPreferences(prefs);
 
         getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragment()).commit();
     }
@@ -32,7 +32,7 @@ public class WaterLevelSettingsActivity extends ChaPreferenceActivity {
                     new Runnable() {
                         public void run() {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                            OtherControllerData.Instance.decodeWaterLevelSettings(prefs);
+                            OtherControllerData.Instance.decode(prefs);
 
                             setResult(Activity.RESULT_OK, null); //The data you want to send back
                             context.finish();

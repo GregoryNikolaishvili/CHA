@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import ge.altasoft.gia.cha.classes.ChaWidget;
+import ge.altasoft.gia.cha.classes.RelayControllerData;
 import ge.altasoft.gia.cha.views.OutsideSensorView;
 import ge.altasoft.gia.cha.views.PressureSensorView;
 import ge.altasoft.gia.cha.views.RainSensorView;
@@ -11,7 +12,7 @@ import ge.altasoft.gia.cha.views.WaterLevelSensorView;
 import ge.altasoft.gia.cha.views.WindDirSensorView;
 import ge.altasoft.gia.cha.views.WindSensorView;
 
-public final class OtherControllerData {
+public final class OtherControllerData extends RelayControllerData {
 
     final static public int _5IN1_SENSOR_ID_TH = 0;
     final static public int _5IN1_SENSOR_ID_WIND = 1;
@@ -21,6 +22,8 @@ public final class OtherControllerData {
     final static private int _WATER_LEVEL_SENSOR1 = 5;
     final static private int _WATER_LEVEL_SENSOR2 = 6;
     final static private int _WATER_LEVEL_SENSOR3 = 7;
+
+    final private static int RELAY_COUNT = 5;
 
     final static private int SENSOR_COUNT = 5 + 3;
 
@@ -36,6 +39,20 @@ public final class OtherControllerData {
         waterLevelDatas[0] = new WaterLevelData(0);
         waterLevelDatas[1] = new WaterLevelData(1);
         waterLevelDatas[2] = new WaterLevelData(2);
+
+        for (int i = 0; i < RELAY_COUNT; i++) {
+            PumpRelayData relay = new PumpRelayData(i);
+            setRelay(i, relay);
+        }
+    }
+
+    @Override
+    public int relayCount() {
+        return RELAY_COUNT;
+    }
+
+    public PumpRelayData relays(int index) {
+        return (PumpRelayData) super.relays(index);
     }
 
     int sensorCount() {
@@ -95,8 +112,26 @@ public final class OtherControllerData {
         return sb.toString();
     }
 
-    void saveWaterLevelToPreferences(SharedPreferences prefs) {
+    void decode(SharedPreferences prefs) {
+
+        setIsActive(prefs.getBoolean("wl_automatic_mode", false));
+
+        for (int i = 0; i < RELAY_COUNT; i++)
+            relays(i).decodeSettings(prefs);
+
+        waterLevelDatas[0].decodeSettings(prefs);
+        waterLevelDatas[1].decodeSettings(prefs);
+        waterLevelDatas[2].decodeSettings(prefs);
+        //boilerSettings.decodeSettings(prefs);
+    }
+
+    void saveToPreferences(SharedPreferences prefs) {
         SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putBoolean("wl_automatic_mode", isActive());
+
+        for (int i = 0; i < RELAY_COUNT; i++)
+            relays(i).encodeSettings(editor);
 
         waterLevelDatas[0].encodeSettings(editor);
         waterLevelDatas[1].encodeSettings(editor);
@@ -105,10 +140,4 @@ public final class OtherControllerData {
         editor.apply();
     }
 
-    void decodeWaterLevelSettings(SharedPreferences prefs) {
-
-        waterLevelDatas[0].decodeSettings(prefs);
-        waterLevelDatas[1].decodeSettings(prefs);
-        waterLevelDatas[2].decodeSettings(prefs);
-    }
 }

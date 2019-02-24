@@ -11,14 +11,14 @@ public final class LightControllerData extends RelayControllerData {
 
     public final static LightControllerData Instance = new LightControllerData();
 
-    private final short sunriseMin;
-    private final short sunsetMin;
+//    private final short sunriseMin;
+//    private final short sunsetMin;
 
     private LightControllerData() {
         super();
 
-        sunriseMin = 8 * 60;
-        sunsetMin = 22 * 60;
+//        sunriseMin = 8 * 60;
+//        sunsetMin = 22 * 60;
 
         for (int i = 0; i < RELAY_COUNT; i++) {
             LightRelayData relay = new LightRelayData(i);
@@ -34,14 +34,14 @@ public final class LightControllerData extends RelayControllerData {
     public LightRelayData relays(int index) {
         return (LightRelayData) super.relays(index);
     }
-
-    short getSunriseMin() {
-        return this.sunriseMin;
-    }
-
-    short getSunsetMin() {
-        return this.sunsetMin;
-    }
+//
+//    short getSunriseMin() {
+//        return this.sunriseMin;
+//    }
+//
+//    short getSunsetMin() {
+//        return this.sunsetMin;
+//    }
 
     //region Encode/Decode
     void decode(SharedPreferences prefs) {

@@ -176,8 +176,8 @@ public class Utils {
 
     static String getMtqqBrokerUrl(Context context) {
         if (Debug.isDebuggerConnected())
-            return mqttBrokerLocalUrl;
-        //return mqttBrokerGlobalUrl;
+            //return mqttBrokerLocalUrl;
+        return mqttBrokerGlobalUrl;
 
         final ConnectivityManager conMgr = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr == null)

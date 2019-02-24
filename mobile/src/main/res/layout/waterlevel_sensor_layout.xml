@@ -22,6 +22,7 @@
             android:text="@string/water_level"
             android:textSize="@dimen/widget_caption" />
 
+
         <TextView
             android:id="@+id/water_percent_value"
             android:layout_width="match_parent"
@@ -30,6 +31,16 @@
             android:gravity="center|center_vertical"
             android:text="@string/no_sensor_value"
             android:textSize="@dimen/widget_t_size" />
+
+        <TextView
+            android:id="@+id/ball_valve_switch_state"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="20"
+            android:gravity="center|center_vertical"
+            android:text="@string/no_sensor_value"
+            android:textSize="@dimen/widget_l_size" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,7 +65,7 @@
                 android:layout_weight="20" />
 
             <TextView
-                android:id="@+id/solenoid_state"
+                android:id="@+id/ball_valve_state"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sample_normal"
