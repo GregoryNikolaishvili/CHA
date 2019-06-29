@@ -36,6 +36,7 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_ROOM_SENSOR_STATE = "cha/room_sensor/"; // last "/" is important
 
     // Light controller
+    private static final String TOPIC_CHA_LIGHT_CONTROLLER_ALIVE = "cha/lc/alive";
     private static final String TOPIC_CHA_LIGHT_CONTROLLER_STATE = "cha/lc/state";
 
     private static final String TOPIC_CHA_LIGHT_RELAY_STATE = "cha/lc/rs/"; // last "/" is important
@@ -45,7 +46,6 @@ public class MqttClientLocal {
 
     // ts. Thermostat controller
     private static final String TOPIC_CHA_THERMOSTAT_ALIVE = "cha/ts/alive";
-
     private static final String TOPIC_CHA_THERMOSTAT_CONTROLLER_STATE = "cha/ts/state";
 
     private static final String TOPIC_CHA_THERMOSTAT_BOILER_SENSOR_STATE = "cha/ts/bs/"; // last "/" is important
@@ -59,9 +59,10 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_THERMOSTAT_ROOM_SENSOR_NAMES_AND_ORDER = "cha/ts/names/rs";
 
     // wl. Water level controller
+    private static final String TOPIC_CHA_WATER_LEVEL_ALIVE = "cha/wl/alive";
     private static final String TOPIC_CHA_WATER_LEVEL_CONTROLLER_STATE = "cha/wl/state";
 
-    private static final String TOPIC_CHA_WATER_LEVEL_SENSOR_STATE = "cha/wl/state/"; // last "/" is important
+    private static final String TOPIC_CHA_WATER_LEVEL_STATE = "cha/wl/state/"; // last "/" is important
 
     private static final String TOPIC_CHA_WATER_LEVEL_SETTINGS = "cha/wl/settings";
 
@@ -77,6 +78,7 @@ public class MqttClientLocal {
         Sensor5in1StateW,
         SensorRoomState,
 
+        LightControllerAlive,
         LightControllerState,
         LightRelayState,
         //LightRelayStateRefresh,
@@ -92,6 +94,7 @@ public class MqttClientLocal {
         ThermostatHeaterRelayState,
         ThermostatBoilerSettings,
 
+        WaterLevelControllerAlive,
         WaterLevelControllerState,
         WaterLevelState,
         WaterLevelSettings
@@ -248,7 +251,10 @@ public class MqttClientLocal {
                         broadcastServiceStatus("Connected", false);
 
                         publish(TOPIC_CHA_SYS.concat(clientId), "connected", true);
+
+                        publish("chac/lc/refresh", "1", false);
                         publish("chac/ts/refresh", "1", false);
+                        publish("chac/wl/refresh", "1", false);
 
                         new Thread(new Runnable() {
                             @Override
@@ -383,6 +389,13 @@ public class MqttClientLocal {
                         context.sendBroadcast(broadcastDataIntent);
                         return;
 
+
+                    case TOPIC_CHA_LIGHT_CONTROLLER_ALIVE:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerAlive);
+                        broadcastDataIntent.putExtra("BoardTimeInSec", Long.parseLong(payload, 16));
+                        context.sendBroadcast(broadcastDataIntent);
+                        return;
+
                     case TOPIC_CHA_LIGHT_CONTROLLER_STATE:
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.LightControllerState);
                         broadcastDataIntent.putExtra("state", Integer.parseInt(payload, 16));
@@ -455,6 +468,12 @@ public class MqttClientLocal {
                     //endregion
 
                     //region Water level
+                    case TOPIC_CHA_WATER_LEVEL_ALIVE:
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelControllerAlive);
+                        broadcastDataIntent.putExtra("BoardTimeInSec", Long.parseLong(payload, 16));
+                        context.sendBroadcast(broadcastDataIntent);
+                        return;
+
                     case TOPIC_CHA_WATER_LEVEL_SETTINGS:
                         OtherControllerData.Instance.decodeWaterLevelSettings(payload);
 
@@ -502,8 +521,8 @@ public class MqttClientLocal {
                     return;
                 }
 
-                if (topic.startsWith(TOPIC_CHA_WATER_LEVEL_SENSOR_STATE)) {
-                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_WATER_LEVEL_SENSOR_STATE.length()), 16);
+                if (topic.startsWith(TOPIC_CHA_WATER_LEVEL_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_WATER_LEVEL_STATE.length()), 16);
                     WaterLevelData wl = OtherControllerData.Instance.getWaterLevelData(id);
                     if (wl != null)
                         wl.decodeState(payload);

@@ -138,9 +138,9 @@ public class Log5in1Activity extends ChaActivity {
                         value1 = wd.getWaterPercent();
                         int x = wd.getWaterDistance();
                         if (x == Utils.I_UNDEFINED)
-                            value2 = String.format(Locale.US, "-- cm %s %s", wd.getFloatSwitchIsOn() ? "F" : "", wd.getSolenoidIsOn() ? "S" : "");
+                            value2 = String.format(Locale.US, "-- cm %s %s", wd.getFloatSwitchIsOn() ? "F" : "", wd.getBallValveState()); //todo
                         else
-                            value2 = String.format(Locale.US, "%d cm %s %s", x, wd.getFloatSwitchIsOn() ? "F" : "", wd.getSolenoidIsOn() ? "S" : "");
+                            value2 = String.format(Locale.US, "%d cm %s %s", x, wd.getFloatSwitchIsOn() ? "F" : "", wd.getBallValveState());//todo
                         lastSync = wd.getLastSyncTime();
                         break;
 

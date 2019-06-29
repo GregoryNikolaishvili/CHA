@@ -128,19 +128,18 @@ public class Utils {
     @NonNull
     public static String decodeArduinoString(String encodedName) {
         StringBuilder sb = new StringBuilder();
-        boolean prevCharIsEscape = false;
+        boolean isUnicode = false;
         char[] carr = encodedName.toCharArray();
         for (char c : carr) {
             if (c == '~') {
-                prevCharIsEscape = true;
+                isUnicode = !isUnicode;
                 continue;
             }
 
-            if (prevCharIsEscape)
+            if (isUnicode)
                 sb.append((char) (((int) c + 0x108F))); // 'ა' - 'A'
             else
                 sb.append(c);
-            prevCharIsEscape = false;
         }
         return sb.toString();
     }
@@ -149,25 +148,36 @@ public class Utils {
         StringBuilder sb = new StringBuilder();
 
         char[] carr = name.toCharArray();
+        boolean isUnicode = false;
         for (char c : carr) {
             if (c == ';')
-                sb.append(':');
+                c = ':';
             else if (c == '~')
-                sb.append(' ');
+                c = ' ';
             else if (((int) c >= 0x10D0) && ((int) c <= 0x10F0)) // 'ა'..'ჰ'
             {
-                sb.append('~');
+                if (!isUnicode)
+                {
+                    isUnicode = true;
+                    sb.append('~');
+                }
                 sb.append((char) (((int) c - 0x108F))); // 'ა' - 'A'
-            } else
+            } else {
+                if (isUnicode)
+                {
+                    isUnicode = false;
+                    sb.append('~');
+                }
                 sb.append(c);
+            }
         }
         return sb.toString();
     }
 
     static String getMtqqBrokerUrl(Context context) {
         if (Debug.isDebuggerConnected())
-            return mqttBrokerLocalUrl;
-            //return mqttBrokerGlobalUrl;
+            //return mqttBrokerLocalUrl;
+        return mqttBrokerGlobalUrl;
 
         final ConnectivityManager conMgr = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr == null)
@@ -329,32 +339,32 @@ public class Utils {
         return calendar.getTimeInMillis();
     }
 
-    public static void analyseStorage(Context context) {
-        long totalSize = 0;
-        File appBaseFolder = context.getFilesDir().getParentFile();
-        for (File f: appBaseFolder.listFiles()) {
-            if (f.isDirectory()) {
-                long dirSize = browseFiles(f);
-                totalSize += dirSize;
-                Log.d("CHA", f.getPath() + " uses " + dirSize + " bytes");
-            } else {
-                totalSize += f.length();
-            }
-        }
-        Log.d("CHA", "App uses " + totalSize + " total bytes");
-    }
+//    public static void analyseStorage(Context context) {
+//        long totalSize = 0;
+//        File appBaseFolder = context.getFilesDir().getParentFile();
+//        for (File f : appBaseFolder.listFiles()) {
+//            if (f.isDirectory()) {
+//                long dirSize = browseFiles(f);
+//                totalSize += dirSize;
+//                Log.d("CHA", f.getPath() + " uses " + dirSize + " bytes");
+//            } else {
+//                totalSize += f.length();
+//            }
+//        }
+//        Log.d("CHA", "App uses " + totalSize + " total bytes");
+//    }
 
-    private static long browseFiles(File dir) {
-        long dirSize = 0;
-        for (File f: dir.listFiles()) {
-            dirSize += f.length();
-            //Log.d(STORAGE_TAG, dir.getAbsolutePath() + "/" + f.getName() + " weighs " + f.length());
-            if (f.isDirectory()) {
-                dirSize += browseFiles(f);
-            }
-        }
-        return dirSize;
-    }
+//    private static long browseFiles(File dir) {
+//        long dirSize = 0;
+//        for (File f : dir.listFiles()) {
+//            dirSize += f.length();
+//            //Log.d(STORAGE_TAG, dir.getAbsolutePath() + "/" + f.getName() + " weighs " + f.length());
+//            if (f.isDirectory()) {
+//                dirSize += browseFiles(f);
+//            }
+//        }
+//        return dirSize;
+//    }
 //    public static int getColorFromResource(Context context, int resId) {
 //        return ContextCompat.getColor(context, resId);
 //    }

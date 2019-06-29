@@ -19,7 +19,8 @@ public class WaterLevelSensorView extends ChaWidget {
 
     private TextView tvPercent;
     private TextView tvDistance;
-    private TextView tvSolenoid;
+    private TextView tvBallValve;
+    private TextView tvBallValveSwitch;
 
     private int defaultTextColor;
 
@@ -75,7 +76,8 @@ public class WaterLevelSensorView extends ChaWidget {
         defaultTextColor = tvPercent.getCurrentTextColor();
 
         tvDistance = (TextView) this.findViewById(R.id.distance_cm);
-        tvSolenoid = (TextView) this.findViewById(R.id.solenoid_state);
+        tvBallValve = (TextView) this.findViewById(R.id.ball_valve_state);
+        tvBallValveSwitch = (TextView) this.findViewById(R.id.ball_valve_switch_state);
     }
 
     public void setWaterLevelData(WaterLevelData value) {
@@ -102,13 +104,30 @@ public class WaterLevelSensorView extends ChaWidget {
         else
             tvDistance.setText(String.format(Locale.US, "%d cm", x));
 
-        if (this.waterLevelData.getSolenoidIsOn()) {
-            tvSolenoid.setText("On");
-            tvSolenoid.setTextColor(Color.GREEN);
-        } else {
-            tvSolenoid.setText("Off");
-            tvSolenoid.setTextColor(Color.RED);
+        int state = this.waterLevelData.getBallValveState();
+        if (state == 0xFF) {
+            tvBallValve.setText("On");
+            tvBallValve.setTextColor(Color.GREEN);
         }
+        else
+        if (state == -0xFF) {
+            tvBallValve.setText("Off");
+            tvBallValve.setTextColor(Color.RED);
+        }
+        else {
+            tvBallValve.setText("ooo");
+            tvBallValve.setTextColor(Color.YELLOW); //todo
+        }
+
+        state = this.waterLevelData.getBallValveSwitchState();
+        String text = "";
+        if ((state & 0x02) != 0) {
+            text = "Open";
+        }
+        if ((state & 0x01) != 0) {
+            text += " Closed";
+        }
+        tvBallValveSwitch.setText(text);
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -2);

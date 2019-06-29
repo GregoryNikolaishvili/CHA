@@ -166,7 +166,7 @@ public class MainActivity extends ChaActivity {
 
         timerHandler.postDelayed(timerRunnable, 60000);
 
-        Utils.analyseStorage(this);
+        //Utils.analyseStorage(this);
     }
 
     @Override
@@ -175,6 +175,20 @@ public class MainActivity extends ChaActivity {
 
         timerHandler.removeCallbacks(timerRunnable);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        drawControllerStatus(false, R.id.lcControllerIsOnline);
+        drawControllerStatus(false, R.id.lcControllerIsOnline2);
+        drawControllerStatus(false, R.id.tsControllerIsOnline);
+        drawControllerStatus(false, R.id.tsControllerIsOnline2);
+        drawControllerStatus(false, R.id.tsControllerIsOnline3);
+        drawControllerStatus(false, R.id.wlControllerIsOnline);
+        drawControllerStatus(false, R.id.wlControllerIsOnline2);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -238,6 +252,7 @@ public class MainActivity extends ChaActivity {
 
         int id;
         int state;
+        long boardTimeInSec;
         StringBuilder sb;
 
         switch (dataType) {
@@ -254,23 +269,28 @@ public class MainActivity extends ChaActivity {
                 switch (clientId) {
                     case "LC controller":
                         value = intent.getBooleanExtra("value", false);
-                        drawControllerStatus(LightControllerData.Instance.isAlive(), R.id.lcControllerIsOnline);
-                        drawControllerStatus(LightControllerData.Instance.isAlive(), R.id.lcControllerIsOnline2);
+                        drawControllerStatus(value && LightControllerData.Instance.isAlive(), R.id.lcControllerIsOnline);
+                        drawControllerStatus(value && LightControllerData.Instance.isAlive(), R.id.lcControllerIsOnline2);
                         break;
                     case "TS controller":
                         value = intent.getBooleanExtra("value", false);
-                        drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline);
-                        drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline2);
-                        drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline3);
+                        drawControllerStatus(value && ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline);
+                        drawControllerStatus(value && ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline2);
+                        drawControllerStatus(value && ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline3);
                         break;
                     case "WL controller":
                         value = intent.getBooleanExtra("value", false);
-//                        drawControllerStatus(WaterLevelData.Instance.isAlive(), R.id.wlControllerIsOnline);
-//                        drawControllerStatus(WaterLevelData.Instance.isAlive(), R.id.wlControllerIsOnline2);
-                        drawControllerStatus(false, R.id.wlControllerIsOnline);
-                        drawControllerStatus(false, R.id.wlControllerIsOnline2);
+                        drawControllerStatus(value && OtherControllerData.Instance.isAlive(), R.id.wlControllerIsOnline);
+                        drawControllerStatus(value && OtherControllerData.Instance.isAlive(), R.id.wlControllerIsOnline2);
                         break;
                 }
+                break;
+
+            case LightControllerAlive:
+                boardTimeInSec = intent.getLongExtra("BoardTimeInSec", 0);
+                LightControllerData.Instance.SetAlive(boardTimeInSec);
+                drawControllerStatus(LightControllerData.Instance.isAlive(), R.id.lcControllerIsOnline);
+                drawControllerStatus(LightControllerData.Instance.isAlive(), R.id.lcControllerIsOnline2);
                 break;
 
             //region Controller states
@@ -299,8 +319,11 @@ public class MainActivity extends ChaActivity {
                 break;
 
             case ThermostatControllerAlive:
-                long boardTimeInSec = intent.getLongExtra("BoardTimeInSec", 0);
+                boardTimeInSec = intent.getLongExtra("BoardTimeInSec", 0);
                 ThermostatControllerData.Instance.SetAlive(boardTimeInSec);
+                drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline);
+                drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline2);
+                drawControllerStatus(ThermostatControllerData.Instance.isAlive(), R.id.tsControllerIsOnline3);
                 break;
 
             case ThermostatControllerState:
@@ -363,6 +386,13 @@ public class MainActivity extends ChaActivity {
                 } else if (pagerAdapter.fragmentDashboard != null)
                     pagerAdapter.fragmentDashboard.drawControllersState("TS", null);
 
+                break;
+
+            case WaterLevelControllerAlive:
+                boardTimeInSec = intent.getLongExtra("BoardTimeInSec", 0);
+                OtherControllerData.Instance.SetAlive(boardTimeInSec);
+                drawControllerStatus(OtherControllerData.Instance.isAlive(), R.id.wlControllerIsOnline);
+                drawControllerStatus(OtherControllerData.Instance.isAlive(), R.id.wlControllerIsOnline2);
                 break;
 
             case WaterLevelControllerState:
@@ -492,14 +522,14 @@ public class MainActivity extends ChaActivity {
     private void drawControllerStatus(boolean isOK, int resId) {
         ImageView image = (ImageView) findViewById(resId);
         if (image != null) {
-                image.setImageResource(isOK ? R.drawable.circle_green : R.drawable.circle_red);
+            image.setImageResource(isOK ? R.drawable.circle_green : R.drawable.circle_red);
         }
     }
 
     private void drawWrtStatus(boolean isOK, int resId) {
         ImageView image = (ImageView) findViewById(resId);
         if (image != null) {
-            image.setImageResource(isOK ? R.drawable.wifi_on: R.drawable.wifi_off);
+            image.setImageResource(isOK ? R.drawable.wifi_on : R.drawable.wifi_off);
         }
     }
 

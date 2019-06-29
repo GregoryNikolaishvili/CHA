@@ -148,8 +148,29 @@ public abstract class ChaActivity extends AppCompatActivity {
         if (client == null)
             return;
 
+
+        if (message.length() > 256) {
+            Toast.makeText(this, "Content too long. Cannot publish to MQTT", Toast.LENGTH_SHORT).show();
+            return;
+        }
         client.publish(topic, message, retained);
     }
+
+//    public void publishMultipart(String topic, String message, int partSize, boolean retained) {
+//        MqttClientLocal client = getMqttClient();
+//        if (client == null)
+//            return;
+//
+//        int partId = 0;
+//        for (int start = 0; start < message.length(); start += partSize) {
+//            String partMsg = message.substring(start, Math.min(message.length(), start + partSize));
+//            if (partId == 0)
+//            client.publish(topic, partMsg, retained);
+//            else
+//                client.publish(topic + String.valueOf(partId), partMsg, retained);
+//            partId++;
+//        }
+//    }
 
     private boolean mBound;
     private MqttServiceLocal mService = null;
