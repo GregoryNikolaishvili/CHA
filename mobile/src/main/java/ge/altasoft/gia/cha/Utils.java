@@ -128,19 +128,19 @@ public class Utils {
     @NonNull
     public static String decodeArduinoString(String encodedName) {
         StringBuilder sb = new StringBuilder();
-        boolean prevCharIsEscape = false;
+        boolean isUnicode = false;
+	//boolean prevCharIsEscape = false;
         char[] carr = encodedName.toCharArray();
         for (char c : carr) {
             if (c == '~') {
-                prevCharIsEscape = true;
+                isUnicode = !isUnicode;
                 continue;
             }
 
-            if (prevCharIsEscape)
+            if (isUnicode)
                 sb.append((char) (((int) c + 0x108F))); // 'ა' - 'A'
             else
                 sb.append(c);
-            prevCharIsEscape = false;
         }
         return sb.toString();
     }
@@ -149,17 +149,31 @@ public class Utils {
         StringBuilder sb = new StringBuilder();
 
         char[] carr = name.toCharArray();
-        for (char c : carr) {
+	boolean isUnicode = false;        
+	for (char c : carr) {
             if (c == ';')
-                sb.append(':');
-            else if (c == '~')
-                sb.append(' ');
+                c = ':';
+            else 
+	if (c == '~')
+                c = ' ';
             else if (((int) c >= 0x10D0) && ((int) c <= 0x10F0)) // 'ა'..'ჰ'
             {
-                sb.append('~');
-                sb.append((char) (((int) c - 0x108F))); // 'ა' - 'A'
-            } else
+		if (!isUnicode)
+		{
+                	sb.append('~');
+			isUnicode = true;
+                }
+		sb.append((char) (((int) c - 0x108F))); // 'ა' - 'A'
+            } 
+		else
+	{
+		if (isUnicode)
+		{
+                	sb.append('~');
+			isUnicode = false;
+                }
                 sb.append(c);
+		}
         }
         return sb.toString();
     }
