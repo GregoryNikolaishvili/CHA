@@ -383,16 +383,17 @@ public final class ThermostatUtils {
         }
     }
 
-    public static void FillWaterLevelLog(WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
+    public static void FillWaterLevelLog(int sensorId, WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        int logEntryLen = 17;
+        int logEntryLen = 21;
 
         logBuffer.clear();
 
         Date XX;
+        int id;
         int value1 = 0;
         String value2 = "";
 
@@ -407,10 +408,24 @@ public final class ThermostatUtils {
                 }
 
                 try {
+                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid id", ex);
+                    continue;
+                }
+
+                if (id != sensorId)
+                    continue;
+
+                try {
                     switch (scope) {
                         case WaterLevelSensor:
                             value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
-                            value2 = String.format(Locale.US, "%d cm %s %s", Integer.parseInt(logEntry.substring(7, 11), 16), logEntry.charAt(15) == '0' ? "" : "F", logEntry.charAt(16) == '0' ? "" : "S");
+                            value2 = String.format(Locale.US, "%d cm %s %s %s",
+                                    Integer.parseInt(logEntry.substring(7, 11), 16),
+                                    logEntry.charAt(15) == '0' ? "" : "F",
+                                    Integer.parseInt(logEntry.substring(16, 20), 16),
+                                    logEntry.charAt(20));
                             break;
                     }
                 } catch (NumberFormatException ex) {

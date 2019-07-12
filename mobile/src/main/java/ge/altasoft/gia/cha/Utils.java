@@ -156,15 +156,13 @@ public class Utils {
                 c = ' ';
             else if (((int) c >= 0x10D0) && ((int) c <= 0x10F0)) // 'ა'..'ჰ'
             {
-                if (!isUnicode)
-                {
+                if (!isUnicode) {
                     isUnicode = true;
                     sb.append('~');
                 }
                 sb.append((char) (((int) c - 0x108F))); // 'ა' - 'A'
             } else {
-                if (isUnicode)
-                {
+                if (isUnicode) {
                     isUnicode = false;
                     sb.append('~');
                 }
@@ -176,8 +174,8 @@ public class Utils {
 
     static String getMtqqBrokerUrl(Context context) {
         if (Debug.isDebuggerConnected())
-            //return mqttBrokerLocalUrl;
-        return mqttBrokerGlobalUrl;
+            return mqttBrokerLocalUrl;
+//        //return mqttBrokerGlobalUrl;
 
         final ConnectivityManager conMgr = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr == null)

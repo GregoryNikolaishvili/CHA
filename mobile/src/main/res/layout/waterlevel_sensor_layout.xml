@@ -41,7 +41,6 @@
             android:text="@string/no_sensor_value"
             android:textSize="@dimen/widget_l_size" />
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

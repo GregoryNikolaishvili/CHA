@@ -4,11 +4,13 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Locale;
 
+import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.ChaWidget;
@@ -17,14 +19,19 @@ import ge.altasoft.gia.cha.other.WaterLevelData;
 
 public class WaterLevelSensorView extends ChaWidget {
 
+//    private enum ButtonState {UNKNOWN, ON, OFF, WAIT}
+
     private TextView tvPercent;
     private TextView tvDistance;
     private TextView tvBallValve;
     private TextView tvBallValveSwitch;
+    private ImageView ivLight;
 
     private int defaultTextColor;
 
     private WaterLevelData waterLevelData;
+
+//    private ButtonState buttonState = ButtonState.UNKNOWN;
 
     public WaterLevelSensorView(Context context, boolean fromDashboard) {
         super(context, fromDashboard);
@@ -66,6 +73,12 @@ public class WaterLevelSensorView extends ChaWidget {
         return R.menu._5in1_sensor_popup_menu;
     }
 
+//    @Override
+//    protected void onClick() {
+//        ((ChaActivity) getContext()).publish(String.format(Locale.US, "chac/lc/state/%01X", relayData.getId()), buttonState == ButtonState.OFF ? "1" : "0", false);
+//        setState(ButtonState.WAIT);
+//    }
+
     private void initializeViews(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.waterlevel_sensor_layout, this);
@@ -78,7 +91,28 @@ public class WaterLevelSensorView extends ChaWidget {
         tvDistance = (TextView) this.findViewById(R.id.distance_cm);
         tvBallValve = (TextView) this.findViewById(R.id.ball_valve_state);
         tvBallValveSwitch = (TextView) this.findViewById(R.id.ball_valve_switch_state);
+
+        ivLight = ((ImageView) findViewById(R.id.relay_light));
     }
+
+//    private void setState(ButtonState value) {
+//        buttonState = value;
+//
+//        switch (value) {
+//            case UNKNOWN:
+//                ivLight.setImageResource(R.drawable.button_onoff_indicator_unknown);
+//                break;
+//            case ON:
+//                ivLight.setImageResource(R.drawable.button_onoff_indicator_on);
+//                break;
+//            case OFF:
+//                ivLight.setImageResource(R.drawable.button_onoff_indicator_off);
+//                break;
+//            case WAIT:
+//                ivLight.setImageResource(R.drawable.button_onoff_indicator_wait);
+//                break;
+//        }
+//    }
 
     public void setWaterLevelData(WaterLevelData value) {
         this.waterLevelData = value;
@@ -108,24 +142,26 @@ public class WaterLevelSensorView extends ChaWidget {
         if (state == 0xFF) {
             tvBallValve.setText("On");
             tvBallValve.setTextColor(Color.GREEN);
-        }
-        else
-        if (state == -0xFF) {
+        } else if (state == 0xFF01) {
             tvBallValve.setText("Off");
             tvBallValve.setTextColor(Color.RED);
-        }
-        else {
+        } else {
             tvBallValve.setText("ooo");
             tvBallValve.setTextColor(Color.YELLOW); //todo
         }
 
-        state = this.waterLevelData.getBallValveSwitchState();
+        char sstate = this.waterLevelData.getBallValveSwitchState();
         String text = "";
-        if ((state & 0x02) != 0) {
-            text = "Open";
-        }
-        if ((state & 0x01) != 0) {
-            text += " Closed";
+        switch (sstate) {
+            case 'O':
+                text = "Open";
+                break;
+            case 'C':
+                text = "Closed";
+                break;
+            case 'B':
+                text = "Open/Closed";
+                break;
         }
         tvBallValveSwitch.setText(text);
 
@@ -138,8 +174,7 @@ public class WaterLevelSensorView extends ChaWidget {
     }
 
     @Override
-    protected long getLastSyncTime()
-    {
+    protected long getLastSyncTime() {
         return this.waterLevelData.getLastSyncTime();
     }
 }

@@ -172,7 +172,7 @@ public class Log5in1Activity extends ChaActivity {
                     case WaterLevelSensor:
                         if (intent.getStringExtra("type").startsWith("tank")) {
                             String log = intent.getStringExtra("log");
-                            ThermostatUtils.FillWaterLevelLog(scope, log, logBuffer);
+                            ThermostatUtils.FillWaterLevelLog(widgetId, scope, log, logBuffer);
                             adapter.notifyDataSetChanged();
                             ThermostatUtils.DrawTwoValueChart(logBuffer, mChartView, mRenderer, xyDataSet);
                         }
@@ -287,7 +287,9 @@ public class Log5in1Activity extends ChaActivity {
                 case RainSensor:
                     publish("cha/hub/getlog", "5in1_".concat(String.valueOf(wd)), false);
                     break;
-            }
+                case WaterLevelSensor:
+                    publish("cha/hub/getlog", "tank_".concat(String.valueOf(wd)), false);
+                    break;            }
             return true;
         }
 
