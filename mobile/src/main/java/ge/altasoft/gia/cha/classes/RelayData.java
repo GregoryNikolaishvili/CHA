@@ -20,7 +20,7 @@ public abstract class RelayData implements Comparable<RelayData> {
         this.id = id;
         this.order = id;
         this.state = 0;
-        this.name = "Default Relay #" + String.valueOf(id);
+        this.name = "Default Relay #" + id;
     }
 
     public long getLastSyncTime() {

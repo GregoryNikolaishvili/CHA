@@ -34,11 +34,11 @@ class MqttTokenAndroid implements IMqttToken {
 
   private final Object waitObject = new Object();
 
-  private MqttAndroidClient client;
+  private final MqttAndroidClient client;
 
   private Object userContext;
 
-  private String[] topics;
+  private final String[] topics;
 
   private IMqttToken delegate; // specifically for getMessageId
 

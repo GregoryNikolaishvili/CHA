@@ -4,13 +4,11 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-import ge.altasoft.gia.cha.ChaActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.ChaWidget;
@@ -21,11 +19,12 @@ public class WaterLevelSensorView extends ChaWidget {
 
 //    private enum ButtonState {UNKNOWN, ON, OFF, WAIT}
 
+    private TextView tvSensorName;
     private TextView tvPercent;
     private TextView tvDistance;
     private TextView tvBallValve;
     private TextView tvBallValveSwitch;
-    private ImageView ivLight;
+    //private ImageView ivLight;
 
     private int defaultTextColor;
 
@@ -85,6 +84,7 @@ public class WaterLevelSensorView extends ChaWidget {
 
         afterInflate();
 
+        tvSensorName = (TextView) this.findViewById(R.id.sensor_name);
         tvPercent = (TextView) this.findViewById(R.id.water_percent_value);
         defaultTextColor = tvPercent.getCurrentTextColor();
 
@@ -92,7 +92,7 @@ public class WaterLevelSensorView extends ChaWidget {
         tvBallValve = (TextView) this.findViewById(R.id.ball_valve_state);
         tvBallValveSwitch = (TextView) this.findViewById(R.id.ball_valve_switch_state);
 
-        ivLight = ((ImageView) findViewById(R.id.relay_light));
+        //ivLight = ((ImageView) findViewById(R.id.relay_light));
     }
 
 //    private void setState(ButtonState value) {
@@ -121,6 +121,8 @@ public class WaterLevelSensorView extends ChaWidget {
 
     @Override
     public void refresh() {
+        tvSensorName.setText(getResources().getString(R.string.water_level) + " " + (this.waterLevelData.getId() + 1));
+
         int x = this.waterLevelData.getWaterPercent();
         if (x == 255)
             tvPercent.setText("- - - - %");

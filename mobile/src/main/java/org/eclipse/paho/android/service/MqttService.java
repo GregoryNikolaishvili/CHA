@@ -252,7 +252,7 @@ public class MqttService extends Service implements MqttTraceHandler {
     private MqttServiceBinder mqttServiceBinder;
 
     // mapping from client handle strings to actual client connections.
-    private Map<String/* clientHandle */, MqttConnection/* client */> connections = new ConcurrentHashMap<>();
+    private final Map<String/* clientHandle */, MqttConnection/* client */> connections = new ConcurrentHashMap<>();
 
     public MqttService() {
         super();
@@ -756,9 +756,11 @@ public class MqttService extends Service implements MqttTraceHandler {
             // by requesting a wake lock - we request the minimum possible wake
             // lock - just enough to keep the CPU running until we've finished
             PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-            WakeLock wl = pm
-                    .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT");
-            wl.acquire();
+            WakeLock wl = null;
+            if (pm != null) {
+                wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT:");
+            }
+            wl.acquire(10*60*1000L /*10 minutes*/);
             traceDebug(TAG, "Reconnect for Network recovery.");
             if (isOnline()) {
                 traceDebug(TAG, "Online,reconnect.");

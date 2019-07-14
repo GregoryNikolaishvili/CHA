@@ -22,8 +22,8 @@ public class BoilerSettings {
 
     private float CollectorEmergencySwitchOffT;
     private float CollectorEmergencySwitchOnT;
-    float CollectorMinimumSwitchOnT;
-    float CollectorAntifreezeT;
+    private float CollectorMinimumSwitchOnT;
+    private float CollectorAntifreezeT;
     private float MaxTankT;
     private float AbsoluteMaxTankT;
 
@@ -33,7 +33,7 @@ public class BoilerSettings {
     private int BackupHeatingTS1_Start;
     private int BackupHeatingTS1_End;
     private float BackupHeatingTS1_SwitchOnT;
-    float BackupHeatingTS1_SwitchOffT;
+    private float BackupHeatingTS1_SwitchOffT;
 
     private int BackupHeatingTS2_Start;
     private int BackupHeatingTS2_End;

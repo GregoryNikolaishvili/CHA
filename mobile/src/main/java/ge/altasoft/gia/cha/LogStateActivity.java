@@ -127,7 +127,7 @@ public class LogStateActivity extends ChaActivity {
         }
     }
 
-    public class StateLogAdapter extends ArrayAdapter<LogOneValueItem> {
+    class StateLogAdapter extends ArrayAdapter<LogOneValueItem> {
         StateLogAdapter(Context context, ArrayList<LogOneValueItem> points) {
             super(context, 0, points);
         }

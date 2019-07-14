@@ -16,10 +16,10 @@ import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.thermostat.RoomSensorData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
-import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
-import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_AWAY;
-import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
-import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL_AWAY;
+//import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER;
+//import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_AWAY;
+//import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL;
+//import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_SUMMER_POOL_AWAY;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER;
 import static ge.altasoft.gia.cha.thermostat.BoilerSettings.BOILER_MODE_WINTER_AWAY;
 
@@ -144,7 +144,7 @@ public class RoomSensorView extends ChaWidget {
             char mode = ThermostatControllerData.Instance.getBoilerMode();
             if (mode == BOILER_MODE_WINTER || mode == BOILER_MODE_WINTER_AWAY)
                 tvRelayState.setTextColor(Color.YELLOW);
-            tvRelayState.setText(Integer.toString(this.sensorData.Value()) + "%");
+            tvRelayState.setText(this.sensorData.Value() + "%");
         } else {
             tvRelayState.setTextColor(Color.GRAY);
             tvRelayState.setText("Off");

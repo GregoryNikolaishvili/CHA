@@ -54,7 +54,7 @@ public class ParcelableMqttMessage extends MqttMessage implements Parcelable {
     setDuplicate(original.isDuplicate());
   }
 
-  ParcelableMqttMessage(Parcel parcel) {
+  private ParcelableMqttMessage(Parcel parcel) {
     super(parcel.createByteArray());
     setQos(parcel.readInt());
     boolean[] flags = parcel.createBooleanArray();

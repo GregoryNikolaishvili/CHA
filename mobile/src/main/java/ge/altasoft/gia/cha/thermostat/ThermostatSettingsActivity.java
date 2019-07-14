@@ -82,24 +82,24 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
                     Preference p0 = new Preference(prefContext);
                     p0.setPersistent(false);
                     p0.setSelectable(false);
-                    p0.setTitle("Sensor #" + Integer.toString(id));
-                    p0.setKey("t_sensor_deleted_" + Integer.toString(id));
+                    p0.setTitle("Sensor #" + id);
+                    p0.setKey("t_sensor_deleted_" + id);
                     screen.addPreference(p0);
 
                     FriendlyEditTextPreference p1 = new FriendlyEditTextPreference(prefContext);
-                    p1.setKey("t_sensor_name_" + Integer.toString(id));
+                    p1.setKey("t_sensor_name_" + id);
                     p1.setSummary("%s");
                     p1.setTitle("Name");
                     screen.addPreference(p1);
 
                     TemperaturePreference p2 = new TemperaturePreference(prefContext);
-                    p2.setKey("t_target_t_" + Integer.toString(id));
+                    p2.setKey("t_target_t_" + id);
                     p2.setSummary("%s°");
                     p2.setTitle("Target temperature");
                     screen.addPreference(p2);
 
                     FriendlyEditTextPreference p3 = new FriendlyEditTextPreference(prefContext);
-                    p3.setKey("t_resp_relay_id_" + Integer.toString(id));
+                    p3.setKey("t_resp_relay_id_" + id);
                     p3.setSummary("# %s");
                     p3.setTitle("Responsible relay id");
                     screen.addPreference(p3);
@@ -189,7 +189,7 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
                         TemperaturePreference targetTPref = (TemperaturePreference) screen.getPreference(2);
                         FriendlyEditTextPreference relayPref = (FriendlyEditTextPreference) screen.getPreference(3);
 
-                        screen.setTitle(namePref.getText() == null ? "Sensor #" + Integer.toString(ThermostatControllerData.Instance.relays(i).getId()) : namePref.getText());
+                        screen.setTitle(namePref.getText() == null ? "Sensor #" + ThermostatControllerData.Instance.relays(i).getId() : namePref.getText());
 
                         String summary = "";
                         if (screen.isEnabled()) {

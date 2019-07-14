@@ -11,9 +11,9 @@ import java.util.Iterator;
 class InMemoryMessageStore implements MessageStore {
 
 
-    private static HashMap<String, ArrayList<StoredData>> MessageList = new HashMap<String, ArrayList<StoredData>>();
+    private final static HashMap<String, ArrayList<StoredData>> MessageList = new HashMap<>();
 
-    public InMemoryMessageStore() {
+    InMemoryMessageStore() {
     }
 
     /**
@@ -34,7 +34,7 @@ class InMemoryMessageStore implements MessageStore {
         if (MessageList.containsKey(clientHandle)) {
             messages = MessageList.get(clientHandle);
         } else {
-            messages = new ArrayList<StoredData>();
+            messages = new ArrayList<>();
             MessageList.put(clientHandle, messages);
         }
         messages.add(data);
@@ -106,11 +106,10 @@ class InMemoryMessageStore implements MessageStore {
                 throw new UnsupportedOperationException();
             }
 
-            @Override
-            protected void finalize() throws Throwable {
-                super.finalize();
-            }
-
+//            @Override
+//            protected void finalize() throws Throwable {
+//                super.finalize();
+//            }
         };
     }
 
@@ -123,8 +122,7 @@ class InMemoryMessageStore implements MessageStore {
     @Override
     public void clearArrivedMessages(String clientHandle) {
 
-        if (MessageList.containsKey(clientHandle))
-            MessageList.remove(clientHandle);
+        MessageList.remove(clientHandle);
     }
 
 
@@ -134,10 +132,10 @@ class InMemoryMessageStore implements MessageStore {
 
 
     private class StoredData implements StoredMessage {
-        private String messageId;
-        private String clientHandle;
-        private String topic;
-        private MqttMessage message;
+        private final String messageId;
+        private final String clientHandle;
+        private final String topic;
+        private final MqttMessage message;
 
         StoredData(String messageId, String clientHandle, String topic, MqttMessage message) {
             this.messageId = messageId;

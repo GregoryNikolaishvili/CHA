@@ -187,7 +187,7 @@ public class LogTHActivity extends ChaActivity {
         }
     }
 
-    public class THLogAdapter extends ArrayAdapter<LogTHItem> {
+    class THLogAdapter extends ArrayAdapter<LogTHItem> {
 
         private final boolean hasHumidity;
 

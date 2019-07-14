@@ -182,7 +182,7 @@ public class Log5in1Activity extends ChaActivity {
         }
     }
 
-    public class _5in1LogAdapter extends ArrayAdapter<LogTwoValueItem> {
+    class _5in1LogAdapter extends ArrayAdapter<LogTwoValueItem> {
 
         private final boolean has2ndValue;
 

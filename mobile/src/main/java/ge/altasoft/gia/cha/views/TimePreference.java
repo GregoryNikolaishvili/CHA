@@ -19,7 +19,7 @@ public final class TimePreference extends DialogPreference {
         this(context, null);
     }
 
-    public TimePreference(Context context, AttributeSet attrs) {
+    private TimePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setPositiveButtonText("Set");
         setNegativeButtonText("Cancel");

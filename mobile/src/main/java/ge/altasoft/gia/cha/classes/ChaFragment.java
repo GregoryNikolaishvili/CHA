@@ -57,7 +57,7 @@ public abstract class ChaFragment extends Fragment implements OnStartDragListene
 
 
     private class MySimpleItemTouchHelperCallback extends SimpleItemTouchHelperCallback {
-        public MySimpleItemTouchHelperCallback(ItemTouchHelperAdapter _adapter) {
+        MySimpleItemTouchHelperCallback(ItemTouchHelperAdapter _adapter) {
             super(_adapter);
         }
 

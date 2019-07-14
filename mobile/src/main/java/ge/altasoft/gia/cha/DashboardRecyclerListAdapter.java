@@ -68,9 +68,9 @@ class DashboardRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> 
         DashboardItem item = DashboardItems.getItemAt(position);
         switch (item.type) {
             case LightRelay:
-                RelayData rd = LightControllerData.Instance.relays(item.id);
+                LightRelayData rd = LightControllerData.Instance.relays(item.id);
                 w = new LightRelayView(ll.getContext(), true);
-                ((LightRelayView) w).setRelayData((LightRelayData) rd);
+                ((LightRelayView) w).setRelayData(rd);
                 break;
 
             case RoomSensor:

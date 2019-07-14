@@ -28,7 +28,6 @@ import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.light.LightSettingsActivity;
 import ge.altasoft.gia.cha.other.FragmentOtherSensors;
 import ge.altasoft.gia.cha.other.OtherControllerData;
-import ge.altasoft.gia.cha.other.WaterLevelData;
 import ge.altasoft.gia.cha.other.WaterLevelSettingsActivity;
 import ge.altasoft.gia.cha.thermostat.FragmentBoiler;
 import ge.altasoft.gia.cha.thermostat.FragmentRoomSensors;

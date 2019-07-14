@@ -26,7 +26,7 @@ public class WhoIsOnlineActivity extends ChaActivity {
         listView.setAdapter(adapter);
     }
 
-    public class LogAdapter extends ArrayAdapter<String> {
+    class LogAdapter extends ArrayAdapter<String> {
         LogAdapter(Context context, ArrayList<String> points) {
             super(context, 0, points);
         }

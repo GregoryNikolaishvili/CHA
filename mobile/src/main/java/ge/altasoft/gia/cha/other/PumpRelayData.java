@@ -59,7 +59,7 @@ public final class PumpRelayData extends RelayData {
             value = 0;
         offValue = value;
 
-        setName(prefs.getString("l_relay_name_" + suffix, "Relay #" + suffix));
+        setName(prefs.getString("wl_relay_name_" + suffix, "Relay #" + suffix));
     }
 
     void encodeSettings(SharedPreferences.Editor editor) {

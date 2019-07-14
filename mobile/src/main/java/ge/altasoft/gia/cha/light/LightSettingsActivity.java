@@ -79,27 +79,27 @@ public class LightSettingsActivity extends ChaPreferenceActivity {
                 for (int id = 0; id < LightControllerData.RELAY_COUNT; id++) {
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 
-                    screen.setTitle(Integer.toString(id));
+                    screen.setTitle(id);
 
                     Preference p0 = new Preference(prefContext);
                     p0.setPersistent(false);
                     p0.setSelectable(false);
-                    p0.setTitle("Relay #" + Integer.toString(id));
+                    p0.setTitle("Relay #" + id);
                     screen.addPreference(p0);
 
                     FriendlyEditTextPreference p1 = new FriendlyEditTextPreference(prefContext);
-                    p1.setKey("l_relay_name_" + Integer.toString(id));
+                    p1.setKey("l_relay_name_" + id);
                     p1.setSummary("%s");
                     p1.setTitle("Name");
                     screen.addPreference(p1);
 
                     CheckBoxPreference p2 = new CheckBoxPreference(prefContext);
-                    p2.setKey("l_is_active_" + Integer.toString(id));
+                    p2.setKey("l_is_active_" + id);
                     p2.setTitle("Active");
                     screen.addPreference(p2);
 
                     TimePreference p3 = new TimePreference(prefContext);
-                    p3.setKey("l_on_offset_" + Integer.toString(id));
+                    p3.setKey("l_on_offset_" + id);
                     p3.setTitle("On (offset to sunset)");
                     screen.addPreference(p3);
 
@@ -107,13 +107,13 @@ public class LightSettingsActivity extends ChaPreferenceActivity {
                     p4.setDefaultValue("S");
                     p4.setEntries(R.array.listArray);
                     p4.setEntryValues(R.array.listValues);
-                    p4.setKey("l_off_mode_" + Integer.toString(id));
+                    p4.setKey("l_off_mode_" + id);
                     p4.setSummary("%s");
                     p4.setTitle("Off mode");
                     screen.addPreference(p4);
 
                     TimePreference p5 = new TimePreference(prefContext);
-                    p5.setKey("l_off_value_" + Integer.toString(id));
+                    p5.setKey("l_off_value_" + id);
                     p5.setTitle("Value");
                     screen.addPreference(p5);
 //
@@ -162,7 +162,7 @@ public class LightSettingsActivity extends ChaPreferenceActivity {
 
                         String name = namePref.getText();
                         if (name == null)
-                            name = "Relay #" + Integer.toString(LightControllerData.Instance.relays(i).getId());
+                            name = "Relay #" + LightControllerData.Instance.relays(i).getId();
                         screen.setTitle(name);
 
                         if (isActivePref.isChecked()) {

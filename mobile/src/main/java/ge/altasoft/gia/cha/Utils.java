@@ -15,9 +15,6 @@ import android.os.Build;
 import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
-
-import java.io.File;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;

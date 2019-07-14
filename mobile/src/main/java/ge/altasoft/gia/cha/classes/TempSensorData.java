@@ -65,7 +65,7 @@ public class TempSensorData {
         return this.targetT;
     }
 
-    public void setTargetTemperature(float value) {
+    protected void setTargetTemperature(float value) {
         if (value == Utils.F_UNDEFINED)
             this.targetT = Float.NaN;
         else

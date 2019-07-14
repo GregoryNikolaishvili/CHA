@@ -5,8 +5,10 @@ import android.content.SharedPreferences;
 
 import ge.altasoft.gia.cha.classes.ChaWidget;
 import ge.altasoft.gia.cha.classes.RelayControllerData;
+import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.views.OutsideSensorView;
 import ge.altasoft.gia.cha.views.PressureSensorView;
+import ge.altasoft.gia.cha.views.PumpRelayView;
 import ge.altasoft.gia.cha.views.RainSensorView;
 import ge.altasoft.gia.cha.views.WaterLevelSensorView;
 import ge.altasoft.gia.cha.views.WindDirSensorView;
@@ -23,9 +25,15 @@ public final class OtherControllerData extends RelayControllerData {
     final static private int _WATER_LEVEL_SENSOR2 = 6;
     final static private int _WATER_LEVEL_SENSOR3 = 7;
 
+    final static private int _WATER_LEVEL_RELAY1 = 8;
+    final static private int _WATER_LEVEL_RELAY2 = 9;
+    final static private int _WATER_LEVEL_RELAY3 = 10;
+    final static private int _WATER_LEVEL_RELAY4 = 11;
+    final static private int _WATER_LEVEL_RELAY5 = 12;
+
     final private static int RELAY_COUNT = 5;
 
-    final static private int SENSOR_COUNT = 5 + 3;
+    final static private int SENSOR_COUNT = 5 + 3 + 5;
 
     final public static OtherControllerData Instance = new OtherControllerData();
 
@@ -41,7 +49,7 @@ public final class OtherControllerData extends RelayControllerData {
         waterLevelDatas[2] = new WaterLevelData(2);
 
         for (int i = 0; i < RELAY_COUNT; i++) {
-            PumpRelayData relay = new PumpRelayData(i);
+            RelayData relay = new PumpRelayData(i);
             setRelay(i, relay);
         }
     }
@@ -51,9 +59,9 @@ public final class OtherControllerData extends RelayControllerData {
         return RELAY_COUNT;
     }
 
-    public PumpRelayData relays(int index) {
-        return (PumpRelayData) super.relays(index);
-    }
+//    public RelayData relays(int index) {
+//        return (RelayData) super.relays(index);
+//    }
 
     int sensorCount() {
         return SENSOR_COUNT;
@@ -78,6 +86,15 @@ public final class OtherControllerData extends RelayControllerData {
                 WaterLevelSensorView w = new WaterLevelSensorView(context, fromDashboard);
                 w.setWaterLevelData(sd);
                 return w;
+            case _WATER_LEVEL_RELAY1:
+            case _WATER_LEVEL_RELAY2:
+            case _WATER_LEVEL_RELAY3:
+            case _WATER_LEVEL_RELAY4:
+            case _WATER_LEVEL_RELAY5:
+                RelayData rd = OtherControllerData.Instance.relays(position - _WATER_LEVEL_RELAY1);
+                PumpRelayView rw = new PumpRelayView(context, fromDashboard);
+                rw.setRelayData(rd);
+                return rw;
             default:
                 return null;
         }
@@ -116,8 +133,8 @@ public final class OtherControllerData extends RelayControllerData {
 
         setIsActive(prefs.getBoolean("wl_automatic_mode", false));
 
-        for (int i = 0; i < RELAY_COUNT; i++)
-            relays(i).decodeSettings(prefs);
+//        for (int i = 0; i < RELAY_COUNT; i++)
+//            relays(i).decodeSettings(prefs);
 
         waterLevelDatas[0].decodeSettings(prefs);
         waterLevelDatas[1].decodeSettings(prefs);
@@ -130,8 +147,8 @@ public final class OtherControllerData extends RelayControllerData {
 
         editor.putBoolean("wl_automatic_mode", isActive());
 
-        for (int i = 0; i < RELAY_COUNT; i++)
-            relays(i).encodeSettings(editor);
+//        for (int i = 0; i < RELAY_COUNT; i++)
+//            relays(i).encodeSettings(editor);
 
         waterLevelDatas[0].encodeSettings(editor);
         waterLevelDatas[1].encodeSettings(editor);

@@ -14,6 +14,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import ge.altasoft.gia.cha.light.LightControllerData;
@@ -144,7 +146,7 @@ public class MqttClientLocal {
         Utils.readUrlSettings(context);
         brokerUrl = "tcp://" + Utils.getMtqqBrokerUrl(context);
 
-        mqttClient = new MqttAndroidClient(context, brokerUrl, "android." + String.valueOf(System.currentTimeMillis()));
+        mqttClient = new MqttAndroidClient(context, brokerUrl, "android." + System.currentTimeMillis());
         //mqttClient.registerResources(context);
         mqttClient.setCallback(new MqttCallbackHandler());
 
@@ -206,11 +208,8 @@ public class MqttClientLocal {
             if (message.equals(""))
                 payload = new byte[0];
             else
-                payload = message.getBytes("UTF-8");
+                payload = message.getBytes(Charset.defaultCharset());
             mqttClient.publish(topic, payload, 1, retained);
-        } catch (UnsupportedEncodingException e) {
-            Log.e("mqtt", "publish failed - UnsupportedEncodingException", e);
-            broadcastServiceStatus("publish failed - UnsupportedEncodingException: " + e.getMessage(), true);
         } catch (MqttException e) {
             Log.e("mqtt", "publish failed - MQTT exception", e);
             broadcastServiceStatus("publish failed - MQTT exception: " + e.getMessage(), true);
@@ -509,6 +508,7 @@ public class MqttClientLocal {
 
                 if (topic.startsWith(TOPIC_CHA_5IN1)) {
                     int id = Integer.parseInt(topic.substring(TOPIC_CHA_5IN1.length()), 16);
+                    id &= 0xA0000;
                     boolean isWeatherSensor = id == 0xA0000;
                     if ((id == 0) || isWeatherSensor) {
                         Sensor5in1Data sd = OtherControllerData.Instance.get5in1SensorData();
@@ -606,8 +606,7 @@ public class MqttClientLocal {
 
                         case "disconnected":
                         case "":
-                            if (connectedClients.contains(clientId))
-                                connectedClients.remove(clientId);
+                            connectedClients.remove(clientId);
 
                             broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.ClientConnected);
                             broadcastDataIntent.putExtra("id", clientId);
