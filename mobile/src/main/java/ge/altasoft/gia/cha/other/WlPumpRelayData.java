@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import ge.altasoft.gia.cha.Utils;
 import ge.altasoft.gia.cha.classes.RelayData;
 
-public final class PumpRelayData extends RelayData {
+public final class WlPumpRelayData extends RelayData {
 
     private static final char OFF_SUNRISE = 'S';
     private static final char OFF_TIME = 'T';
@@ -16,7 +16,7 @@ public final class PumpRelayData extends RelayData {
     private String offMode;
     private short offValue;
 
-    PumpRelayData(int id) {
+    WlPumpRelayData(int id) {
         super(id);
 
         this.isActive = false;

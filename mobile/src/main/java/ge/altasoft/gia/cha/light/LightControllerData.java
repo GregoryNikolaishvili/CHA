@@ -34,14 +34,6 @@ public final class LightControllerData extends RelayControllerData {
     public LightRelayData relays(int index) {
         return (LightRelayData) super.relays(index);
     }
-//
-//    short getSunriseMin() {
-//        return this.sunriseMin;
-//    }
-//
-//    short getSunsetMin() {
-//        return this.sunsetMin;
-//    }
 
     //region Encode/Decode
     void decode(SharedPreferences prefs) {
@@ -62,13 +54,6 @@ public final class LightControllerData extends RelayControllerData {
         editor.apply();
     }
 
-//    public void decodeAllStates(String payload) {
-//        if (payload.length() != (RELAY_COUNT + 1))
-//            return;
-//
-//        for (int i = 0; i < RELAY_COUNT; i++)
-//            relays(i).decodeState(Character.toString(payload.charAt(i)));
-//    }
     //endregion
 }
 

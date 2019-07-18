@@ -14,7 +14,7 @@ import ge.altasoft.gia.cha.classes.ChaWidget;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.classes.WidgetType;
 
-public class PumpRelayView extends ChaWidget {
+public class WlPumpRelayView extends ChaWidget {
 
     private enum ButtonState {UNKNOWN, ON, OFF, WAIT}
 
@@ -25,17 +25,17 @@ public class PumpRelayView extends ChaWidget {
     private TextView tvRelayName;
     private ImageView ivLight;
 
-    public PumpRelayView(Context context, boolean fromDashboard) {
+    public WlPumpRelayView(Context context, boolean fromDashboard) {
         super(context, fromDashboard);
         initializeViews(context);
     }
 
-    public PumpRelayView(Context context, AttributeSet attrs) {
+    public WlPumpRelayView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initializeViews(context);
     }
 
-    public PumpRelayView(Context context, AttributeSet attrs, int defStyle) {
+    public WlPumpRelayView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initializeViews(context);
     }
@@ -47,7 +47,7 @@ public class PumpRelayView extends ChaWidget {
 
     @Override
     public WidgetType getWidgetType() {
-        return WidgetType.LightRelay;
+        return WidgetType.WaterLevelPumpRelay;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class PumpRelayView extends ChaWidget {
 
     private void initializeViews(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.light_relay_layout, this);
+        inflater.inflate(R.layout.wl_pump_relay_layout, this);
 
         afterInflate();
 

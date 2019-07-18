@@ -6,7 +6,7 @@
 //
 //import ge.altasoft.gia.cha.classes.RelayControllerData;
 //import ge.altasoft.gia.cha.classes.TempSensorData;
-//import ge.altasoft.gia.cha.other.PumpRelayData;
+//import ge.altasoft.gia.cha.other.WlPumpRelayData;
 //import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
 //
 //public final class WaterLevelControllerData extends RelayControllerData {
@@ -34,14 +34,14 @@
 //        super();
 //
 //        for (int i = 0; i < RELAY_COUNT; i++) {
-//            PumpRelayData relay = new PumpRelayData(i);
+//            WlPumpRelayData relay = new WlPumpRelayData(i);
 //            setRelay(i, relay);
 //        }
 //        tempSensorsData = new BoilerSensorData[TEMP_SENSOR_COUNT];
 //    }
 //
-//    public PumpRelayData relays(int index) {
-//        return (PumpRelayData) super.relays(index);
+//    public WlPumpRelayData relays(int index) {
+//        return (WlPumpRelayData) super.relays(index);
 //    }
 //
 //    @Override

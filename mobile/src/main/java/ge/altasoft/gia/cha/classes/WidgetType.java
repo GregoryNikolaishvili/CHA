@@ -10,7 +10,8 @@ public enum WidgetType {
     PressureSensor,
     RainSensor,
     WindDirSensor,
-    WaterLevelSensor;
+    WaterLevelSensor,
+    WaterLevelPumpRelay;
 
     public static WidgetType fromInt(int value) {
         switch (value) {
@@ -34,7 +35,8 @@ public enum WidgetType {
                 return WindDirSensor;
             case 9:
                 return WaterLevelSensor;
-
+            case  10:
+                return WaterLevelPumpRelay;
             default:
                 return null;
         }

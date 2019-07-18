@@ -202,8 +202,8 @@ public class MainActivity extends ChaActivity {
 
             case Utils.ACTIVITY_REQUEST_RESULT_LIGHT_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
-                    publish("chac/lc/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
                     publish("chac/lc/settings", LightControllerData.Instance.encodeSettings(), false);
+                    publish("chac/lc/settings/names", LightControllerData.Instance.encodeNamesAndOrder(), false);
                 }
                 clearUnneededPreferences();
                 break;
@@ -212,7 +212,6 @@ public class MainActivity extends ChaActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     publish("chac/ts/settings/rs", ThermostatControllerData.Instance.encodeRoomSensorSettings(), false);
                     publish("chac/ts/settings/bl", ThermostatControllerData.Instance.encodeBoilerSettings(), false);
-
                     publish("chac/ts/settings/rs/names", ThermostatControllerData.Instance.encodeRoomSensorNamesAndOrder(), false);
                 }
                 clearUnneededPreferences();
@@ -221,6 +220,7 @@ public class MainActivity extends ChaActivity {
             case Utils.ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
                     publish("chac/wl/settings", OtherControllerData.Instance.encodeWaterLevelSettings(), false);
+                    publish("chac/wc/settings/names", OtherControllerData.Instance.encodeNamesAndOrder(), false);
                 }
                 clearUnneededPreferences();
                 break;

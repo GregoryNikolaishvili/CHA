@@ -79,7 +79,7 @@ public class LightSettingsActivity extends ChaPreferenceActivity {
                 for (int id = 0; id < LightControllerData.RELAY_COUNT; id++) {
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 
-                    screen.setTitle(id);
+                    screen.setTitle(Integer.toString(id));
 
                     Preference p0 = new Preference(prefContext);
                     p0.setPersistent(false);
