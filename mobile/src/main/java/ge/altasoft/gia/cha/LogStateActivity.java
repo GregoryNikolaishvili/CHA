@@ -23,6 +23,7 @@ import ge.altasoft.gia.cha.classes.LogOneValueItem;
 import ge.altasoft.gia.cha.classes.RelayData;
 import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.light.LightControllerData;
+import ge.altasoft.gia.cha.other.OtherControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
@@ -61,6 +62,9 @@ public class LogStateActivity extends ChaActivity {
                 break;
             case LightRelay:
                 publish("cha/hub/getlog", "light_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+                break;
+            case WaterLevelPumpRelay:
+                publish("cha/hub/getlog", "trelay_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
         }
     }
@@ -103,6 +107,21 @@ public class LogStateActivity extends ChaActivity {
 
                 break;
 
+            case WaterLevelRelayState:
+                if (scope != WidgetType.WaterLevelPumpRelay)
+                    return;
+                id = intent.getIntExtra("id", -1);
+                if (id != relayId)
+                    return;
+
+                data = OtherControllerData.Instance.relays(id);
+
+                LogOneValueItem point3 = new LogOneValueItem(new Date(data.getLastSyncTime()), data.getState());
+                logBuffer.add(point3);
+                adapter.notifyDataSetChanged();
+
+                break;
+
             case Log:
                 switch (scope) {
                     case BoilerPump:
@@ -122,7 +141,15 @@ public class LogStateActivity extends ChaActivity {
                             adapter.notifyDataSetChanged();
                         }
                         break;
-                }
+
+                    case WaterLevelPumpRelay:
+                        if (intent.getStringExtra("type").startsWith("trelay")) {
+                            String log = intent.getStringExtra("log");
+
+                            ThermostatUtils.FillRelayLog(relayId, scope, log, logBuffer);
+                            adapter.notifyDataSetChanged();
+                        }
+                        break;}
                 break;
         }
     }

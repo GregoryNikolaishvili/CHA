@@ -443,11 +443,6 @@ public class MainActivity extends ChaActivity {
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.LightRelay, id);
                 break;
 
-//            case LightRelayStateRefresh:
-//                pagerAdapter.fragmentLight.drawAllStates();
-//                pagerAdapter.fragmentDashboard.drawAllWidgetStates(WidgetType.LightRelay);
-//                break;
-
             case ThermostatRoomSensorSettings:
             case ThermostatRoomSensorNameAndOrders:
                 pagerAdapter.fragmentRoomSensors.rebuildUI(false);
@@ -509,6 +504,12 @@ public class MainActivity extends ChaActivity {
 
                 pagerAdapter.fragmentOtherSensors.drawState(WidgetType.WaterLevelSensor, id);
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.WaterLevelSensor, id);
+                break;
+
+            case WaterLevelRelayState:
+                id = intent.getIntExtra("id", -1);
+                pagerAdapter.fragmentOtherSensors.drawState(WidgetType.WaterLevelPumpRelay, id);
+                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.WaterLevelPumpRelay, id);
                 break;
 
             case WaterLevelSettings:

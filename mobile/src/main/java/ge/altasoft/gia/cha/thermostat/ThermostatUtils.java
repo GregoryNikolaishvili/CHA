@@ -341,7 +341,7 @@ public final class ThermostatUtils {
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        int logEntryLen = 27;
+        int logEntryLen = 31;
 
         logBuffer.clear();
 
@@ -370,7 +370,8 @@ public final class ThermostatUtils {
                             value1 = Integer.parseInt(logEntry.substring(23, 27), 16);
                             break;
                         case RainSensor:
-                            value1 = Integer.parseInt(logEntry.substring(19, 24), 16);
+                            value1 = Integer.parseInt(logEntry.substring(19, 23), 16);
+                            value2 = String.format(Locale.US, "%d", Integer.parseInt(logEntry.substring(27, 31), 16));
                             break;
                     }
                 } catch (NumberFormatException ex) {
@@ -421,9 +422,9 @@ public final class ThermostatUtils {
                     if (scope == WidgetType.WaterLevelSensor) {
                         value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
                         value2 = String.format(Locale.US, "%d cm %s %s %s",
-                                Integer.parseInt(logEntry.substring(7, 11), 16),
-                                logEntry.charAt(15) == '0' ? "" : "F",
-                                Integer.parseInt(logEntry.substring(16, 20), 16),
+                                Integer.parseInt(logEntry.substring(7, 11), 16), // distance
+                                logEntry.charAt(15) == '0' ? "" : "F", // float switch is full
+                                Utils.GetBallValveStateText(Integer.parseInt(logEntry.substring(16, 20), 16)), //  ball valve state
                                 logEntry.charAt(20));
                     }
                 } catch (NumberFormatException ex) {

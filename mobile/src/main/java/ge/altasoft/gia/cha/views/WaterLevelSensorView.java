@@ -141,16 +141,9 @@ public class WaterLevelSensorView extends ChaWidget {
             tvDistance.setText(String.format(Locale.US, "%d cm", x));
 
         int state = this.waterLevelData.getBallValveState();
-        if (state == 0xFF) {
-            tvBallValve.setText("On");
-            tvBallValve.setTextColor(Color.GREEN);
-        } else if (state == 0xFF01) {
-            tvBallValve.setText("Off");
-            tvBallValve.setTextColor(Color.RED);
-        } else {
-            tvBallValve.setText("ooo");
-            tvBallValve.setTextColor(Color.YELLOW); //todo
-        }
+
+        tvBallValve.setText(Utils.GetBallValveStateText(state));
+        tvBallValve.setTextColor(Utils.GetBallValveStateColor(state));
 
         char sstate = this.waterLevelData.getBallValveSwitchState();
         String text = "";

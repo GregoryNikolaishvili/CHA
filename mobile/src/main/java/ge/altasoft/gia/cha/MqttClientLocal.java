@@ -65,6 +65,7 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_WATER_LEVEL_CONTROLLER_STATE = "cha/wl/state";
 
     private static final String TOPIC_CHA_WATER_LEVEL_STATE = "cha/wl/state/"; // last "/" is important
+    private static final String TOPIC_CHA_WATER_LEVEL_RELAY_STATE = "cha/wl/rs/"; // last "/" is important
 
     private static final String TOPIC_CHA_WATER_LEVEL_SETTINGS = "cha/wl/settings";
 
@@ -99,7 +100,8 @@ public class MqttClientLocal {
         WaterLevelControllerAlive,
         WaterLevelControllerState,
         WaterLevelState,
-        WaterLevelSettings
+        WaterLevelSettings,
+        WaterLevelRelayState
     }
 
     enum MQTTConnectionStatus {
@@ -530,6 +532,18 @@ public class MqttClientLocal {
                     broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelState);
                     broadcastDataIntent.putExtra("id", id);
                     context.sendBroadcast(broadcastDataIntent);
+                    return;
+                }
+
+
+                if (topic.startsWith(TOPIC_CHA_WATER_LEVEL_RELAY_STATE)) {
+                    int id = Integer.parseInt(topic.substring(TOPIC_CHA_WATER_LEVEL_RELAY_STATE.length()), 16);
+                    OtherControllerData.Instance.relays(id).decodeState(payload);
+
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelRelayState);
+                    broadcastDataIntent.putExtra("id", id);
+                    context.sendBroadcast(broadcastDataIntent);
+
                     return;
                 }
 

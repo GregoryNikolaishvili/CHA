@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -332,6 +333,28 @@ public class Utils {
         calendar.set(yr, month - 1, day, hr, min, sec);
 
         return calendar.getTimeInMillis();
+    }
+
+    public static String GetBallValveStateText(int state) {
+        if (state == 0xFF) {
+            return "On";
+        } else if (state == 0xFF01) {
+            return "Off";
+        } else if (state < 0xFF) {
+            return ">>>";
+        } else {
+            return "<<<";
+        }
+    }
+
+    public static int GetBallValveStateColor(int state) {
+        if (state == 0xFF) {
+            return Color.GREEN;
+        } else if (state == 0xFF01) {
+            return Color.RED;
+        } else {
+            return Color.YELLOW;
+        }
     }
 
 //    public static void analyseStorage(Context context) {
