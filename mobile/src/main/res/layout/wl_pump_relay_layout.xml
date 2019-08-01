@@ -40,7 +40,7 @@
             <ImageView
                 android:layout_width="0dp"
                 android:id="@+id/relay_light"
-                android:src="@drawable/button_onoff_indicator_on"
+                android:src="@drawable/pump_animation_active"
                 android:layout_height="match_parent"
                 android:layout_weight="30" />
 

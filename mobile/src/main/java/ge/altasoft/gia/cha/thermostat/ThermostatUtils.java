@@ -236,7 +236,6 @@ public final class ThermostatUtils {
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
         int logEntryLen = scope == WidgetType.BoilerSensor ? 11 : 18;
-
         logBuffer.clear();
 
         int id;

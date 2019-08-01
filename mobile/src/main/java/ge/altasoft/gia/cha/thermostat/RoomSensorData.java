@@ -31,7 +31,7 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
         responsibleRelayId = 0; // no responsible
         signalLevel = 0;
         batteryLevel = "unknown";
-        name = String.valueOf(id);
+        name = Integer.toHexString(id);
         isDeleted = false;
     }
 

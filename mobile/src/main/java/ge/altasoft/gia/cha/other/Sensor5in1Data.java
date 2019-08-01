@@ -60,12 +60,7 @@ public class Sensor5in1Data extends RoomSensorData {
         return dailyRain;
     }
 
-    public void decodeState(String payload, boolean isWeatherData) {
-
-        if (!isWeatherData) {
-            super.decodeState(payload);
-            return;
-        }
+    public void decodeState(String payload) {
 
         JSONObject jMain;
         try {

@@ -57,7 +57,7 @@ public class Log5in1Activity extends ChaActivity {
         widgetId = intent.getIntExtra("id", -1);
 
         logBuffer = new ArrayList<>();
-        adapter = new _5in1LogAdapter(this, logBuffer, (scope == WidgetType.WindSensor) || (scope == WidgetType.WaterLevelSensor)|| (scope == WidgetType.RainSensor));
+        adapter = new _5in1LogAdapter(this, logBuffer, (scope == WidgetType.WindSensor) || (scope == WidgetType.WaterLevelSensor) || (scope == WidgetType.RainSensor));
 
         ListView listView = (ListView) findViewById(R.id.lvLog);
         listView.setAdapter(adapter);
@@ -169,6 +169,7 @@ public class Log5in1Activity extends ChaActivity {
             case Log:
                 switch (scope) {
                     case WindSensor:
+                    case WindDirSensor:
                     case PressureSensor:
                     case RainSensor:
                         if (intent.getStringExtra("type").startsWith("5in1")) {
@@ -300,7 +301,8 @@ public class Log5in1Activity extends ChaActivity {
                     break;
                 case WaterLevelSensor:
                     publish("cha/hub/getlog", "tank_".concat(String.valueOf(wd)), false);
-                    break;            }
+                    break;
+            }
             return true;
         }
 

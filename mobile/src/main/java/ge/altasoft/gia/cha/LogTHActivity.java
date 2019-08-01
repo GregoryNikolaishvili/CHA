@@ -90,7 +90,6 @@ public class LogTHActivity extends ChaActivity {
                 publish("cha/hub/getlog", "boiler_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
             case RoomSensor:
-            case OutsideSensor:
                 publish("cha/hub/getlog", "room_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
         }
@@ -143,26 +142,6 @@ public class LogTHActivity extends ChaActivity {
                 }
                 break;
 
-            case Sensor5in1StateTH:
-                if (scope != WidgetType.OutsideSensor)
-                    return;
-                id = intent.getIntExtra("id", -1);
-                if (id != sensorId)
-                    return;
-
-                RoomSensorData wsd = OtherControllerData.Instance.get5in1SensorData();
-
-                v = wsd.getTemperature();
-                if (!Float.isNaN(v)) {
-                    LogTHItem point = new LogTHItem(new Date(wsd.getLastSyncTime()), v, 0f);
-                    logBuffer.add(point);
-                    adapter.notifyDataSetChanged();
-
-                    xyDataSet.getSeriesAt(0).add(wsd.getLastSyncTime(), v);
-                    mChartView.repaint();
-                }
-                break;
-
             case Log:
                 switch (scope) {
                     case BoilerSensor:
@@ -174,7 +153,6 @@ public class LogTHActivity extends ChaActivity {
                         }
                         break;
                     case RoomSensor:
-                    case OutsideSensor:
                         if (intent.getStringExtra("type").startsWith("room")) {
                             String log = intent.getStringExtra("log");
                             ThermostatUtils.FillTHSensorLog(sensorId, scope, log, logBuffer);

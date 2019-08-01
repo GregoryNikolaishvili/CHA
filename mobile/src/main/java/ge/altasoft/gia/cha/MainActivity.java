@@ -220,7 +220,7 @@ public class MainActivity extends ChaActivity {
             case Utils.ACTIVITY_REQUEST_RESULT_WATER_LEVEL_SETTINGS:
                 if (resultCode == Activity.RESULT_OK) {
                     publish("chac/wl/settings", OtherControllerData.Instance.encodeWaterLevelSettings(), false);
-                    publish("chac/wc/settings/names", OtherControllerData.Instance.encodeNamesAndOrder(), false);
+                    publish("chac/wl/settings/names", OtherControllerData.Instance.encodeNamesAndOrder(), false);
                 }
                 clearUnneededPreferences();
                 break;
@@ -467,11 +467,6 @@ public class MainActivity extends ChaActivity {
 
                 pagerAdapter.fragmentRoomSensors.drawState(id);
                 pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.RoomSensor, id);
-                break;
-
-            case Sensor5in1StateTH:
-                pagerAdapter.fragmentOtherSensors.drawState(WidgetType.OutsideSensor, OtherControllerData._5IN1_SENSOR_ID_TH);
-                pagerAdapter.fragmentDashboard.drawWidgetState(WidgetType.OutsideSensor, OtherControllerData._5IN1_SENSOR_ID_TH);
                 break;
 
             case Sensor5in1StateW:

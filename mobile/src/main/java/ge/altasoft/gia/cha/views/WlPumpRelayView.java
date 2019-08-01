@@ -81,16 +81,16 @@ public class WlPumpRelayView extends ChaWidget {
 
         switch (value) {
             case UNKNOWN:
-                ivLight.setImageResource(R.drawable.button_onoff_indicator_unknown);
+                ivLight.setImageResource(R.drawable.pump_off);
                 break;
             case ON:
-                ivLight.setImageResource(R.drawable.button_onoff_indicator_on);
+                ivLight.setImageResource(R.drawable.pump_90);
                 break;
             case OFF:
-                ivLight.setImageResource(R.drawable.button_onoff_indicator_off);
+                ivLight.setImageResource(R.drawable.pump_standby_0);
                 break;
             case WAIT:
-                ivLight.setImageResource(R.drawable.button_onoff_indicator_wait);
+                ivLight.setImageResource(R.drawable.pump_wait);
                 break;
         }
     }

@@ -77,12 +77,12 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
                 for (int id : sensors.keySet()) {
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 
-                    screen.setTitle(Integer.toString(id));
+                    screen.setTitle(Integer.toHexString(id));
 
                     Preference p0 = new Preference(prefContext);
                     p0.setPersistent(false);
                     p0.setSelectable(false);
-                    p0.setTitle("Sensor #" + id);
+                    p0.setTitle("Sensor #" + Integer.toHexString(id));
                     p0.setKey("t_sensor_deleted_" + id);
                     screen.addPreference(p0);
 

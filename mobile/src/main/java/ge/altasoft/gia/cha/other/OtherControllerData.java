@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import ge.altasoft.gia.cha.classes.ChaWidget;
 import ge.altasoft.gia.cha.classes.RelayControllerData;
 import ge.altasoft.gia.cha.classes.RelayData;
-import ge.altasoft.gia.cha.views.OutsideSensorView;
 import ge.altasoft.gia.cha.views.PressureSensorView;
 import ge.altasoft.gia.cha.views.WlPumpRelayView;
 import ge.altasoft.gia.cha.views.RainSensorView;
@@ -16,24 +15,25 @@ import ge.altasoft.gia.cha.views.WindSensorView;
 
 public final class OtherControllerData extends RelayControllerData {
 
-    final static public int _5IN1_SENSOR_ID_TH = 0;
-    final static public int _5IN1_SENSOR_ID_WIND = 1;
-    final static public int _5IN1_SENSOR_ID_PRESSURE = 2;
-    final static public int _5IN1_SENSOR_ID_RAIN = 3;
-    final static public int _5IN1_SENSOR_ID_WIND_DIR = 4;
-    final static private int _WATER_LEVEL_SENSOR1 = 5;
-    final static private int _WATER_LEVEL_SENSOR2 = 6;
-    final static private int _WATER_LEVEL_SENSOR3 = 7;
+    //final static public int _5IN1_SENSOR_ID_TH = 0;
+    final static public int _5IN1_SENSOR_ID_WIND = 0;
+    final static public int _5IN1_SENSOR_ID_PRESSURE = 1;
+    final static public int _5IN1_SENSOR_ID_RAIN = 2;
+    final static public int _5IN1_SENSOR_ID_WIND_DIR = 3;
 
-    final static private int _WATER_LEVEL_RELAY1 = 8;
-    final static private int _WATER_LEVEL_RELAY2 = 9;
-    final static private int _WATER_LEVEL_RELAY3 = 10;
-    final static private int _WATER_LEVEL_RELAY4 = 11;
-    final static private int _WATER_LEVEL_RELAY5 = 12;
+    final static private int _WATER_LEVEL_SENSOR1 = 4;
+    final static private int _WATER_LEVEL_SENSOR2 = 5;
+    final static private int _WATER_LEVEL_SENSOR3 = 6;
+
+    final static private int _WATER_LEVEL_RELAY1 = 7;
+    final static private int _WATER_LEVEL_RELAY2 = 8;
+    final static private int _WATER_LEVEL_RELAY3 = 9;
+    final static private int _WATER_LEVEL_RELAY4 = 10;
+    final static private int _WATER_LEVEL_RELAY5 = 11;
 
     final static int RELAY_COUNT = 5;
 
-    final static private int SENSOR_COUNT = 5 + 3 + 5;
+    final static private int SENSOR_COUNT = 4 + 3 + RELAY_COUNT;
 
     final public static OtherControllerData Instance = new OtherControllerData();
 
@@ -69,8 +69,6 @@ public final class OtherControllerData extends RelayControllerData {
 
     ChaWidget createWidget(Context context, int position, boolean fromDashboard) {
         switch (position) {
-            case _5IN1_SENSOR_ID_TH:
-                return new OutsideSensorView(context, fromDashboard);
             case _5IN1_SENSOR_ID_WIND:
                 return new WindSensorView(context, fromDashboard);
             case _5IN1_SENSOR_ID_PRESSURE:

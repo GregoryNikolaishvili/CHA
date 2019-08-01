@@ -77,7 +77,6 @@ public class MqttClientLocal {
         Log,
         ClientConnected,
 
-        Sensor5in1StateTH,
         Sensor5in1StateW,
         SensorRoomState,
 
@@ -511,15 +510,12 @@ public class MqttClientLocal {
                 if (topic.startsWith(TOPIC_CHA_5IN1)) {
                     int id = Integer.parseInt(topic.substring(TOPIC_CHA_5IN1.length()), 16);
                     id &= 0xA0000;
-                    boolean isWeatherSensor = id == 0xA0000;
-                    if ((id == 0) || isWeatherSensor) {
-                        Sensor5in1Data sd = OtherControllerData.Instance.get5in1SensorData();
-                        sd.decodeState(payload, isWeatherSensor);
+                    Sensor5in1Data sd = OtherControllerData.Instance.get5in1SensorData();
+                    sd.decodeState(payload);
 
-                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, isWeatherSensor ? MQTTReceivedDataType.Sensor5in1StateW : MQTTReceivedDataType.Sensor5in1StateTH);
-                        broadcastDataIntent.putExtra("id", 0);
-                        context.sendBroadcast(broadcastDataIntent);
-                    }
+                    broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.Sensor5in1StateW);
+                    broadcastDataIntent.putExtra("id", 0);
+                    context.sendBroadcast(broadcastDataIntent);
                     return;
                 }
 
