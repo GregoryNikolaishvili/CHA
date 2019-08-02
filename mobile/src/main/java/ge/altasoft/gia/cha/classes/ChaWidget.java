@@ -15,6 +15,8 @@ import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 
 import ge.altasoft.gia.cha.Log5in1Activity;
+import ge.altasoft.gia.cha.LogActivity2;
+import ge.altasoft.gia.cha.LogActivityTH2;
 import ge.altasoft.gia.cha.LogStateActivity;
 import ge.altasoft.gia.cha.LogTHActivity;
 import ge.altasoft.gia.cha.R;
@@ -197,7 +199,7 @@ public abstract class ChaWidget extends LinearLayout {
                 break;
 
             case R.id.item_log_and_chart: {
-                Intent intent = new Intent(getContext(), LogTHActivity.class);
+                Intent intent = new Intent(getContext(), LogActivityTH2.class);
                 intent.putExtra("id", getWidgetId());
                 intent.putExtra("widget", getWidgetType());
                 getContext().startActivity(intent);
@@ -205,7 +207,8 @@ public abstract class ChaWidget extends LinearLayout {
             }
 
             case R.id.item_log_and_chart2: {
-                Intent intent = new Intent(getContext(), Log5in1Activity.class);
+                //Intent intent = new Intent(getContext(), Log5in1Activity.class);
+                Intent intent = new Intent(getContext(), LogActivity2.class);
                 intent.putExtra("id", getWidgetId());
                 intent.putExtra("widget", getWidgetType());
                 getContext().startActivity(intent);

@@ -50,7 +50,7 @@ public class Log5in1Activity extends ChaActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_log_th);
+        setContentView(R.layout.activity_log_5in1);
 
         Intent intent = getIntent();
         scope = (WidgetType) intent.getSerializableExtra("widget");

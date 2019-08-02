@@ -348,7 +348,6 @@ public final class ThermostatUtils {
         int value1 = 0;
         String value2 = "";
 
-
         String[] logEntries = log.split(":");
         for (String logEntry : logEntries) {
             if (logEntry.length() == logEntryLen) {

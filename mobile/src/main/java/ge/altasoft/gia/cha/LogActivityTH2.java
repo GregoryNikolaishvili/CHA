@@ -1,0 +1,290 @@
+package ge.altasoft.gia.cha;
+
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.model.XYSeries;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import ge.altasoft.gia.cha.classes.LogTHItem;
+import ge.altasoft.gia.cha.classes.LogTwoValueItem;
+import ge.altasoft.gia.cha.classes.WidgetType;
+import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
+import ge.altasoft.gia.cha.thermostat.RoomSensorData;
+import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
+import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
+
+public class LogActivityTH2 extends ChaActivity {
+
+    final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
+    final private SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm", Locale.US);
+
+    private WidgetType scope;
+    private int sensorId;
+
+    private THLogAdapter adapter = null;
+    private ArrayList<LogTHItem> logBuffer;
+
+    LineChart chart;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_log_th2);
+
+        Intent intent = getIntent();
+        scope = (WidgetType) intent.getSerializableExtra("widget");
+        sensorId = intent.getIntExtra("id", -1);
+
+        logBuffer = new ArrayList<>();
+        adapter = new THLogAdapter(this, logBuffer, scope == WidgetType.RoomSensor);
+
+        ListView listView = (ListView) findViewById(R.id.lvLog);
+        listView.setAdapter(adapter);
+
+        chart = (LineChart) findViewById(R.id.chart);
+        chart.getLegend().setEnabled(false);
+        chart.setNoDataText("Loading ...");
+
+        XAxis x = chart.getXAxis();
+        x.setLabelCount(6, false);
+        x.setTextColor(Color.WHITE);
+        x.setPosition(XAxis.XAxisPosition.BOTTOM);
+        x.setDrawGridLines(true);
+        x.setAxisLineColor(Color.WHITE);
+        x.setValueFormatter(new TimeValueFormatter());
+
+        YAxis y = chart.getAxisLeft();
+        y.setLabelCount(6, false);
+        y.setTextColor(Color.WHITE);
+        y.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        y.setDrawGridLines(true);
+        y.setAxisLineColor(Color.WHITE);
+
+        chart.getAxisRight().setEnabled(false);
+    }
+
+    private void RequestLog(int wd) {
+        switch (scope) {
+            case BoilerSensor:
+                publish("cha/hub/getlog", "boiler_".concat(String.valueOf(wd)), false);
+                break;
+            case RoomSensor:
+                publish("cha/hub/getlog", "room_".concat(String.valueOf(wd)), false);
+                break;
+        }
+    }
+
+    @Override
+    protected void ServiceConnected() {
+        super.ServiceConnected();
+
+        RequestLog(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1);
+    }
+
+    @Override
+    public void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
+        super.processMqttData(dataType, intent);
+
+        int id;
+        float v;
+
+        if (dataType == MqttClientLocal.MQTTReceivedDataType.Log) {
+            switch (scope) {
+                case BoilerSensor:
+                    if (intent.getStringExtra("type").startsWith("boiler")) {
+                        String log = intent.getStringExtra("log");
+                        ThermostatUtils.FillTHSensorLog(sensorId, scope, log, logBuffer);
+                        adapter.notifyDataSetChanged();
+                        DrawChart(logBuffer, chart);
+                    }
+                    break;
+                case RoomSensor:
+                    if (intent.getStringExtra("type").startsWith("room")) {
+                        String log = intent.getStringExtra("log");
+                        ThermostatUtils.FillTHSensorLog(sensorId, scope, log, logBuffer);
+                        adapter.notifyDataSetChanged();
+                        DrawChart(logBuffer, chart);
+                    }
+                    break;
+            }
+        }
+    }
+
+    class THLogAdapter extends ArrayAdapter<LogTHItem> {
+
+        private final boolean hasHumidity;
+
+        THLogAdapter(Context context, ArrayList<LogTHItem> points, boolean hasHumidity) {
+            super(context, 0, points);
+
+            this.hasHumidity = hasHumidity;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+
+            // Check if an existing view is being reused, otherwise inflate the view
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_item_key_value, parent, false);
+            }
+
+            LogTHItem point = getItem(position);
+            if (point != null) {
+                ((TextView) convertView.findViewById(R.id.tvListViewItemKey)).setText(sdf.format(point.date));
+                ((TextView) convertView.findViewById(R.id.tvListViewItemValue1)).setText(String.format(Locale.US, "%.1f°", point.T));
+
+                if (hasHumidity)
+                    ((TextView) convertView.findViewById(R.id.tvListViewItemValue2)).setText(String.format(Locale.US, "%.0f %%", point.H));
+                else
+                    convertView.findViewById(R.id.tvListViewItemValue2).setVisibility(View.GONE);
+            }
+            return convertView;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_graph, menu);
+
+        int id = 0;
+        int logSuffix = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+        switch (logSuffix) {
+            case 0:
+                id = R.id.action_sunday;
+                break;
+            case 1:
+                id = R.id.action_monday;
+                break;
+            case 2:
+                id = R.id.action_tuesday;
+                break;
+            case 3:
+                id = R.id.action_wednesday;
+                break;
+            case 4:
+                id = R.id.action_thursday;
+                break;
+            case 5:
+                id = R.id.action_friday;
+                break;
+            case 6:
+                id = R.id.action_saturday;
+                break;
+        }
+        menu.findItem(id).setChecked(true);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        item.setChecked(!item.isChecked());
+
+        int wd = -1;
+        switch (id) {
+            case R.id.action_sunday:
+                wd = 0;
+                break;
+            case R.id.action_monday:
+                wd = 1;
+                break;
+            case R.id.action_tuesday:
+                wd = 2;
+                break;
+            case R.id.action_wednesday:
+                wd = 3;
+                break;
+            case R.id.action_thursday:
+                wd = 4;
+                break;
+            case R.id.action_friday:
+                wd = 5;
+                break;
+            case R.id.action_saturday:
+                wd = 6;
+                break;
+        }
+
+        if (wd >= 0) {
+            RequestLog(wd);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private static void DrawChart(ArrayList<LogTHItem> logBuffer, LineChart chart) {
+
+        List<Entry> entries = new ArrayList<>();
+
+        Float lastValue = null;
+        for (LogTHItem item : logBuffer) {
+            entries.add(new Entry(item.date.getTime(), item.T));
+            lastValue = item.T;
+        }
+
+        // add current value (last one)
+        if (lastValue != null)
+            entries.add(new Entry(new Date().getTime(), lastValue));
+
+        LineDataSet dataSet = new LineDataSet(entries, "");
+        dataSet.setDrawValues(true);
+
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setCubicIntensity(0.1f);
+
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
+        chart.invalidate(); // refresh
+    }
+
+    private class TimeValueFormatter extends ValueFormatter {
+        @Override
+        public String getAxisLabel(float value, AxisBase axis) {
+
+            try{
+                return sdf2.format(new Date((long)value));
+            }
+            catch (Exception e)
+            {
+                return  "?";
+            }
+
+        }
+    }
+
+}
