@@ -6,9 +6,9 @@ public enum WidgetType {
     BoilerPump,
     BoilerSensor,
     WindSensor,
-    PressureSensor,
-    RainSensor,
     WindDirSensor,
+    RainSensor,
+    PressureSensor,
     WaterLevelSensor,
     WaterLevelPumpRelay;
 
@@ -25,11 +25,11 @@ public enum WidgetType {
             case 4:
                 return WindSensor;
             case 5:
-                return PressureSensor;
+                return WindDirSensor;
             case 6:
                 return RainSensor;
             case 7:
-                return WindDirSensor;
+                return PressureSensor;
             case 8:
                 return WaterLevelSensor;
             case  9:

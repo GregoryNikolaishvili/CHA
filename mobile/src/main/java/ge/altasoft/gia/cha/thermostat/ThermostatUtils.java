@@ -340,7 +340,7 @@ public final class ThermostatUtils {
         String date0 = sdf.format(new Date());
         sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        int logEntryLen = 31;
+        int logEntryLen = 19;
 
         logBuffer.clear();
 
@@ -365,12 +365,16 @@ public final class ThermostatUtils {
                             value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
                             value2 = String.format(Locale.US, "%d °", Integer.parseInt(logEntry.substring(15, 19), 16));
                             break;
-                        case PressureSensor:
-                            value1 = Integer.parseInt(logEntry.substring(23, 27), 16);
+                        case WindDirSensor:
+                            value1 = Integer.parseInt(logEntry.substring(15, 19), 16);
+                            value2 = String.format(Locale.US, "%d km/h", Integer.parseInt(logEntry.substring(11, 15), 16));
                             break;
                         case RainSensor:
-                            value1 = Integer.parseInt(logEntry.substring(19, 23), 16);
-                            value2 = String.format(Locale.US, "%d", Integer.parseInt(logEntry.substring(27, 31), 16));
+                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
+                            value2 = String.format(Locale.US, "%d mm", Integer.parseInt(logEntry.substring(15, 19), 16));
+                            break;
+                        case PressureSensor:
+                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
                             break;
                     }
                 } catch (NumberFormatException ex) {

@@ -57,7 +57,8 @@ public class Log5in1Activity extends ChaActivity {
         widgetId = intent.getIntExtra("id", -1);
 
         logBuffer = new ArrayList<>();
-        adapter = new _5in1LogAdapter(this, logBuffer, (scope == WidgetType.WindSensor) || (scope == WidgetType.WaterLevelSensor) || (scope == WidgetType.RainSensor));
+        adapter = new _5in1LogAdapter(this, logBuffer,
+                (scope == WidgetType.WindSensor) || (scope == WidgetType.WindDirSensor) || (scope == WidgetType.WaterLevelSensor) || (scope == WidgetType.RainSensor));
 
         ListView listView = (ListView) findViewById(R.id.lvLog);
         listView.setAdapter(adapter);
@@ -87,9 +88,12 @@ public class Log5in1Activity extends ChaActivity {
         switch (scope) {
             case WindSensor:
             case WindDirSensor:
-            case PressureSensor:
+                publish("cha/hub/getlog", "wind_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
             case RainSensor:
-                publish("cha/hub/getlog", "5in1_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+                publish("cha/hub/getlog", "rain_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+            case PressureSensor:
+                publish("cha/hub/getlog", "pressure_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
+                //publish("cha/hub/getlog", "5in1_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
                 break;
             case WaterLevelSensor:
                 publish("cha/hub/getlog", "tank_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
@@ -108,71 +112,85 @@ public class Log5in1Activity extends ChaActivity {
         long lastSync;
 
         switch (dataType) {
-            case Sensor5in1StateW:
-                id = intent.getIntExtra("id", -1);
-                if (id != widgetId)
-                    return;
-
-                switch (scope) {
-                    case WindSensor:
-                    case WindDirSensor:
-                        data = OtherControllerData.Instance.get5in1SensorData();
-                        value1 = data.getWindSpeed();
-                        value2 = String.format(Locale.US, "%d °", data.getWindDirection());
-                        lastSync = data.getLastSyncTime();
-                        break;
-
-                    case RainSensor:
-                        data = OtherControllerData.Instance.get5in1SensorData();
-                        value1 = data.getRain();
-                        value2 = String.valueOf(data.getDailyRain());
-                        lastSync = data.getLastSyncTime();
-                        break;
-
-                    case PressureSensor:
-                        data = OtherControllerData.Instance.get5in1SensorData();
-                        value1 = data.getPressure();
-                        lastSync = data.getLastSyncTime();
-                        break;
-
-                    case WaterLevelSensor:
-                        WaterLevelData wd = OtherControllerData.Instance.getWaterLevelData(id);
-                        if (wd == null) return;
-                        value1 = wd.getWaterPercent();
-                        int x = wd.getWaterDistance();
-                        if (x == Utils.I_UNDEFINED)
-                            value2 = String.format(Locale.US, "-- cm %s %s %s",
-                                    wd.getFloatSwitchIsOn() ? "F" : " ",
-                                    Utils.GetBallValveStateText(wd.getBallValveState()),
-                                    wd.getBallValveSwitchState());
-                        else
-                            value2 = String.format(Locale.US, "%d cm %s %s %s",
-                                    x,
-                                    wd.getFloatSwitchIsOn() ? "F" : " ",
-                                    Utils.GetBallValveStateText(wd.getBallValveState()),
-                                    wd.getBallValveSwitchState());
-                        lastSync = wd.getLastSyncTime();
-                        break;
-
-                    default:
-                        return;
-                }
-
-                LogTwoValueItem point = new LogTwoValueItem(new Date(lastSync), value1, value2);
-                logBuffer.add(point);
-                adapter.notifyDataSetChanged();
-
-                xyDataSet.getSeriesAt(0).add(lastSync, value1);
-                mChartView.repaint();
-                break;
-
+//            case Sensor5in1StateW:
+//                id = intent.getIntExtra("id", -1);
+//                if (id != widgetId)
+//                    return;
+//
+//                switch (scope) {
+//                    case WindSensor:
+//                    case WindDirSensor:
+//                        data = OtherControllerData.Instance.get5in1SensorData();
+//                        value1 = data.getWindSpeed();
+//                        value2 = String.format(Locale.US, "%d °", data.getWindDirection());
+//                        lastSync = data.getLastSyncTime();
+//                        break;
+//
+//                    case RainSensor:
+//                        data = OtherControllerData.Instance.get5in1SensorData();
+//                        value1 = data.getRain();
+//                        value2 = String.valueOf(data.getDailyRain());
+//                        lastSync = data.getLastSyncTime();
+//                        break;
+//
+//                    case PressureSensor:
+//                        data = OtherControllerData.Instance.get5in1SensorData();
+//                        value1 = data.getPressure();
+//                        lastSync = data.getLastSyncTime();
+//                        break;
+//
+//                    case WaterLevelSensor:
+//                        WaterLevelData wd = OtherControllerData.Instance.getWaterLevelData(id);
+//                        if (wd == null) return;
+//                        value1 = wd.getWaterPercent();
+//                        int x = wd.getWaterDistance();
+//                        if (x == Utils.I_UNDEFINED)
+//                            value2 = String.format(Locale.US, "-- cm %s %s %s",
+//                                    wd.getFloatSwitchIsOn() ? "F" : " ",
+//                                    Utils.GetBallValveStateText(wd.getBallValveState()),
+//                                    wd.getBallValveSwitchState());
+//                        else
+//                            value2 = String.format(Locale.US, "%d cm %s %s %s",
+//                                    x,
+//                                    wd.getFloatSwitchIsOn() ? "F" : " ",
+//                                    Utils.GetBallValveStateText(wd.getBallValveState()),
+//                                    wd.getBallValveSwitchState());
+//                        lastSync = wd.getLastSyncTime();
+//                        break;
+//
+//                    default:
+//                        return;
+//                }
+//
+//                LogTwoValueItem point = new LogTwoValueItem(new Date(lastSync), value1, value2);
+//                logBuffer.add(point);
+//                adapter.notifyDataSetChanged();
+//
+//                xyDataSet.getSeriesAt(0).add(lastSync, value1);
+//                mChartView.repaint();
+//                break;
+//
             case Log:
                 switch (scope) {
                     case WindSensor:
                     case WindDirSensor:
-                    case PressureSensor:
+                        if (intent.getStringExtra("type").startsWith("wind_")) {
+                            String log = intent.getStringExtra("log");
+                            ThermostatUtils.Fill5in1SensorLog(scope, log, logBuffer);
+                            adapter.notifyDataSetChanged();
+                            ThermostatUtils.DrawTwoValueChart(logBuffer, mChartView, mRenderer, xyDataSet);
+                        }
+                        break;
                     case RainSensor:
-                        if (intent.getStringExtra("type").startsWith("5in1")) {
+                        if (intent.getStringExtra("type").startsWith("rain_")) {
+                            String log = intent.getStringExtra("log");
+                            ThermostatUtils.Fill5in1SensorLog(scope, log, logBuffer);
+                            adapter.notifyDataSetChanged();
+                            ThermostatUtils.DrawTwoValueChart(logBuffer, mChartView, mRenderer, xyDataSet);
+                        }
+                        break;
+                    case PressureSensor:
+                        if (intent.getStringExtra("type").startsWith("pressure_")) {
                             String log = intent.getStringExtra("log");
                             ThermostatUtils.Fill5in1SensorLog(scope, log, logBuffer);
                             adapter.notifyDataSetChanged();
