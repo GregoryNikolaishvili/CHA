@@ -115,8 +115,7 @@ public class BoilerChartActivity extends ChaActivity {
                 id = R.id.action_saturday;
                 break;
         }
-        if (id > 0)
-            menu.findItem(id).setChecked(true);
+        menu.findItem(id).setChecked(true);
         return true;
     }
 

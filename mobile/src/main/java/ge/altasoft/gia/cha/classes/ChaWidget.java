@@ -14,11 +14,9 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 
-import ge.altasoft.gia.cha.Log5in1Activity;
 import ge.altasoft.gia.cha.LogActivity2;
 import ge.altasoft.gia.cha.LogActivityTH2;
 import ge.altasoft.gia.cha.LogStateActivity;
-import ge.altasoft.gia.cha.LogTHActivity;
 import ge.altasoft.gia.cha.R;
 import ge.altasoft.gia.cha.Utils;
 

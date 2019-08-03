@@ -29,51 +29,8 @@ import ge.altasoft.gia.cha.classes.WidgetType;
 
 public final class ThermostatUtils {
 
-    public static void FillRelayLog(int relayId, WidgetType scope, String log, ArrayList<LogOneValueItem> logBuffer) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
-        String date0 = sdf.format(new Date());
-        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        logBuffer.clear();
-
-        int id;
-        Date XX;
-        int state;
-
-
-        String[] logEntries = log.split(":");
-        for (String logEntry : logEntries) {
-            if (logEntry.length() == 8) {
-                try {
-                    XX = sdf.parse(date0 + logEntry.substring(0, 6));
-                } catch (ParseException ex) {
-                    Log.e("Log", "Invalid X", ex);
-                    continue;
-                }
-
-                try {
-                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
-                } catch (NumberFormatException ex) {
-                    Log.e("Log", "Invalid id", ex);
-                    continue;
-                }
-
-                if (id != relayId)
-                    continue;
-
-                try {
-                    state = Integer.parseInt(logEntry.substring(7, 8), 16);
-                } catch (NumberFormatException ex) {
-                    Log.e("Log", "Invalid Y", ex);
-                    continue;
-                }
-
-                logBuffer.add(new LogOneValueItem(XX, state));
-            }
-        }
-    }
-
-    public static XYMultipleSeriesRenderer getSensorChartRenderer(Context context, boolean isSmall, int rendererCount, int[] colors) {
+    static XYMultipleSeriesRenderer getSensorChartRenderer(Context context, boolean isSmall, int rendererCount, int[] colors) {
 
         XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 
@@ -230,263 +187,107 @@ public final class ThermostatUtils {
         return new Date[]{minXX, maxXX};
     }
 
-    public static void FillTHSensorLog(int sensorId, WidgetType scope, String log, ArrayList<LogTHItem> logBuffer) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
-        String date0 = sdf.format(new Date());
-        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
 
-        int logEntryLen = scope == WidgetType.BoilerSensor ? 11 : 18;
-        logBuffer.clear();
+//    public static void DrawTHSensorChart(ArrayList<LogTHItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+//
+//        for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
+//            xyDataSet.getSeriesAt(i).clear();
+//
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.add(Calendar.YEAR, 1);
+//        Date minXX = calendar.getTime();
+//        calendar.add(Calendar.YEAR, -2);
+//        Date maxXX = calendar.getTime();
+//
+//        Date XX;
+//        XYSeries series = xyDataSet.getSeriesAt(0);
+//
+//        for (LogTHItem item : logBuffer) {
+//            XX = item.date;
+//
+//            series.add(XX.getTime(), item.T);
+//
+//            if (XX.before(minXX))
+//                minXX = XX;
+//            if (XX.after(maxXX))
+//                maxXX = XX;
+//        }
+//
+//        // add current value (last one)
+//        if (series.getItemCount() > 0)
+//            series.add(new Date().getTime(), series.getY(series.getItemCount() - 1));
+//
+//        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
+//
+//        calendar.setTime(minXX);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        minXX = calendar.getTime();
+//
+//        calendar.setTime(maxXX);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        calendar.add(Calendar.MINUTE, 120);
+//        maxXX = calendar.getTime();
+//
+//        calendar.setTime(minXX);
+//        while (calendar.getTimeInMillis() <= maxXX.getTime()) {
+//            renderer.addXTextLabel(calendar.getTimeInMillis(), sdf.format(calendar.getTime()));
+//            calendar.add(Calendar.MINUTE, 120);
+//        }
+//
+//        chartView.repaint();
+//    }
 
-        int id;
-        Date XX;
-        double T, H = 0f;
 
-
-        String[] logEntries = log.split(":");
-        for (String logEntry : logEntries) {
-            if (logEntry.length() == logEntryLen) {
-                try {
-                    XX = sdf.parse(date0 + logEntry.substring(0, 6));
-                } catch (ParseException ex) {
-                    Log.e("Log", "Invalid X", ex);
-                    continue;
-                }
-
-                try {
-                    if (scope == WidgetType.BoilerSensor)
-                        id = Integer.parseInt(logEntry.substring(6, 7), 16);
-                    else
-                        id = Integer.parseInt(logEntry.substring(6, 10), 16);
-
-                } catch (NumberFormatException ex) {
-                    Log.e("Log", "Invalid id", ex);
-                    continue;
-                }
-
-                if (id != sensorId)
-                    continue;
-
-                try {
-                    if (scope == WidgetType.BoilerSensor) {
-                        T = Utils.decodeT(logEntry.substring(7, 11));
-                    } else {
-                        T = Utils.decodeT(logEntry.substring(10, 14));
-                        H = Integer.parseInt(logEntry.substring(14, 18), 16);
-                    }
-                } catch (NumberFormatException ex) {
-                    Log.e("Log", "Invalid Y", ex);
-                    continue;
-                }
-
-                logBuffer.add(new LogTHItem(XX, (float) T, (float) H));
-            }
-        }
-    }
-
-    public static void DrawTHSensorChart(ArrayList<LogTHItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
-
-        for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
-            xyDataSet.getSeriesAt(i).clear();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 1);
-        Date minXX = calendar.getTime();
-        calendar.add(Calendar.YEAR, -2);
-        Date maxXX = calendar.getTime();
-
-        Date XX;
-        XYSeries series = xyDataSet.getSeriesAt(0);
-
-        for (LogTHItem item : logBuffer) {
-            XX = item.date;
-
-            series.add(XX.getTime(), item.T);
-
-            if (XX.before(minXX))
-                minXX = XX;
-            if (XX.after(maxXX))
-                maxXX = XX;
-        }
-
-        // add current value (last one)
-        if (series.getItemCount() > 0)
-            series.add(new Date().getTime(), series.getY(series.getItemCount() - 1));
-
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
-
-        calendar.setTime(minXX);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        minXX = calendar.getTime();
-
-        calendar.setTime(maxXX);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.add(Calendar.MINUTE, 120);
-        maxXX = calendar.getTime();
-
-        calendar.setTime(minXX);
-        while (calendar.getTimeInMillis() <= maxXX.getTime()) {
-            renderer.addXTextLabel(calendar.getTimeInMillis(), sdf.format(calendar.getTime()));
-            calendar.add(Calendar.MINUTE, 120);
-        }
-
-        chartView.repaint();
-    }
-
-    public static void Fill5in1SensorLog(WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
-        String date0 = sdf.format(new Date());
-        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-
-        int logEntryLen = 19;
-
-        logBuffer.clear();
-
-        Date XX;
-        int value1 = 0;
-        String value2 = "";
-
-        String[] logEntries = log.split(":");
-        for (String logEntry : logEntries) {
-            if (logEntry.length() == logEntryLen) {
-                try {
-                    XX = sdf.parse(date0 + logEntry.substring(0, 6));
-                } catch (ParseException ex) {
-                    Log.e("Log", "Invalid X", ex);
-                    continue;
-                }
-
-                try {
-                    switch (scope) {
-                        case WindSensor:
-                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
-                            value2 = String.format(Locale.US, "%d °", Integer.parseInt(logEntry.substring(15, 19), 16));
-                            break;
-                        case WindDirSensor:
-                            value1 = Integer.parseInt(logEntry.substring(15, 19), 16);
-                            value2 = String.format(Locale.US, "%d km/h", Integer.parseInt(logEntry.substring(11, 15), 16));
-                            break;
-                        case RainSensor:
-                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
-                            value2 = String.format(Locale.US, "%d mm", Integer.parseInt(logEntry.substring(15, 19), 16));
-                            break;
-                        case PressureSensor:
-                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
-                            break;
-                    }
-                } catch (NumberFormatException ex) {
-                    Log.e("Log", "Invalid Y", ex);
-                    continue;
-                }
-
-                logBuffer.add(new LogTwoValueItem(XX, value1, value2));
-            }
-        }
-    }
-
-    public static void FillWaterLevelLog(int sensorId, WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
-        String date0 = sdf.format(new Date());
-        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-
-        int logEntryLen = 21;
-
-        logBuffer.clear();
-
-        Date XX;
-        int id;
-        int value1 = 0;
-        String value2 = "";
-
-        String[] logEntries = log.split(":");
-        for (String logEntry : logEntries) {
-            if (logEntry.length() == logEntryLen) {
-                try {
-                    XX = sdf.parse(date0 + logEntry.substring(0, 6));
-                } catch (ParseException ex) {
-                    Log.e("Log", "Invalid X", ex);
-                    continue;
-                }
-
-                try {
-                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
-                } catch (NumberFormatException ex) {
-                    Log.e("Log", "Invalid id", ex);
-                    continue;
-                }
-
-                if (id != sensorId)
-                    continue;
-
-                try {
-                    if (scope == WidgetType.WaterLevelSensor) {
-                        value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
-                        value2 = String.format(Locale.US, "%d cm %s %s %s",
-                                Integer.parseInt(logEntry.substring(7, 11), 16), // distance
-                                logEntry.charAt(15) == '0' ? "" : "F", // float switch is full
-                                Utils.GetBallValveStateText(Integer.parseInt(logEntry.substring(16, 20), 16)), //  ball valve state
-                                logEntry.charAt(20));
-                    }
-                } catch (NumberFormatException ex) {
-                    Log.e("Log", "Invalid Y", ex);
-                    continue;
-                }
-
-                logBuffer.add(new LogTwoValueItem(XX, value1, value2));
-            }
-        }
-    }
-
-    public static void DrawTwoValueChart(ArrayList<LogTwoValueItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
-
-        for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
-            xyDataSet.getSeriesAt(i).clear();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, 1);
-        Date minXX = calendar.getTime();
-        calendar.add(Calendar.YEAR, -2);
-        Date maxXX = calendar.getTime();
-
-        Date XX;
-        XYSeries series = xyDataSet.getSeriesAt(0);
-
-        for (LogTwoValueItem item : logBuffer) {
-            XX = item.date;
-
-            series.add(XX.getTime(), item.Value1);
-
-            if (XX.before(minXX))
-                minXX = XX;
-            if (XX.after(maxXX))
-                maxXX = XX;
-        }
-
-        // add current value (last one)
-        if (series.getItemCount() > 0)
-            series.add(new Date().getTime(), series.getY(series.getItemCount() - 1));
-
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
-
-        calendar.setTime(minXX);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        minXX = calendar.getTime();
-
-        calendar.setTime(maxXX);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.add(Calendar.MINUTE, 120);
-        maxXX = calendar.getTime();
-
-        calendar.setTime(minXX);
-        while (calendar.getTimeInMillis() <= maxXX.getTime()) {
-            renderer.addXTextLabel(calendar.getTimeInMillis(), sdf.format(calendar.getTime()));
-            calendar.add(Calendar.MINUTE, 120);
-        }
-
-        chartView.repaint();
-    }
+//    public static void DrawTwoValueChart(ArrayList<LogTwoValueItem> logBuffer, GraphicalView chartView, XYMultipleSeriesRenderer renderer, XYMultipleSeriesDataset xyDataSet) {
+//
+//        for (int i = 0; i < xyDataSet.getSeriesCount(); i++)
+//            xyDataSet.getSeriesAt(i).clear();
+//
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.add(Calendar.YEAR, 1);
+//        Date minXX = calendar.getTime();
+//        calendar.add(Calendar.YEAR, -2);
+//        Date maxXX = calendar.getTime();
+//
+//        Date XX;
+//        XYSeries series = xyDataSet.getSeriesAt(0);
+//
+//        for (LogTwoValueItem item : logBuffer) {
+//            XX = item.date;
+//
+//            series.add(XX.getTime(), item.Value1);
+//
+//            if (XX.before(minXX))
+//                minXX = XX;
+//            if (XX.after(maxXX))
+//                maxXX = XX;
+//        }
+//
+//        // add current value (last one)
+//        if (series.getItemCount() > 0)
+//            series.add(new Date().getTime(), series.getY(series.getItemCount() - 1));
+//
+//        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
+//
+//        calendar.setTime(minXX);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        minXX = calendar.getTime();
+//
+//        calendar.setTime(maxXX);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        calendar.add(Calendar.MINUTE, 120);
+//        maxXX = calendar.getTime();
+//
+//        calendar.setTime(minXX);
+//        while (calendar.getTimeInMillis() <= maxXX.getTime()) {
+//            renderer.addXTextLabel(calendar.getTimeInMillis(), sdf.format(calendar.getTime()));
+//            calendar.add(Calendar.MINUTE, 120);
+//        }
+//
+//        chartView.repaint();
+//    }
 }

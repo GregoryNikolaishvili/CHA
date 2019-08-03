@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,11 +27,10 @@ import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.light.LightControllerData;
 import ge.altasoft.gia.cha.other.OtherControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
-import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class LogStateActivity extends ChaActivity {
 
-    final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
+    final private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);
     private WidgetType scope;
     private int relayId;
 
@@ -52,21 +53,22 @@ public class LogStateActivity extends ChaActivity {
         listView.setAdapter(adapter);
     }
 
+    private void RequestLog(int wd) {
+        switch (scope) {
+            case BoilerPump:
+                publish("cha/hub/getlog", "brelay_".concat(String.valueOf(wd)), false);
+                break;
+            case LightRelay:
+                publish("cha/hub/getlog", "light_".concat(String.valueOf(wd)), false);
+                break;
+        }
+    }
+
     @Override
     protected void ServiceConnected() {
         super.ServiceConnected();
 
-        switch (scope) {
-            case BoilerPump:
-                publish("cha/hub/getlog", "brelay_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
-                break;
-            case LightRelay:
-                publish("cha/hub/getlog", "light_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
-                break;
-            case WaterLevelPumpRelay:
-                publish("cha/hub/getlog", "trelay_".concat(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1)), false);
-                break;
-        }
+        RequestLog(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1);
     }
 
     @Override
@@ -127,8 +129,7 @@ public class LogStateActivity extends ChaActivity {
                     case BoilerPump:
                         if (intent.getStringExtra("type").startsWith("brelay")) {
                             String log = intent.getStringExtra("log");
-
-                            ThermostatUtils.FillRelayLog(relayId, scope, log, logBuffer);
+                            FillRelayLog(relayId, log, logBuffer);
                             adapter.notifyDataSetChanged();
                         }
                         break;
@@ -136,8 +137,7 @@ public class LogStateActivity extends ChaActivity {
                     case LightRelay:
                         if (intent.getStringExtra("type").startsWith("light")) {
                             String log = intent.getStringExtra("log");
-
-                            ThermostatUtils.FillRelayLog(relayId, scope, log, logBuffer);
+                            FillRelayLog(relayId, log, logBuffer);
                             adapter.notifyDataSetChanged();
                         }
                         break;
@@ -145,11 +145,11 @@ public class LogStateActivity extends ChaActivity {
                     case WaterLevelPumpRelay:
                         if (intent.getStringExtra("type").startsWith("trelay")) {
                             String log = intent.getStringExtra("log");
-
-                            ThermostatUtils.FillRelayLog(relayId, scope, log, logBuffer);
+                            FillRelayLog(relayId, log, logBuffer);
                             adapter.notifyDataSetChanged();
                         }
-                        break;}
+                        break;
+                }
                 break;
         }
     }
@@ -207,8 +207,7 @@ public class LogStateActivity extends ChaActivity {
                 id = R.id.action_saturday;
                 break;
         }
-        if (id > 0)
-            menu.findItem(id).setChecked(true);
+        menu.findItem(id).setChecked(true);
         return true;
     }
 
@@ -243,17 +242,57 @@ public class LogStateActivity extends ChaActivity {
         }
 
         if (wd >= 0) {
-            switch (scope) {
-                case BoilerPump:
-                    publish("cha/hub/getlog", "brelay_".concat(String.valueOf(wd)), false);
-                    break;
-                case LightRelay:
-                    publish("cha/hub/getlog", "light_".concat(String.valueOf(wd)), false);
-                    break;
-            }
+            RequestLog(wd);
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    public static void FillRelayLog(int relayId, String log, ArrayList<LogOneValueItem> logBuffer) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd", Locale.US);
+        String date0 = sdf.format(new Date());
+        sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+
+        logBuffer.clear();
+
+        int id;
+        Date XX;
+        int state;
+
+
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == 8) {
+                try {
+                    XX = sdf.parse(date0 + logEntry.substring(0, 6));
+                } catch (ParseException ex) {
+                    Log.e("Log", "Invalid X", ex);
+                    continue;
+                }
+
+                try {
+                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid id", ex);
+                    continue;
+                }
+
+                if (id != relayId)
+                    continue;
+
+                try {
+                    state = Integer.parseInt(logEntry.substring(7, 8), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid Y", ex);
+                    continue;
+                }
+
+                logBuffer.add(new LogOneValueItem(XX, state));
+            }
+        }
+    }
+
 }

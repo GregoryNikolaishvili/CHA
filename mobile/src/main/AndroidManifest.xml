@@ -51,10 +51,9 @@
         <activity android:name=".LogActivity2" />
         <activity android:name=".LogActivityTH2" />
 
-        <activity android:name=".LogTHActivity" />
-        <activity android:name=".Log5in1Activity" />
         <activity android:name=".LogStateActivity" />
         <activity android:name=".WhoIsOnlineActivity" />
+        <activity android:name=".thermostat.BoilerChartActivity2" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 

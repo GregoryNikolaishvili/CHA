@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,12 +24,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
-import org.achartengine.ChartFactory;
-import org.achartengine.GraphicalView;
-import org.achartengine.model.XYMultipleSeriesDataset;
-import org.achartengine.model.XYSeries;
-import org.achartengine.renderer.XYMultipleSeriesRenderer;
-
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,17 +33,21 @@ import java.util.List;
 import java.util.Locale;
 
 import ge.altasoft.gia.cha.classes.LogTHItem;
-import ge.altasoft.gia.cha.classes.LogTwoValueItem;
 import ge.altasoft.gia.cha.classes.WidgetType;
-import ge.altasoft.gia.cha.thermostat.BoilerSensorData;
-import ge.altasoft.gia.cha.thermostat.RoomSensorData;
-import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
-import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class LogActivityTH2 extends ChaActivity {
 
-    final private SimpleDateFormat sdf = new SimpleDateFormat("dd MMM HH:mm:ss", Locale.US);
+    final private SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm:ss", Locale.US);
     final private SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm", Locale.US);
+    final private SimpleDateFormat sdfX = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+    final private SimpleDateFormat sdf0 = new SimpleDateFormat("yyMMdd", Locale.US);
+
+    private Date startTime;
+
+    private int endWeekDay;
+    private int startWeekDay;
+    private String startDate0;
+    private String endDate0;
 
     private WidgetType scope;
     private int sensorId;
@@ -56,7 +55,7 @@ public class LogActivityTH2 extends ChaActivity {
     private THLogAdapter adapter = null;
     private ArrayList<LogTHItem> logBuffer;
 
-    LineChart chart;
+    private LineChart chart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +92,8 @@ public class LogActivityTH2 extends ChaActivity {
         y.setAxisLineColor(Color.WHITE);
 
         chart.getAxisRight().setEnabled(false);
+
+        SetStartAndDates(-1, false);
     }
 
     private void RequestLog(int wd) {
@@ -110,32 +111,38 @@ public class LogActivityTH2 extends ChaActivity {
     protected void ServiceConnected() {
         super.ServiceConnected();
 
-        RequestLog(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1);
+        logBuffer.clear();
+
+        RequestLog(startWeekDay);
+        RequestLog(endWeekDay);
     }
 
     @Override
     public void processMqttData(MqttClientLocal.MQTTReceivedDataType dataType, Intent intent) {
         super.processMqttData(dataType, intent);
 
-        int id;
-        float v;
-
         if (dataType == MqttClientLocal.MQTTReceivedDataType.Log) {
             switch (scope) {
                 case BoilerSensor:
-                    if (intent.getStringExtra("type").startsWith("boiler")) {
+                    String type = intent.getStringExtra("type");
+                    if (type.startsWith("boiler_")) {
                         String log = intent.getStringExtra("log");
-                        ThermostatUtils.FillTHSensorLog(sensorId, scope, log, logBuffer);
-                        adapter.notifyDataSetChanged();
-                        DrawChart(logBuffer, chart);
+                        int wd = Integer.parseInt(type.substring(7));
+                        if (FillTHSensorLog(wd, sensorId, scope, log, logBuffer)) {
+                            adapter.notifyDataSetChanged();
+                            DrawChart(logBuffer, chart);
+                        }
                     }
                     break;
                 case RoomSensor:
-                    if (intent.getStringExtra("type").startsWith("room")) {
+                    type = intent.getStringExtra("type");
+                    if (type.startsWith("room_")) {
+                        int wd = Integer.parseInt(type.substring(5));
                         String log = intent.getStringExtra("log");
-                        ThermostatUtils.FillTHSensorLog(sensorId, scope, log, logBuffer);
-                        adapter.notifyDataSetChanged();
-                        DrawChart(logBuffer, chart);
+                        if (FillTHSensorLog(wd, sensorId, scope, log, logBuffer)) {
+                            adapter.notifyDataSetChanged();
+                            DrawChart(logBuffer, chart);
+                        }
                     }
                     break;
             }
@@ -179,33 +186,7 @@ public class LogActivityTH2 extends ChaActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_graph, menu);
-
-        int id = 0;
-        int logSuffix = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
-        switch (logSuffix) {
-            case 0:
-                id = R.id.action_sunday;
-                break;
-            case 1:
-                id = R.id.action_monday;
-                break;
-            case 2:
-                id = R.id.action_tuesday;
-                break;
-            case 3:
-                id = R.id.action_wednesday;
-                break;
-            case 4:
-                id = R.id.action_thursday;
-                break;
-            case 5:
-                id = R.id.action_friday;
-                break;
-            case 6:
-                id = R.id.action_saturday;
-                break;
-        }
-        menu.findItem(id).setChecked(true);
+        menu.findItem(R.id.action_24h).setChecked(true);
         return true;
     }
 
@@ -216,6 +197,9 @@ public class LogActivityTH2 extends ChaActivity {
 
         int wd = -1;
         switch (id) {
+            case R.id.action_24h:
+                wd = -1;
+                break;
             case R.id.action_sunday:
                 wd = 0;
                 break;
@@ -239,33 +223,55 @@ public class LogActivityTH2 extends ChaActivity {
                 break;
         }
 
-        if (wd >= 0) {
-            RequestLog(wd);
-            return true;
+        logBuffer.clear();
+        chart.getData().clearValues();
+        chart.clear();
+
+        SetStartAndDates(wd, true);
+        return true;
+    }
+
+    private void SetStartAndDates(int wd, boolean requestLogs) {
+
+        Calendar calendar = Calendar.getInstance();
+
+        endWeekDay = wd < 0 ? calendar.get(Calendar.DAY_OF_WEEK) - 1 : wd;
+        endDate0 = sdf0.format(calendar.getTime());
+
+        if (wd < 0) {
+            calendar.add(Calendar.DATE, -1);
+
+            startTime = calendar.getTime();
+            startWeekDay = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+            startDate0 = sdf0.format(startTime);
+        } else {
+            calendar.set(Calendar.DAY_OF_WEEK, wd + 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+
+            startTime = calendar.getTime();
+            startWeekDay = wd;
+            startDate0 = endDate0;
         }
 
-        return super.onOptionsItemSelected(item);
+        if (requestLogs) {
+            RequestLog(startWeekDay);
+            if (wd < 0)
+                RequestLog(endWeekDay);
+        }
     }
 
     private static void DrawChart(ArrayList<LogTHItem> logBuffer, LineChart chart) {
 
         List<Entry> entries = new ArrayList<>();
 
-        Float lastValue = null;
         for (LogTHItem item : logBuffer) {
             entries.add(new Entry(item.date.getTime(), item.T));
-            lastValue = item.T;
         }
 
-        // add current value (last one)
-        if (lastValue != null)
-            entries.add(new Entry(new Date().getTime(), lastValue));
-
         LineDataSet dataSet = new LineDataSet(entries, "");
-        dataSet.setDrawValues(true);
-
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setCubicIntensity(0.1f);
+        dataSet.setDrawCircles(false);
 
         LineData lineData = new LineData(dataSet);
         chart.setData(lineData);
@@ -276,15 +282,73 @@ public class LogActivityTH2 extends ChaActivity {
         @Override
         public String getAxisLabel(float value, AxisBase axis) {
 
-            try{
-                return sdf2.format(new Date((long)value));
-            }
-            catch (Exception e)
-            {
-                return  "?";
+            try {
+                return sdf2.format(new Date((long) value));
+            } catch (Exception e) {
+                return "?";
             }
 
         }
+    }
+
+    private boolean FillTHSensorLog(int wd, int sensorId, WidgetType scope, String log, ArrayList<LogTHItem> logBuffer) {
+
+        String date0;
+        if (wd == startWeekDay)
+            date0 = startDate0;
+        else {
+            date0 = endDate0;
+        }
+
+        int logEntryLen = scope == WidgetType.BoilerSensor ? 11 : 18;
+
+        int id;
+        Date XX;
+        double T, H = 0f;
+
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == logEntryLen) {
+                try {
+                    XX = sdfX.parse(date0 + logEntry.substring(0, 6));
+                } catch (ParseException ex) {
+                    Log.e("Log", "Invalid X", ex);
+                    continue;
+                }
+
+                if (XX.compareTo(startTime) < 0)
+                    continue;
+
+                try {
+                    if (scope == WidgetType.BoilerSensor)
+                        id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                    else
+                        id = Integer.parseInt(logEntry.substring(6, 10), 16);
+
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid id", ex);
+                    continue;
+                }
+
+                if (id != sensorId)
+                    continue;
+
+                try {
+                    if (scope == WidgetType.BoilerSensor) {
+                        T = Utils.decodeT(logEntry.substring(7, 11));
+                    } else {
+                        T = Utils.decodeT(logEntry.substring(10, 14));
+                        H = Integer.parseInt(logEntry.substring(14, 18), 16);
+                    }
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid Y", ex);
+                    continue;
+                }
+
+                logBuffer.add(new LogTHItem(XX, (float) T, (float) H));
+            }
+        }
+        return wd == endWeekDay;
     }
 
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,12 +34,20 @@ import java.util.Locale;
 
 import ge.altasoft.gia.cha.classes.LogTwoValueItem;
 import ge.altasoft.gia.cha.classes.WidgetType;
-import ge.altasoft.gia.cha.thermostat.ThermostatUtils;
 
 public class LogActivity2 extends ChaActivity {
 
-    final private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);
+    final private SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm:ss", Locale.US);
     final private SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm", Locale.US);
+    final private SimpleDateFormat sdfX = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+    final private SimpleDateFormat sdf0 = new SimpleDateFormat("yyMMdd", Locale.US);
+
+    private Date startTime;
+
+    private int endWeekDay;
+    private int startWeekDay;
+    private String startDate0;
+    private String endDate0;
 
     private WidgetType scope;
     private int widgetId;
@@ -45,7 +55,7 @@ public class LogActivity2 extends ChaActivity {
     private _5in1LogAdapter adapter = null;
     private ArrayList<LogTwoValueItem> logBuffer;
 
-    LineChart chart;
+    private LineChart chart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +93,11 @@ public class LogActivity2 extends ChaActivity {
         y.setAxisLineColor(Color.WHITE);
 
         chart.getAxisRight().setEnabled(false);
+
+        SetStartAndDates(-1, false);
     }
 
-    private void RequestLog(int wd)
-    {
+    private void RequestLog(int wd) {
         switch (scope) {
             case WindSensor:
             case WindDirSensor:
@@ -94,8 +105,8 @@ public class LogActivity2 extends ChaActivity {
             case RainSensor:
                 publish("cha/hub/getlog", "rain_".concat(String.valueOf(wd)), false);
             case PressureSensor:
-                publish("cha/hub/getlog", "pressure_".concat(String.valueOf(wd)), false);
-               break;
+                publish("cha/hub/getlog", "pres_".concat(String.valueOf(wd)), false);
+                break;
             case WaterLevelSensor:
                 publish("cha/hub/getlog", "tank_".concat(String.valueOf(wd)), false);
                 break;
@@ -106,7 +117,10 @@ public class LogActivity2 extends ChaActivity {
     protected void ServiceConnected() {
         super.ServiceConnected();
 
-        RequestLog(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1);
+        logBuffer.clear();
+
+        RequestLog(startWeekDay);
+        RequestLog(endWeekDay);
     }
 
     @Override
@@ -117,36 +131,48 @@ public class LogActivity2 extends ChaActivity {
             switch (scope) {
                 case WindSensor:
                 case WindDirSensor:
+                    String type = intent.getStringExtra("type");
                     if (intent.getStringExtra("type").startsWith("wind_")) {
                         String log = intent.getStringExtra("log");
-                        ThermostatUtils.Fill5in1SensorLog(scope, log, logBuffer);
-                        adapter.notifyDataSetChanged();
-                        DrawChart(logBuffer, chart);
+                        int wd = Integer.parseInt(type.substring(5));
+                        if (Fill5in1SensorLog(wd, scope, log, logBuffer)) {
+                            adapter.notifyDataSetChanged();
+                            DrawChart(logBuffer, chart);
+                        }
                     }
                     break;
                 case RainSensor:
+                    type = intent.getStringExtra("type");
                     if (intent.getStringExtra("type").startsWith("rain_")) {
                         String log = intent.getStringExtra("log");
-                        ThermostatUtils.Fill5in1SensorLog(scope, log, logBuffer);
-                        adapter.notifyDataSetChanged();
-                        DrawChart(logBuffer, chart);
+                        int wd = Integer.parseInt(type.substring(5));
+                        if (Fill5in1SensorLog(wd, scope, log, logBuffer)) {
+                            adapter.notifyDataSetChanged();
+                            DrawChart(logBuffer, chart);
+                        }
                     }
                     break;
                 case PressureSensor:
-                    if (intent.getStringExtra("type").startsWith("pressure_")) {
+                    type = intent.getStringExtra("type");
+                    if (intent.getStringExtra("type").startsWith("pres_")) {
                         String log = intent.getStringExtra("log");
-                        ThermostatUtils.Fill5in1SensorLog(scope, log, logBuffer);
-                        adapter.notifyDataSetChanged();
-                        DrawChart(logBuffer, chart);
+                        int wd = Integer.parseInt(type.substring(5));
+                        if (Fill5in1SensorLog(wd, scope, log, logBuffer)) {
+                            adapter.notifyDataSetChanged();
+                            DrawChart(logBuffer, chart);
+                        }
                     }
                     break;
 
                 case WaterLevelSensor:
-                    if (intent.getStringExtra("type").startsWith("tank")) {
+                    type = intent.getStringExtra("type");
+                    if (intent.getStringExtra("type").startsWith("tank_")) {
                         String log = intent.getStringExtra("log");
-                        ThermostatUtils.FillWaterLevelLog(widgetId, scope, log, logBuffer);
-                        adapter.notifyDataSetChanged();
-                        DrawChart(logBuffer, chart);
+                        int wd = Integer.parseInt(type.substring(5));
+                        if (FillWaterLevelLog(wd, widgetId, scope, log, logBuffer)) {
+                            adapter.notifyDataSetChanged();
+                            DrawChart(logBuffer, chart);
+                        }
                     }
                     break;
             }
@@ -167,7 +193,6 @@ public class LogActivity2 extends ChaActivity {
         @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
-
             // Check if an existing view is being reused, otherwise inflate the view
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_item_key_value, parent, false);
@@ -186,37 +211,10 @@ public class LogActivity2 extends ChaActivity {
         }
     }
 
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_graph, menu);
-
-        int id = 0;
-        int logSuffix = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
-        switch (logSuffix) {
-            case 0:
-                id = R.id.action_sunday;
-                break;
-            case 1:
-                id = R.id.action_monday;
-                break;
-            case 2:
-                id = R.id.action_tuesday;
-                break;
-            case 3:
-                id = R.id.action_wednesday;
-                break;
-            case 4:
-                id = R.id.action_thursday;
-                break;
-            case 5:
-                id = R.id.action_friday;
-                break;
-            case 6:
-                id = R.id.action_saturday;
-                break;
-        }
-        menu.findItem(id).setChecked(true);
+        menu.findItem(R.id.action_24h).setChecked(true);
         return true;
     }
 
@@ -227,6 +225,9 @@ public class LogActivity2 extends ChaActivity {
 
         int wd = -1;
         switch (id) {
+            case R.id.action_24h:
+                wd = -1;
+                break;
             case R.id.action_sunday:
                 wd = 0;
                 break;
@@ -250,12 +251,43 @@ public class LogActivity2 extends ChaActivity {
                 break;
         }
 
-        if (wd >= 0) {
-            RequestLog(wd);
-            return true;
+        logBuffer.clear();
+        chart.getData().clearValues();
+        chart.clear();
+
+        SetStartAndDates(wd, true);
+        return true;
+    }
+
+    private void SetStartAndDates(int wd, boolean requestLogs) {
+
+        Calendar calendar = Calendar.getInstance();
+
+        endWeekDay = wd < 0 ? calendar.get(Calendar.DAY_OF_WEEK) - 1 : wd;
+        endDate0 = sdf0.format(calendar.getTime());
+
+        if (wd < 0) {
+            calendar.add(Calendar.DATE, -1);
+
+            startTime = calendar.getTime();
+            startWeekDay = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+            startDate0 = sdf0.format(startTime);
+        } else {
+            calendar.set(Calendar.DAY_OF_WEEK, wd + 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+
+            startTime = calendar.getTime();
+            startWeekDay = wd;
+            startDate0 = endDate0;
         }
 
-        return super.onOptionsItemSelected(item);
+        if (requestLogs) {
+            RequestLog(startWeekDay);
+            if (wd < 0)
+                RequestLog(endWeekDay);
+        }
     }
 
     private static void DrawChart(ArrayList<LogTwoValueItem> logBuffer, LineChart chart) {
@@ -273,10 +305,7 @@ public class LogActivity2 extends ChaActivity {
             entries.add(new Entry(new Date().getTime(), lastValue));
 
         LineDataSet dataSet = new LineDataSet(entries, "");
-        dataSet.setDrawValues(true);
-
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setCubicIntensity(0.1f);
+        dataSet.setDrawCircles(false);
 
         LineData lineData = new LineData(dataSet);
         chart.setData(lineData);
@@ -287,14 +316,133 @@ public class LogActivity2 extends ChaActivity {
         @Override
         public String getAxisLabel(float value, AxisBase axis) {
 
-            try{
-                return sdf2.format(new Date((long)value));
-            }
-            catch (Exception e)
-            {
-                return  "?";
+            try {
+                return sdf2.format(new Date((long) value));
+            } catch (Exception e) {
+                return "?";
             }
 
         }
+    }
+
+    public boolean Fill5in1SensorLog(int wd, WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
+
+        String date0;
+        if (wd == startWeekDay)
+            date0 = startDate0;
+        else {
+            date0 = endDate0;
+        }
+
+        int logEntryLen = 19;
+
+        Date XX;
+        int value1 = 0;
+        String value2 = "";
+
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == logEntryLen) {
+                try {
+                    XX = sdfX.parse(date0 + logEntry.substring(0, 6));
+                } catch (ParseException ex) {
+                    Log.e("Log", "Invalid X", ex);
+                    continue;
+                }
+
+                if (XX.compareTo(startTime) < 0)
+                    continue;
+
+                try {
+                    switch (scope) {
+                        case WindSensor:
+                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
+                            value2 = String.format(Locale.US, "%d °", Integer.parseInt(logEntry.substring(15, 19), 16));
+                            break;
+                        case WindDirSensor:
+                            value1 = Integer.parseInt(logEntry.substring(15, 19), 16);
+                            value2 = String.format(Locale.US, "%d km/h", Integer.parseInt(logEntry.substring(11, 15), 16));
+                            break;
+                        case RainSensor:
+                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
+                            value2 = String.format(Locale.US, "%d mm", Integer.parseInt(logEntry.substring(15, 19), 16));
+                            break;
+                        case PressureSensor:
+                            value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
+                            break;
+                    }
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid Y", ex);
+                    continue;
+                }
+
+                logBuffer.add(new LogTwoValueItem(XX, value1, value2));
+            }
+        }
+
+        return wd == endWeekDay;
+    }
+
+
+    public boolean FillWaterLevelLog(int wd, int sensorId, WidgetType scope, String log, ArrayList<LogTwoValueItem> logBuffer) {
+
+        boolean result = false;
+
+        String date0;
+        if (wd == startWeekDay)
+            date0 = startDate0;
+        else {
+            result = true;
+            date0 = endDate0;
+        }
+
+        int logEntryLen = 21;
+
+        Date XX;
+        int id;
+        int value1 = 0;
+        String value2 = "";
+
+        String[] logEntries = log.split(":");
+        for (String logEntry : logEntries) {
+            if (logEntry.length() == logEntryLen) {
+                try {
+                    XX = sdfX.parse(date0 + logEntry.substring(0, 6));
+                } catch (ParseException ex) {
+                    Log.e("Log", "Invalid X", ex);
+                    continue;
+                }
+
+                try {
+                    id = Integer.parseInt(logEntry.substring(6, 7), 16);
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid id", ex);
+                    continue;
+                }
+
+                if (id != sensorId)
+                    continue;
+                if (XX.compareTo(startTime) < 0)
+                    continue;
+
+                try {
+                    if (scope == WidgetType.WaterLevelSensor) {
+                        value1 = Integer.parseInt(logEntry.substring(11, 15), 16);
+                        value2 = String.format(Locale.US, "%d cm %s %s %s",
+                                Integer.parseInt(logEntry.substring(7, 11), 16), // distance
+                                logEntry.charAt(15) == '0' ? "" : "F", // float switch is full
+                                Utils.GetBallValveStateText(Integer.parseInt(logEntry.substring(16, 20), 16)), //  ball valve state
+                                logEntry.charAt(20));
+                    }
+                } catch (NumberFormatException ex) {
+                    Log.e("Log", "Invalid Y", ex);
+                    continue;
+                }
+
+                logBuffer.add(new LogTwoValueItem(XX, value1, value2));
+            }
+        }
+
+        return result;
     }
 }

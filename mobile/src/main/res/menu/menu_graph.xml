@@ -5,6 +5,11 @@
     <group android:checkableBehavior="single">
 
         <item
+            android:id="@+id/action_24h"
+
+            android:title="Last 24 hour" />
+
+        <item
             android:id="@+id/action_monday"
 
             android:title="Monday" />

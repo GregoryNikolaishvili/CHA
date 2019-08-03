@@ -223,7 +223,7 @@ public class FragmentBoiler extends ChaFragment {
 
         mChartView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
-                Intent intent = new Intent(getActivity(), BoilerChartActivity.class);
+                Intent intent = new Intent(getActivity(), BoilerChartActivity2.class);
                 startActivity(intent);
             }
         });
