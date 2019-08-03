@@ -508,9 +508,10 @@ public class MainActivity extends ChaActivity {
                 break;
 
             case WaterLevelSettings:
-                // nothing to do
+            case WaterLevelNameAndOrders:
+                pagerAdapter.fragmentOtherSensors.rebuildUI(false);
+                pagerAdapter.fragmentDashboard.rebuildUI(false);
                 break;
-
         }
     }
 

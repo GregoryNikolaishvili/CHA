@@ -30,7 +30,7 @@ import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class LogStateActivity extends ChaActivity {
 
-    final private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.US);
+    final private SimpleDateFormat sdf = new SimpleDateFormat("EEE HH:mm:ss", Locale.US);
     private WidgetType scope;
     private int relayId;
 

@@ -68,6 +68,7 @@ public class MqttClientLocal {
     private static final String TOPIC_CHA_WATER_LEVEL_RELAY_STATE = "cha/wl/rs/"; // last "/" is important
 
     private static final String TOPIC_CHA_WATER_LEVEL_SETTINGS = "cha/wl/settings";
+    private static final String TOPIC_CHA_WATER_LEVEL_NAMES_AND_ORDER = "cha/wl/names";
 
     static final String MQTT_DATA_TYPE = "ge.altasoft.gia.cha.DATA_TYPE";
 
@@ -100,6 +101,7 @@ public class MqttClientLocal {
         WaterLevelControllerState,
         WaterLevelState,
         WaterLevelSettings,
+        WaterLevelNameAndOrders,
         WaterLevelRelayState
     }
 
@@ -480,7 +482,15 @@ public class MqttClientLocal {
                         broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelSettings);
                         context.sendBroadcast(broadcastDataIntent);
                         return;
+
+                    case TOPIC_CHA_WATER_LEVEL_NAMES_AND_ORDER:
+                        OtherControllerData.Instance.decodeNamesAndOrder(payload);
+
+                        broadcastDataIntent.putExtra(MQTT_DATA_TYPE, MQTTReceivedDataType.WaterLevelNameAndOrders);
+                        context.sendBroadcast(broadcastDataIntent);
+                        return;
                     //endregion
+
                 }
 
                 if (topic.startsWith(TOPIC_CHA_LIGHT_RELAY_STATE)) {

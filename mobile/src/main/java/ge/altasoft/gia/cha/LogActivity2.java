@@ -37,7 +37,7 @@ import ge.altasoft.gia.cha.classes.WidgetType;
 
 public class LogActivity2 extends ChaActivity {
 
-    final private SimpleDateFormat sdf = new SimpleDateFormat("dd HH:mm:ss", Locale.US);
+    final private SimpleDateFormat sdf = new SimpleDateFormat("EEE HH:mm:ss", Locale.US);
     final private SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm", Locale.US);
     final private SimpleDateFormat sdfX = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
     final private SimpleDateFormat sdf0 = new SimpleDateFormat("yyMMdd", Locale.US);

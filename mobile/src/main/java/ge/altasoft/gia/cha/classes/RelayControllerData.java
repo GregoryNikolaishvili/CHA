@@ -128,7 +128,7 @@ public abstract class RelayControllerData {
 
         String[] arr = response.split(";");
         if (arr.length != relayDatas.length) {
-            Log.e("LightControllerData", "Invalid number of relays returned");
+            Log.e("RelayControllerData", "Invalid number of relays returned");
             return;
         }
 
