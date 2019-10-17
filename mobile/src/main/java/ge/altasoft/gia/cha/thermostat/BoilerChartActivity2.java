@@ -45,11 +45,13 @@ public class BoilerChartActivity2 extends ChaActivity {
 
     private LineChart chart;
 
-    private final ArrayList<LogOneTValueItem>[] chartValues = new ArrayList[3];
+    //private final ArrayList<LogOneTValueItem>[] chartValues = new ArrayList<LogOneTValueItem>[3];
+    private final ArrayList<ArrayList<LogOneTValueItem>> chartValues = new ArrayList<ArrayList<LogOneTValueItem>>(3);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_graph2);
 
         chart = (LineChart) findViewById(R.id.chart);
@@ -87,7 +89,7 @@ public class BoilerChartActivity2 extends ChaActivity {
 
         //
         for (int i = 0; i < 3; i++) {
-            chartValues[i] = new ArrayList<>();
+            chartValues.add(new ArrayList<LogOneTValueItem>());
         }
     }
 
@@ -203,7 +205,7 @@ public class BoilerChartActivity2 extends ChaActivity {
         }
     }
 
-     private boolean FillBoilerSensorChart(int wd, String log, ArrayList<LogOneTValueItem>[] values) {
+     private boolean FillBoilerSensorChart(int wd, String log, ArrayList<ArrayList<LogOneTValueItem>> values) {
 
         String date0;
         if (wd == startWeekDay)
@@ -251,19 +253,19 @@ public class BoilerChartActivity2 extends ChaActivity {
                 if (T == Utils.F_UNDEFINED)
                     continue;
 
-                values[id].add(new LogOneTValueItem(XX, T));
+                values.get(id).add(new LogOneTValueItem(XX, T));
             }
         }
 
         return wd == endWeekDay;
     }
 
-    private static void DrawChart(ArrayList<LogOneTValueItem>[] values, LineChart chart) {
+    private static void DrawChart(ArrayList<ArrayList<LogOneTValueItem>> values, LineChart chart) {
 
         LineData chartData = new LineData();
 
-        for (int i = 0; i < values.length; i++) {
-            ArrayList<LogOneTValueItem> temps = values[i];
+        for (int i = 0; i < values.size(); i++) {
+            ArrayList<LogOneTValueItem> temps = values.get(i);
 
             List<Entry> entries = new ArrayList<>();
 

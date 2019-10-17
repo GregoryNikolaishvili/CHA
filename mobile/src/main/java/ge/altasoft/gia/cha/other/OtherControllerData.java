@@ -115,6 +115,8 @@ public final class OtherControllerData extends RelayControllerData {
         idx = waterLevelDatas[0].decodeSettings(payload, idx);
         idx = waterLevelDatas[1].decodeSettings(payload, idx);
         waterLevelDatas[2].decodeSettings(payload, idx);
+
+        setHaveSettings();
     }
 
     public String encodeWaterLevelSettings() {

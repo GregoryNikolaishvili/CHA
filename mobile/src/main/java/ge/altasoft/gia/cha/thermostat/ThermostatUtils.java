@@ -129,6 +129,9 @@ public final class ThermostatUtils {
                     continue;
                 }
 
+                if (id < 0 || id > 2) // skip room temperature
+                    continue;
+
                 try {
                     T = Utils.decodeT(logEntry.substring(7, 11));
                 } catch (NumberFormatException ex) {

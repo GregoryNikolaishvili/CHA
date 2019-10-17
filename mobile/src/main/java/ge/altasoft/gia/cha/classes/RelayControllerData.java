@@ -54,7 +54,7 @@ public abstract class RelayControllerData {
         this.isActive = value;
     }
 
-    private void setHaveSettings() {
+    protected void setHaveSettings() {
         this.haveSettings = true;
     }
 

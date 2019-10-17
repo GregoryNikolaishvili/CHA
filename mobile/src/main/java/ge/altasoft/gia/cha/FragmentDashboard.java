@@ -21,6 +21,7 @@ import ge.altasoft.gia.cha.classes.ItemViewHolder;
 import ge.altasoft.gia.cha.classes.OnStartDragListener;
 import ge.altasoft.gia.cha.classes.WidgetType;
 import ge.altasoft.gia.cha.light.LightControllerData;
+import ge.altasoft.gia.cha.other.OtherControllerData;
 import ge.altasoft.gia.cha.thermostat.ThermostatControllerData;
 
 public class FragmentDashboard extends ChaFragment implements OnStartDragListener {
@@ -61,6 +62,8 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
         if ((LightControllerData.Instance == null) || !LightControllerData.Instance.haveSettings())
             return;
         if ((ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveBoilerSettings())
+            return;
+        if ((OtherControllerData.Instance == null) || !OtherControllerData.Instance.haveSettings())
             return;
 
         hideWaitingScreen();

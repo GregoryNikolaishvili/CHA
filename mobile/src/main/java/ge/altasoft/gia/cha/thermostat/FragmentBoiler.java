@@ -208,15 +208,15 @@ public class FragmentBoiler extends ChaFragment {
         XYSeries series1 = new XYSeries("T1");
         XYSeries series2 = new XYSeries("T2");
         XYSeries series3 = new XYSeries("T3");
-        XYSeries series4 = new XYSeries("T4");
+        //XYSeries series4 = new XYSeries("T4");
 
-        mRenderer = ThermostatUtils.getSensorChartRenderer(this.getContext(), true, 4, new int[]{Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA});
+        mRenderer = ThermostatUtils.getSensorChartRenderer(this.getContext(), true, 3, new int[]{Color.RED, Color.BLUE, Color.CYAN});
         mRenderer.setPanEnabled(false, false);
 
         xyDataSet.addSeries(series1);
         xyDataSet.addSeries(series2);
         xyDataSet.addSeries(series3);
-        xyDataSet.addSeries(series4);
+        //xyDataSet.addSeries(series4);
 
         mChartView = ChartFactory.getCubeLineChartView(getActivity(), xyDataSet, mRenderer, 0.1f);
         chartLayout.addView(mChartView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -303,9 +303,9 @@ public class FragmentBoiler extends ChaFragment {
             case ThermostatControllerData.BOILER_SENSOR_TOP:
                 resId = R.id.boilerSensorTankTop;
                 break;
-            case ThermostatControllerData.BOILER_SENSOR_FURNACE:
-                resId = R.id.boilerSensorFurnace;
-                break;
+//            case ThermostatControllerData.BOILER_SENSOR_FURNACE:
+//                resId = R.id.boilerSensorFurnace;
+//                break;
             default:
                 resId = 0;
         }

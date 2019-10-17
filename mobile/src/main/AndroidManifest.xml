@@ -46,8 +46,6 @@
             android:name=".other.WaterLevelSettingsActivity"
             android:label="@string/title_activity_settings" />
 
-        <activity android:name=".thermostat.BoilerChartActivity" />
-
         <activity android:name=".LogActivity2" />
         <activity android:name=".LogActivityTH2" />
 
