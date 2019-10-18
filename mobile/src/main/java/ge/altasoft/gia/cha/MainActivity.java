@@ -70,6 +70,10 @@ public class MainActivity extends ChaActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setOffscreenPageLimit(8);
         viewPager.setAdapter(pagerAdapter);
+
+        if (savedInstanceState == null) {
+            viewPager.setCurrentItem(1);
+        }
     }
 
     @Override
@@ -580,9 +584,9 @@ public class MainActivity extends ChaActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return fragmentDashboard;
-                case 1:
                     return fragmentBoiler;
+                case 1:
+                    return fragmentDashboard;
                 case 2:
                     return fragmentLight;
                 case 3:
@@ -602,9 +606,9 @@ public class MainActivity extends ChaActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Dashboard";
-                case 1:
                     return "Boiler";
+                case 1:
+                    return "Dashboard";
                 case 2:
                     return "Lights";
                 case 3:
