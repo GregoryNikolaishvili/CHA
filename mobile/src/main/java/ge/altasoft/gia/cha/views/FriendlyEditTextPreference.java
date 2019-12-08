@@ -9,17 +9,23 @@ import java.util.Locale;
 
 public class FriendlyEditTextPreference extends EditTextPreference {
 
-    FriendlyEditTextPreference(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
-
-    FriendlyEditTextPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
     public FriendlyEditTextPreference(Context context) {
         super(context);
     }
+
+    public FriendlyEditTextPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public FriendlyEditTextPreference(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+
+    public FriendlyEditTextPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+    }
+
 
     // According to ListPreference implementation
     @Override
