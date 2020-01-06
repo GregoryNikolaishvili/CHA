@@ -11,5 +11,11 @@
         android:key="mtqq_url_global"
         android:summary="%s"
         android:title="MTQQ Broker global Url" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="keepScreenOn"
+        android:summary="Keep screen on or off"
+        android:title="Keep screen on" />
 </PreferenceScreen>
 

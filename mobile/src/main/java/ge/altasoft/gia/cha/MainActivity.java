@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -54,12 +55,20 @@ public class MainActivity extends ChaActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Utils.isTablet(this))
+        boolean isTablet = Utils.isTablet(this);
+        if (isTablet)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         else
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         setContentView(R.layout.activity_main);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+        boolean keepScreenOn = prefs.getBoolean("keepScreenOn", true);
+
+        if (keepScreenOn)
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //getSupportActionBar().setTitle("Country House Automation");
@@ -72,7 +81,10 @@ public class MainActivity extends ChaActivity {
         viewPager.setAdapter(pagerAdapter);
 
         if (savedInstanceState == null) {
-            viewPager.setCurrentItem(1);
+            if (isTablet)
+                viewPager.setCurrentItem(0);
+            else
+                viewPager.setCurrentItem(1);
         }
     }
 
@@ -588,11 +600,11 @@ public class MainActivity extends ChaActivity {
                 case 1:
                     return fragmentDashboard;
                 case 2:
-                    return fragmentLight;
+                    return fragmentOtherSensors;
                 case 3:
                     return fragmentRoomSensors;
                 case 4:
-                    return fragmentOtherSensors;
+                    return fragmentLight;
             }
             return null;
         }
@@ -610,11 +622,11 @@ public class MainActivity extends ChaActivity {
                 case 1:
                     return "Dashboard";
                 case 2:
-                    return "Lights";
+                    return "Other sensors";
                 case 3:
                     return "Room sensors";
                 case 4:
-                    return "Other sensors";
+                    return "Lights";
             }
             return null;
         }
