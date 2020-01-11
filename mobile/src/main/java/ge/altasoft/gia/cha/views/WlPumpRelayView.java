@@ -95,10 +95,6 @@ public class WlPumpRelayView extends ChaWidget {
         }
     }
 
-//    public LightRelayData getRelayData() {
-//        return this.relayData;
-//    }
-
     public void setRelayData(RelayData value) {
         this.relayData = value;
         refresh();

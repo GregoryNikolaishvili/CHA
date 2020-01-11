@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.text.format.DateUtils;
@@ -186,7 +187,7 @@ public abstract class ChaWidget extends LinearLayout {
         popupMenu.show();
     }
 
-    private void menuItemClick(MenuItem item) {
+    protected void menuItemClick(MenuItem item) {
         setTag(false);
         switch (item.getItemId()) {
             case R.id.item_pin_to_dashboard:
@@ -222,5 +223,4 @@ public abstract class ChaWidget extends LinearLayout {
             }
         }
     }
-
 }
