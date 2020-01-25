@@ -1,9 +1,14 @@
 package ge.altasoft.gia.cha.views;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -158,10 +163,66 @@ public class RoomSensorView extends ChaWidget {
             cardView.setCardBackgroundColor(Utils.getCardBackgroundColor(false, false));
     }
 
+    @Override
+    protected void menuItemClick(MenuItem item) {
+        super.menuItemClick(item);
+
+        switch (item.getItemId()) {
+            case R.id.item_set_temperature:
+                final Dialog dialog = new Dialog(this.getContext());
+                dialog.setContentView(R.layout.dialog_emperature);
+                dialog.setTitle("Set target temperature");
+
+                // set the custom dialog components - text, image and button
+                final TextView tvText = (TextView) dialog.findViewById(R.id.dlg_temperature_value);
+                tvText.setText(String.format(Locale.US, "%.1f", (float) this.sensorData.getTargetTemperature()));
+
+                Button okBtn = (Button) dialog.findViewById(R.id.dialogButtonOK);
+                ImageButton minusBtn = (ImageButton) dialog.findViewById(R.id.dialogButtonMinus);
+                ImageButton plusBtn = (ImageButton) dialog.findViewById(R.id.dialogButtonPlus);
+
+                minusBtn.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String tt = tvText.getText().toString();
+                        float t = parseTemperature(tt);
+                        t -= 0.1f;
+                        tvText.setText(String.format(Locale.US, "%.1f", t));
+                    }
+                });
+
+                plusBtn.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String tt = tvText.getText().toString();
+                        float t = parseTemperature(tt);
+                        t += 0.1f;
+                        tvText.setText(String.format(Locale.US, "%.1f", t));
+                    }
+                });
+
+                okBtn.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
+                break;
+        }
+    }
+
+    private static Float parseTemperature(String text) {
+        try {
+            return Float.parseFloat(text);
+        } catch (NumberFormatException e) {
+            return 22.0f;
+        }
+    }
 
     @Override
-    protected long getLastSyncTime()
-    {
+    protected long getLastSyncTime() {
         return this.sensorData.getLastSyncTime();
     }
 }

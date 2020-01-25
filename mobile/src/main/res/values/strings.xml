@@ -47,6 +47,7 @@
     <string name="summer_and_pool_away"><![CDATA[Summer & Pool (away)]]></string>
     <string name="open_valve">Open valve</string>
     <string name="close_valve">Close valve</string>
+    <string name="set_temperature">Set temperature</string>
 
     <string-array name="listArray">
         <item>Sunrise</item>

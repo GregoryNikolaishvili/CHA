@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-    <item
-        android:id="@+id/item_open_valve"
-        android:title="@string/open_valve"
-        android:visible="true" />
-
-    <item
-        android:id="@+id/item_close_valve"
-        android:title="@string/close_valve"
-        android:visible="true" />
-
-    <item
-        android:id="@+id/item_separator"
-        android:enabled="false"
-        android:title="-"
-        android:visible="true" />
-
     <item
         android:id="@+id/item_pin_to_dashboard"
         android:checkable="true"
@@ -32,5 +15,22 @@
         android:id="@+id/item_log_last_sync"
         android:title=""
         android:visible="true" />
+
+    <item
+        android:id="@+id/item_separator"
+        android:enabled="false"
+        android:title="-"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/item_open_valve"
+        android:title="@string/open_valve"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/item_close_valve"
+        android:title="@string/close_valve"
+        android:visible="true" />
+
 
 </menu>
