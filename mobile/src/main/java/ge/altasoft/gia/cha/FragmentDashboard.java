@@ -59,11 +59,11 @@ public class FragmentDashboard extends ChaFragment implements OnStartDragListene
     public void rebuildUI(boolean isStart) {
         if (rootView == null) return;
 
-        if ((LightControllerData.Instance == null) || !LightControllerData.Instance.haveSettings())
+        if ((LightControllerData.Instance == null))// || !LightControllerData.Instance.haveSettings())
             return;
-        if ((ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveBoilerSettings())
+        if ((ThermostatControllerData.Instance == null))// || !ThermostatControllerData.Instance.haveBoilerSettings())
             return;
-        if ((OtherControllerData.Instance == null) || !OtherControllerData.Instance.haveSettings())
+        if ((OtherControllerData.Instance == null))// || !OtherControllerData.Instance.haveSettings())
             return;
 
         hideWaitingScreen();

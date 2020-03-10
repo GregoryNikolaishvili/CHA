@@ -47,7 +47,7 @@ public class FragmentOtherSensors extends ChaFragment implements OnStartDragList
 
     @Override
     public void rebuildUI(boolean isStart) {
-        if ((rootView == null) || (OtherControllerData.Instance == null) || !OtherControllerData.Instance.haveSettings())
+        if ((rootView == null) || (OtherControllerData.Instance == null)) // || !OtherControllerData.Instance.haveSettings())
             return;
 
         hideWaitingScreen();

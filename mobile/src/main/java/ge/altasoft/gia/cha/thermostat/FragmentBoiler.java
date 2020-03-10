@@ -252,7 +252,7 @@ public class FragmentBoiler extends ChaFragment {
 
     @Override
     public void rebuildUI(boolean isStart) {
-        if ((rootView == null) || (ThermostatControllerData.Instance == null) || !ThermostatControllerData.Instance.haveBoilerSettings())
+        if ((rootView == null) || (ThermostatControllerData.Instance == null))// || !ThermostatControllerData.Instance.haveBoilerSettings())
             return;
 
         hideWaitingScreen();

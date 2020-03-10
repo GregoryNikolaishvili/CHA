@@ -80,7 +80,7 @@ public class FragmentLight extends ChaFragment implements OnStartDragListener {
 
     @Override
     public void rebuildUI(boolean isStart) {
-        if ((rootView == null) || (LightControllerData.Instance == null) || !LightControllerData.Instance.haveSettings())
+        if ((rootView == null) || (LightControllerData.Instance == null))// || !LightControllerData.Instance.haveSettings())
             return;
 
         hideWaitingScreen();
