@@ -77,13 +77,15 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
                 for (int id : sensors.keySet()) {
                     PreferenceScreen screen = prefMan.createPreferenceScreen(prefContext);
 
+                    String suffix = Integer.toString(id);
+
                     screen.setTitle(Integer.toHexString(id));
 
                     Preference p0 = new Preference(prefContext);
                     p0.setPersistent(false);
                     p0.setSelectable(false);
                     p0.setTitle("Sensor #" + Integer.toHexString(id));
-                    p0.setKey("t_sensor_deleted_" + id);
+                    p0.setKey("t_sensor_deleted_".concat(suffix));
                     screen.addPreference(p0);
 
                     FriendlyEditTextPreference p1 = new FriendlyEditTextPreference(prefContext);
@@ -105,7 +107,7 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
                     screen.addPreference(p3);
 
                     Preference p4 = new Preference(prefContext);
-                    p4.setKey(p0.getTitle().toString());
+                    p4.setKey(".t_sensor_deleted_".concat(suffix));
                     p4.setTitle("Delete");
                     p4.setSummary("Press to delete this sensor");
                     screen.addPreference(p4);
@@ -128,10 +130,11 @@ public class ThermostatSettingsActivity extends ChaPreferenceActivity {
                                                         PreferenceScreen screen = (PreferenceScreen) sensors.getPreference(i);
                                                         Preference pref0 = screen.getPreference(0);
 
-                                                        if (pref0.getTitle().toString().equals(key)) {
+                                                        String tDel = key.substring(1);
+                                                        if (pref0.getKey().equals(tDel)) {
                                                             SharedPreferences prefs = _preference.getSharedPreferences();
                                                             SharedPreferences.Editor editor = prefs.edit();
-                                                            editor.putBoolean("t_sensor_deleted_".concat(key), true);
+                                                            editor.putBoolean(tDel, true);
                                                             editor.apply();
 
                                                             pref0.setTitle(pref0.getTitle().toString().concat(" - deleted"));
