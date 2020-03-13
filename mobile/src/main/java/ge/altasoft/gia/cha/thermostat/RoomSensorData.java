@@ -107,7 +107,7 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
         name = prefs.getString("t_sensor_name_".concat(suffix), "Sensor #" + suffix);
         setTargetTemperature(Float.parseFloat(prefs.getString("t_target_t_".concat(suffix), "25")));
         responsibleRelayId = Integer.parseInt(prefs.getString("t_resp_relay_id_".concat(suffix), "0"));
-        isDeleted = prefs.getBoolean("t_sensor_deleted_Sensor #".concat(suffix), false);
+        isDeleted = prefs.getBoolean("t_sensor_deleted_".concat(suffix), false);
     }
 
     void encodeSettings(SharedPreferences.Editor editor) {
@@ -116,7 +116,7 @@ public class RoomSensorData extends TempSensorData implements Comparable<RoomSen
         editor.putString("t_sensor_name_".concat(suffix), getName());
         editor.putString("t_target_t_".concat(suffix), String.format(Locale.US, "%.1f", (float) getTargetTemperature()));
         editor.putString("t_resp_relay_id_".concat(suffix), String.valueOf(responsibleRelayId));
-        editor.putBoolean("t_sensor_deleted_Sensor #".concat(suffix), false);
+        editor.putBoolean("t_sensor_deleted_".concat(suffix), false);
     }
 
     public void decodeState(String payload) {

@@ -65,7 +65,7 @@ public class MainActivity extends ChaActivity {
         setContentView(R.layout.activity_main);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-        boolean keepScreenOn = prefs.getBoolean("keepScreenOn", true);
+        boolean keepScreenOn = prefs.getBoolean("keepScreenOn", !isTablet);
 
         if (keepScreenOn)
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
