@@ -194,7 +194,7 @@ public class Utils {
         if (wifiInfo == null)
             return mqttBrokerGlobalUrl;
 
-        if (!Utils.isGiaWifi(wifiInfo))
+        if (!Utils.isGiaCountryHouseWifi(wifiInfo))
             return mqttBrokerGlobalUrl;
 
         return mqttBrokerLocalUrl;
@@ -225,14 +225,15 @@ public class Utils {
         if (wifiInfo == null)
             return "No WiFi info";
 
-        if (!isGiaWifi(wifiInfo))
+        if (!isGiaCountryHouseWifi(wifiInfo))
             return "SSID = ".concat(wifiInfo.getSSID());
 
         return null;
     }
 
-    private static boolean isGiaWifi(WifiInfo wifiInfo) {
-        return wifiInfo.getSSID().trim().equals("\"GIA2\"");
+    private static boolean isGiaCountryHouseWifi(WifiInfo wifiInfo) {
+        String name = wifiInfo.getSSID().trim();
+        return name.equals("\"GIA2\"") || name.equals("\"GIA3\"") || name.equals("\"GIA4\"") || name.equals("\"GIA4_5G\"");
     }
 
 //    public static int random(int min, int max) {
